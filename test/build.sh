@@ -29,14 +29,20 @@ cmakeConfigure()
 }
 
 
+echo "TEST $@"
+
 TEMP=`getopt -o h,f:,s,i:,z --long single,fcompiler:,idir:,local \
              -n 'build' -- "$@"`
+if [ $? -ne 0 ]
+then
+    exitError 4440 "Wrong options $@"
+fi
 
 eval set -- "$TEMP"
 
 while true; do
     case "$1" in
-        --single|-s) single_precision="ON"; shift 2;;
+        --single|-s) single_precision="ON"; shift;;
         --fcompiler|-f ) fortran_compiler="$2"; shift 2;;
         --idir|-i) install_dir="$2"; shift 2;;
         --local) install_local="yes"; shift;;
