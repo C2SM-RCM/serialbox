@@ -8,6 +8,9 @@ SET(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/install/" CACHE PATH "installation
 project( SerTools )
 enable_language (Fortran)
 
+find_package( Boost )
+include_directories( SYSTEM ${Boost_INCLUDE_DIRS} )
+
 set(TEST_SCRIPT ${CMAKE_BINARY_DIR}/run_tests.sh)
 file(WRITE ${TEST_SCRIPT} "#!/bin/sh\n")
 file(APPEND ${TEST_SCRIPT} "res=0\n")
