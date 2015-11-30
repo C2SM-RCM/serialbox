@@ -27,4 +27,5 @@ As an example, porting scientific codes to graphical processing units, that requ
 # Building
 
 simply ```mkdir build; cd build; cmake ../; make [install]```
+
 for building the documentation ```make doc```
