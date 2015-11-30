@@ -1,5 +1,8 @@
 #pragma once
 
+//This file is released under terms of BSD license`
+//See LICENSE.txt for more information
+
 #include <string>
 #include <sstream>
 #include <map>

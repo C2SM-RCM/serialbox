@@ -1,11 +1,12 @@
+#pragma once
+//This file is released under terms of BSD license`
+//See LICENSE.txt for more information
+
 #include <cstdlib>
 #include <algorithm>
 #include <limits>
 #include <sys/stat.h>
 #include "serializer/Serializer.h"
-
-#ifndef NEW_SERIALIZER_COMPARE_SHARED
-#define NEW_SERIALIZER_COMPARE_SHARED
 
 struct Bounds {
 	int lower, upper;
@@ -186,4 +187,3 @@ void readData(const ser::Serializer& serializer, const ser::DataFieldInfo& info,
 	serializer.ReadField(fieldName, savepoint, data, iStride, jStride, kStride, lStride);
 }
 
-#endif

@@ -1,3 +1,6 @@
+#This file is released under terms of BSD license`
+#See LICENSE.txt for more information
+
 from __future__ import print_function
 import os, sys
 from os.path import join as pjoin

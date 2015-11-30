@@ -1,3 +1,6 @@
+//This file is released under terms of BSD license`
+//See LICENSE.txt for more information
+
 #include "Serializer.h"
 
 #include "CentralizedFileFormat.h"

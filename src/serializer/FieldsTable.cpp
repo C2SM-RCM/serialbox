@@ -1,3 +1,6 @@
+//This file is released under terms of BSD license`
+//See LICENSE.txt for more information
+
 #include "FieldsTable.h"
 #include "DataFieldInfo.h"
 #include "SerializationException.h"

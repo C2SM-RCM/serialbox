@@ -1,3 +1,6 @@
+//This file is released under terms of BSD license`
+//See LICENSE.txt for more information
+
 #include "gtest/gtest.h"
 #include "serializer/Savepoint.h"
 #include "wrapper/SerializationWrapper.h"

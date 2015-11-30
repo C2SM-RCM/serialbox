@@ -1,3 +1,6 @@
+//This file is released under terms of BSD license`
+//See LICENSE.txt for more information
+
 #include <iostream>
 #include "gtest/gtest.h"
 #include "serializer/MetainfoSet.h"
