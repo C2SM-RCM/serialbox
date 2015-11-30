@@ -1,1 +1,3 @@
-# SerTools
+# SerialBox
+
+![Logo](doc/logo.png)
