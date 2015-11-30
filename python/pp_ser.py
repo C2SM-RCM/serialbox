@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+#This file is released under terms of BSD license`
+#See LICENSE.txt for more information
+
 
 from __future__ import print_function
 

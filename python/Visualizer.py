@@ -1,3 +1,6 @@
+#This file is released under terms of BSD license`
+#See LICENSE.txt for more information
+
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.widgets import Slider, CheckButtons

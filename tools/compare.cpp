@@ -1,3 +1,6 @@
+//This file is released under terms of BSD license`
+//See LICENSE.txt for more information
+
 #include <unistd.h>    /* for getopt */
 #include <algorithm>   /* for max, min */
 #include <cmath>       /* for abs */

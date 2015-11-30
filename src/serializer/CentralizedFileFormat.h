@@ -1,3 +1,7 @@
+#pragma once
+//This file is released under terms of BSD license`
+//See LICENSE.txt for more information
+
 #include "libjson.h"
 #include "FileFormat.h"
 

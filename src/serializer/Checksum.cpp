@@ -1,3 +1,6 @@
+//This file is released under terms of BSD license`
+//See LICENSE.txt for more information
+
 #include "Checksum.h"
 #include "sha256.h"
 #include <iostream>
