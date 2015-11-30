@@ -21,7 +21,7 @@ install(DIRECTORY ${CMAKE_BINARY_DIR}/fortran/ DESTINATION include/fortran FILES
 
 set(CXX11_FLAGS "-std=c++11")
 
-set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 function(sertools_add_test test_name )
   #ignore the execute prefix in case it is not a valid executable prefix
@@ -49,6 +49,8 @@ endif( SINGLEPRECISION )
 
 # OSX specific configuration
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_USE_OWN_TR1_TUPLE=1")
     # CMake requires a RPATH configuration variable set on OSX with CMake >= 3.0
     # (CMake policy CMP0042) to build dynamic libraries. Setting this variable
     # to INSTALL/lib.
