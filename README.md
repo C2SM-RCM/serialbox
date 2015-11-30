@@ -1,3 +1,3 @@
 # SerialBox
 
-![Logo](doc/logo.png=250x)
+![Logo](doc/logo.png =250x)
