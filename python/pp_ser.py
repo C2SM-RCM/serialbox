@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-#This file is released under terms of BSD license`
-#See LICENSE.txt for more information
-
 
 from __future__ import print_function
 
@@ -45,16 +42,18 @@ def toASCII(text):
 class pp_ser:
 
     def __init__(self, infile, outfile='', ifdef='SERIALIZE', real='ireals',
-                 module='m_serialize', identical=True, verbose=False):
+                 module='m_serialize', identical=True, verbose=False,
+                 acc_prefix=True):
 
         # public variables
         self.verbose = verbose
-        self.infile = infile        # input file
-        self.outfile = outfile      # output file
-        self.ifdef = ifdef          # write #ifdef/#endif blocks
-        self.real = real            # name of real type (Fortran)
-        self.module = module        # name of Fortran module which contains serialization methods
-        self.identical = identical  # write identical files (no preprocessing done)?
+        self.infile = infile         # input file
+        self.outfile = outfile       # output file
+        self.ifdef = ifdef           # write #ifdef/#endif blocks
+        self.real = real             # name of real type (Fortran)
+        self.module = module         # name of Fortran module which contains serialization methods
+        self.identical = identical   # write identical files (no preprocessing done)?
+        self.acc_prefix = acc_prefix # generate preprocessing marco for ACC_PREFIX
 
         # setup (also public)
         self.methods = {
@@ -81,6 +80,7 @@ class pp_ser:
         self.language = {
             'cleanup'           : ['CLEANUP', 'CLE'],
             'data'              : ['DATA', 'DAT'],
+            'accdata'           : ['ACCDATA', 'ACC'],
             'mode'              : ['MODE', 'MOD'],
             'init'              : ['INIT', 'INI'],
             'option'            : ['OPTION', 'OPT'],
@@ -116,6 +116,10 @@ class pp_ser:
         self.__outputBuffer = '' # preprocessed file
         self.__implicitnone_found = False # has a implicit none statement been found?
         self.__implicitnone_done = False # has code been inserted at IMPLICIT NONE?
+
+        # define compute sign used in field definition. If one is matched,
+        # the read call is not added
+        self.__computed_fields_sign = ['*', '+', '-', '/', 'merge']
 
     # shortcuts for field registering
     def __reg_shortcuts(self, shortcut):
@@ -414,10 +418,10 @@ class pp_ser:
         if if_statement:
             l += 'ENDIF\n'
         self.__line = l
-            
+
 
     # DATA directive
-    def __ser_data(self, args):
+    def __ser_data(self, args, isacc = False):
 
         (dirs, keys, values, if_statement) = self.__ser_arg_parse(args)
 
@@ -425,8 +429,7 @@ class pp_ser:
         if len(dirs) != 0:
             if not(len(dirs) == 1 and 'removeintentin' in dirs):
                 self.__exit_error(directive = args[0],
-                                  msg = 'Must specify a list of key=value pairs with optional removeintentin')
-        
+                              msg = 'Must specify a list of key=value pairs with optional removeintentin')
         # generate serialization code
         self.__calls.add(self.methods['datawrite'])
         self.__calls.add(self.methods['dataread'])
@@ -442,23 +445,28 @@ class pp_ser:
                 v = re.sub(r'\(.+\)', '', v)
                 if v not in self.intentin_to_remove:
                     self.intentin_to_remove.append(v)
-     
+
         l += tab + 'SELECT CASE ( ' + self.methods['getmode'] + '() )\n'
         l += tab + '  ' + 'CASE(' + str(self.modes['write']) + ')\n'
         for k,v in zip(keys, values):
-            l += tab + '    ' + 'ACC_PREFIX UPDATE HOST ( ' + v + ' ), IF (i_am_accel_node) \n'
+            if isacc: # Genarate acc update directives only for accdata clause
+                l += tab + '    ' + 'ACC_PREFIX UPDATE HOST ( ' + v + ' ), IF (i_am_accel_node) \n'
             l += tab + '    ' + 'call ' + self.methods['datawrite'] + '(ppser_serializer, ppser_savepoint, \'' + k + '\', ' + v + ')\n'
         l += tab + '  ' + 'CASE(' + str(self.modes['read']) + ')\n'
         for k,v in zip(keys, values):
-            l += tab + '    ' + 'call ' + self.methods['dataread'] + '(ppser_serializer_ref, ppser_savepoint, \'' + k + '\', ' + v + ')\n'
-            l += tab + '    ' + 'ACC_PREFIX UPDATE DEVICE ( ' + v + ' ), IF (i_am_accel_node) \n'
+            # If the field does not contains any compute sign, the read call is
+            # generated
+            if not any(ext in v for ext in self.__computed_fields_sign):
+                l += tab + '    ' + 'call ' + self.methods['dataread'] + '(ppser_serializer_ref, ppser_savepoint, \'' + k + '\', ' + v + ')\n'
+                if isacc: # Genarate acc upadte directives only for accdata clause
+                    l += tab + '    ' + 'ACC_PREFIX UPDATE DEVICE ( ' + v + ' ), IF (i_am_accel_node) \n'
         l += tab + 'END SELECT\n'
-        
+
         if if_statement:
             l += 'ENDIF\n'
         self.__line = l
 
-   # TRACER directive
+    # TRACER directive
     def __ser_tracer(self, args):
 
         (tracerspec, if_statement) = self.__ser_tracer_parse(args)
@@ -557,9 +565,6 @@ class pp_ser:
                 if len(calls_fs) > 0:
                     l += 'USE ' + self.module + ', ONLY: ' + ', '.join(calls_fs) + '\n'
                 if len(calls_pp) > 0:
-                    # calls_str = ', '.join(calls_pp)
-                    # calls_str = ' &\n                       '.join(textwrap.wrap(calls_str, 80))
-                    # l         +=    'USE utils_ppser, ONLY: ' + calls_str + '\n'
                     l += 'USE utils_ppser, ONLY: ' + ', '.join(calls_pp) + '\n'
                 if self.ifdef:
                     l += '#endif\n'
@@ -591,6 +596,8 @@ class pp_ser:
                     self.__ser_savepoint(args)
                 elif args[0].upper() in self.language['zero']:
                     self.__ser_zero(args)
+                elif args[0].upper() in self.language['accdata']:
+                    self.__ser_data(args, True)
                 elif args[0].upper() in self.language['data']:
                     self.__ser_data(args)
                 elif args[0].upper() in self.language['tracer']:
@@ -623,19 +630,20 @@ class pp_ser:
         return m
 
     def __re_def(self):
-        r = re.compile(r'.*intent *\(in\)[^:]*::\s+(.*)', re.IGNORECASE)
+        r = re.compile(r'.*intent *\(in\)[^:]*::\s*([^!]*)\s*.*', re.IGNORECASE)
         m = r.search(self.__line)
         if m:
             splitted = self.__line.split('::')
+            splitted[1] = re.sub(r'!.*', '', splitted[1]) # Remove comments at end of the line
             var_with_dim = [x.strip().replace(' ', '') for x in re.split(r',(?![^(]*\))', splitted[1])]
             var = [re.sub(r'\(.*?\)', '', x) for x in var_with_dim]
-
             fields_in_this_line = [x for x in self.intentin_to_remove if x in var]
             self.intentin_removed.extend([x for x in fields_in_this_line if x not in self.intentin_removed])
 
             if fields_in_this_line:
-                l =  '#ifdef ' + self.ifdef + '\n'                
-                l += re.sub(r', *intent *\(in\)', '', self.__line, flags=re.IGNORECASE)
+                l =  '#ifdef ' + self.ifdef + '\n'
+                r = re.compile(r', *intent *\(in\)', re.IGNORECASE)
+                l += r.sub('', self.__line)
                 l += '#else\n' + self.__line + '#endif\n'
 
                 self.__line = l
@@ -684,6 +692,10 @@ class pp_ser:
         self.__outputBuffer = '' # preprocessed file
         self.__implicitnone_found = False # has a implicit none statement been found?
         self.__implicitnone_done = False # has code been inserted at IMPLICIT NONE?
+
+        # generate preprocessing macro for ACC_PREFIX
+        if self.acc_prefix:
+            self.__outputBuffer += '#define ACC_PREFIX !$acc\n'
 
         # open and parse file
         input_file = open(os.path.join(self.infile), 'r')
@@ -829,6 +841,8 @@ def parse_args():
                default='', type=str, dest='output_dir')
     parser.add_option('-v', '--verbose', help='Enable verbose execution',
                default=False, action='store_true', dest='verbose')
+    parser.add_option('-p', '--no-prefix', help='Don\'t generate preprocessing macro definition for ACC_PREFIX',
+               default=True, action='store_false', dest='acc_prefix')
     (options, args) = parser.parse_args()
     if len(args) < 1:
         parser.error('Need at least one source file to process')
@@ -847,5 +861,5 @@ if __name__ == "__main__":
             print('Skipping', infile)
         else:
             print('Processing file', infile)
-            ser = pp_ser(infile, real='wp', outfile=outfile, identical=(not options.ignore_identical), verbose=options.verbose)
+            ser = pp_ser(infile, real='wp', outfile=outfile, identical=(not options.ignore_identical), verbose=options.verbose, acc_prefix=options.acc_prefix)
             ser.preprocess()
