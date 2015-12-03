@@ -45,7 +45,7 @@ class pp_ser:
 
     def __init__(self, infile, outfile='', ifdef='SERIALIZE', real='ireals',
                  module='m_serialize', identical=True, verbose=False,
-                 acc_prefix=True):
+                 acc_prefix=True, acc_if=''):
 
         # public variables
         self.verbose = verbose
@@ -56,6 +56,7 @@ class pp_ser:
         self.module = module         # name of Fortran module which contains serialization methods
         self.identical = identical   # write identical files (no preprocessing done)?
         self.acc_prefix = acc_prefix # generate preprocessing marco for ACC_PREFIX
+        self.acc_if = acc_if         # generate IF clause after OpenACC update
 
         # setup (also public)
         self.methods = {
@@ -452,7 +453,12 @@ class pp_ser:
         l += tab + '  ' + 'CASE(' + str(self.modes['write']) + ')\n'
         for k,v in zip(keys, values):
             if isacc: # Genarate acc update directives only for accdata clause
-                l += tab + '    ' + 'ACC_PREFIX UPDATE HOST ( ' + v + ' ), IF (i_am_accel_node) \n'
+                l += tab + '    ' + 'ACC_PREFIX UPDATE HOST ( ' + v + ' )'
+                # Genarate IF clause if needed
+                if len(self.acc_if) > 0:
+                    l += ', IF (' + self.acc_if + ') \n'
+                else:
+                    l += '\n'
             l += tab + '    ' + 'call ' + self.methods['datawrite'] + '(ppser_serializer, ppser_savepoint, \'' + k + '\', ' + v + ')\n'
         l += tab + '  ' + 'CASE(' + str(self.modes['read']) + ')\n'
         for k,v in zip(keys, values):
@@ -461,7 +467,13 @@ class pp_ser:
             if not any(ext in v for ext in self.__computed_fields_sign):
                 l += tab + '    ' + 'call ' + self.methods['dataread'] + '(ppser_serializer_ref, ppser_savepoint, \'' + k + '\', ' + v + ')\n'
                 if isacc: # Genarate acc upadte directives only for accdata clause
-                    l += tab + '    ' + 'ACC_PREFIX UPDATE DEVICE ( ' + v + ' ), IF (i_am_accel_node) \n'
+                    l += tab + '    ' + 'ACC_PREFIX UPDATE DEVICE ( ' + v + ' )'
+                    # Genarate IF clause if needed
+                    if len(self.acc_if) > 0:
+                        l += ', IF (' + self.acc_if + ') \n'
+                    else:
+                        l += '\n'
+
         l += tab + 'END SELECT\n'
 
         if if_statement:
@@ -845,6 +857,8 @@ def parse_args():
                default=False, action='store_true', dest='verbose')
     parser.add_option('-p', '--no-prefix', help='Don\'t generate preprocessing macro definition for ACC_PREFIX',
                default=True, action='store_false', dest='acc_prefix')
+    parser.add_option('-a', '--acc-if', help='Add IF clause to OpenACC update statement',
+               default='', type=str, dest='acc_if')
     (options, args) = parser.parse_args()
     if len(args) < 1:
         parser.error('Need at least one source file to process')
@@ -863,5 +877,5 @@ if __name__ == "__main__":
             print('Skipping', infile)
         else:
             print('Processing file', infile)
-            ser = pp_ser(infile, real='wp', outfile=outfile, identical=(not options.ignore_identical), verbose=options.verbose, acc_prefix=options.acc_prefix)
+            ser = pp_ser(infile, real='wp', outfile=outfile, identical=(not options.ignore_identical), verbose=options.verbose, acc_prefix=options.acc_prefix, acc_if=options.acc_if)
             ser.preprocess()
