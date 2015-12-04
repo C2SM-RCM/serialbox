@@ -44,6 +44,13 @@ class Savepoint(dict):
 
         raise NameError("Option is not supported: {}, type: {}".format(str(opt), str(type(opt))))
 
+    def keys(self):
+        return self.fields
+
+    def items(self):
+        for key in self.keys():
+            yield (key, self.__getitem__(key))
+
     def __getitem__(self, arg):
         field = arg
         opt = None
@@ -71,7 +78,7 @@ class Serializer(dict):
         self.serializer = serializer(directory, prefix, openmode)
         fnames = self.serializer.fieldnames
         finfos = self.serializer.fieldinfos
-         
+
         self.fieldinfos = {}
         data = {}
         for (name, info) in zip(fnames, finfos):
