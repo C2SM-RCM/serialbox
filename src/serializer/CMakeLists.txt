@@ -37,9 +37,9 @@ set(
 add_library(sertools_files OBJECT ${GENERIC_SOURCES} ${GENERIC_HEADERS})
 
 add_library(
-    SerTools STATIC ${GENERIC_SOURCES}
+    SerialBox STATIC ${GENERIC_SOURCES}
 )
-install (TARGETS SerTools DESTINATION "lib")
+install (TARGETS SerialBox DESTINATION "lib")
 
 # Install headers
-install (FILES ${GENERIC_HEADERS} DESTINATION "include/SerTools")
+install (FILES ${GENERIC_HEADERS} DESTINATION "include/SerialBox")

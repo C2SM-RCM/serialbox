@@ -1,7 +1,5 @@
 # Python STELLA Serializer #
 
-This is currently a work in progress that I want to bring back into STELLA as soon as it's in a reasonable state.
-
 Currently only reads are supported.  
 
 ## Using the Library
@@ -10,7 +8,7 @@ Currently only reads are supported.
 
 Open the serialization:
 
-    from visualization_framework import *
+    from Serializer import *
     ser = Serializer("/scratch/olifu/pollen_case/test_pollen", "Error")
 
 and access the data with the exported dictionary:
@@ -24,7 +22,7 @@ The interface allows removing the halo from the data:
 ### Visualizing
 
 Visualize the data:
-
+    from Visualizer import *
     Visualizer(data, 'pp_in')
 
 ## Creating the Shared Library
