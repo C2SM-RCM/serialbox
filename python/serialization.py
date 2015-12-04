@@ -14,7 +14,7 @@ except:
 
 dirs = (
     os.path.dirname(os.path.realpath(__file__)),
-    pjoin(os.path.dirname(os.path.realpath(__file__)), os.pardir, os.pardir, 'build', 'src', 'serialization_framework_wrapper'),
+    pjoin(os.path.dirname(os.path.realpath(__file__)), os.pardir, 'build', 'src', 'wrapper'),
     '.',
     )
 
@@ -28,7 +28,7 @@ for d in dirs:
 
     # OS X
 
-    libfile = pjoin(d, 'libStellaSerializationFrameworkWrapper.'+library_postfix)
+    libfile = pjoin(d, 'libSerialBox_Wrapper.'+library_postfix)
     print("Trying path: {}".format(libfile))
     try:
         wrapper_try = ctypes.cdll.LoadLibrary(libfile)
@@ -36,8 +36,8 @@ for d in dirs:
             wrapper = wrapper_try
             break
     except Exception as e:
-        raise
-        #pass
+        #raise
+        pass
 
 if wrapper is None:
     raise ImportError("The serialization library could not be found {dirs}".format(dirs=dirs))
