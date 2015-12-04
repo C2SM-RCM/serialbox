@@ -5,11 +5,16 @@ cmake_minimum_required( VERSION 2.8 )
 # able to change.
 SET(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/install/" CACHE PATH "installation prefix")
 
-project( SerTools )
+project( SerialBox )
 enable_language (Fortran)
-
 find_package( Boost )
 include_directories( SYSTEM ${Boost_INCLUDE_DIRS} )
+
+set(ENABLE_DOC "OFF" CACHE BOOL "enable building doc" )
+if(ENABLE_DOC)
+    find_package(LATEX)
+    add_subdirectory(doc)
+endif(ENABLE_DOC)
 
 set(TEST_SCRIPT ${CMAKE_BINARY_DIR}/run_tests.sh)
 file(WRITE ${TEST_SCRIPT} "#!/bin/sh\n")

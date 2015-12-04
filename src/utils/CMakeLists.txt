@@ -19,4 +19,4 @@ add_library(
 install (TARGETS Utils DESTINATION "lib")
 
 # Install headers
-install (FILES ${GENERIC_HEADERS} DESTINATION "include/SerTools")
+install (FILES ${GENERIC_HEADERS} DESTINATION "include/SerialBox")
