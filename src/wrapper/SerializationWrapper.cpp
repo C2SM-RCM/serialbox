@@ -468,7 +468,7 @@ void fs_compute_strides(void* serializer, const char* fieldname, int namelength,
     const DataFieldInfo& info = ser.FindField(std::string(fieldname, namelength));
 
     // Check rank
-    int strides[4] = {
+    long strides[4] = {
             reinterpret_cast<const char*>(iplus1) - reinterpret_cast<const char*>(base_ptr),
             reinterpret_cast<const char*>(jplus1) - reinterpret_cast<const char*>(base_ptr),
             reinterpret_cast<const char*>(kplus1) - reinterpret_cast<const char*>(base_ptr),

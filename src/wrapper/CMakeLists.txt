@@ -11,7 +11,7 @@ add_library(
     SerialBoxWrapper STATIC
     ${SOURCES}
 )
-target_link_libraries( SerialBoxWrapper SerialBox json sha256 )
+target_link_libraries( SerialBoxWrapper SerialBox Utils json sha256 )
 install( TARGETS SerialBoxWrapper DESTINATION lib/ )
 
 set (PYTHON_PATH "python/sertools")
@@ -24,6 +24,7 @@ INSTALL(DIRECTORY
 add_library(SerialBox_Wrapper SHARED
     $<TARGET_OBJECTS:json_files>
     $<TARGET_OBJECTS:sha256_files>
+    $<TARGET_OBJECTS:utils_files>
     $<TARGET_OBJECTS:sertools_files>
     $<TARGET_OBJECTS:sertools_wrapper_files>
 )

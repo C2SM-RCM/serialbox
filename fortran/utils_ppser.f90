@@ -4,7 +4,7 @@
 !+ Module containing procedures for input/output to/from disk
 !------------------------------------------------------------------------------
 
-ODULE utils_ppser
+MODULE utils_ppser
 
 !------------------------------------------------------------------------------
 !
@@ -99,7 +99,7 @@ END SUBROUTINE ppser_finalize
 
 SUBROUTINE ppser_set_mode(mode)
   INTEGER, INTENT(IN) :: mode
-  
+
   ppser_mode = mode
 
 END SUBROUTINE ppser_set_mode
@@ -112,4 +112,3 @@ FUNCTION ppser_get_mode()
 END FUNCTION ppser_get_mode
 
 END MODULE utils_ppser
-
