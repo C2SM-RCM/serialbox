@@ -29,4 +29,4 @@ add_library(SerialBox_Wrapper SHARED
     $<TARGET_OBJECTS:sertools_wrapper_files>
 )
 install(TARGETS SerialBoxWrapper DESTINATION "lib")
-install(TARGETS SerialBoxWrapper DESTINATION ${PYTHON_PATH})
+install(TARGETS SerialBox_Wrapper DESTINATION ${PYTHON_PATH})
