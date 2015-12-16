@@ -36,6 +36,25 @@ The grammar is defined by a set of \texttt{!\$SER} directives. All directives ar
 
 \ppser{} also supports serializing data on GPU with OpenACC directives.
 
+\section{Script options}
+
+\subsection{\texttt{OpenACC IF clause}}
+An \texttt{IF} clause can be added to the generated OpenACC update directives. To add the clause, the option \texttt{--acc-if=value} must be used. 
+
+Usage:
+\begin{lstlisting}
+$ ./pp_ser.py -d . --acc-if="i_am_accel_node"
+\end{lstlisting}
+
+
+\subsection{\texttt{OpenACC pre-processor macro}}
+OpenACC directives to update the field from/to the accelerator are generated with an ACC\_PREFIX. This pre-processor macro is automatically defined with the value !\$acc at the beginning of the file. The option \texttt{--no-prefix} disable the automatic generation. 
+
+Usage:
+\begin{lstlisting}
+$ ./pp_ser.py -d . --no-prefix
+\end{lstlisting}
+
 \section{Keywords}
 
 \subsection{\texttt{INIT}}
@@ -101,6 +120,17 @@ Examples:
 !$ser data pp_field=pp pq=pq if test_counter<30
 \end{lstlisting}
 
+\subsection{\texttt{ACCDATA}}
+Serialize the data field located on the accelerator. Same options as DATA clause.
+OpenACC update host/device are generated before reading
+or writing data from the accelerator.
+
+Examples:
+\begin{lstlisting}
+!$ser accdata pt=pt(:,kk) pq=pq(:,kk)
+!$ser data pp=pp(:) removeintentin
+\end{lstlisting}
+
 \subsection{\texttt{VERBATIM}}
 Examples:
 \begin{lstlisting}
@@ -158,7 +188,7 @@ Here is a first example of how the directives look like in real codes.
 MODULE mo_cuadjust
 ...
 SUBROUTINE cuadjtq()
-ACC_PREFIX DATA PCOPY(pt(:,kk), pq(:,kk)), IF (i_am_accel_node) 
+ACC_PREFIX DATA PCOPY(pt(:,kk), pq(:,kk)), IF (i_am_accel_node)
 
     !$ser init directory='.' prefix='Field'
 
@@ -167,7 +197,7 @@ ACC_PREFIX DATA PCOPY(pt(:,kk), pq(:,kk)), IF (i_am_accel_node)
     !$ser data pt=pt(:,kk) pq=pq(:,kk)
     !$ser data pp=pp(:) removeintentin
 
-ACC_PREFIX PARALLEL, IF (i_am_accel_node) 
+ACC_PREFIX PARALLEL, IF (i_am_accel_node)
 ...
 ACC_PREFIX END PARALLEL
 
@@ -216,7 +246,7 @@ SUBROUTINE cuadjtq()
 
     !$ser savepoint cuadjtq.DoStep-in iteration=test_counter
 
-ACC_PREFIX PARALLEL, IF (i_am_accel_node) 
+ACC_PREFIX PARALLEL, IF (i_am_accel_node)
 ...
 ACC_PREFIX END PARALLEL
 
@@ -253,7 +283,7 @@ MODULE mo_cuadjust
 SUBROUTINE cuadjtq()
     !$ser init directory='.' prefix='ref_' if ser_test_mode==0
     !$ser init directory='.' prefix='test_' prefix_ref='ref_' if ser_test_mode==1
-    
+
     !$ser savepoint cuadjtq.DoStep-in
     !$ser mode ser_test_mode
     !$ser data ...

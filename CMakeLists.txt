@@ -28,13 +28,13 @@ set(CXX11_FLAGS "-std=c++11")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-function(sertools_add_test test_name )
+function(serialbox_add_test test_name )
   #ignore the execute prefix in case it is not a valid executable prefix
   add_test(NAME ${test_name} COMMAND $<TARGET_FILE:${test_name}> ${ARGN})
   file(APPEND ${TEST_SCRIPT} "${CMAKE_CURRENT_BINARY_DIR}/${test_name}" " ${ARGN}" "\n")
   file(APPEND ${TEST_SCRIPT} "if [ $? -ne 0 ] ; then\n echo \"Error: problem found in Unittest\"\nfi\n")
   file(APPEND ${TEST_SCRIPT} "res=$((res || $? ))\n")
-endfunction(sertools_add_test)
+endfunction(serialbox_add_test)
 
 if( CMAKE_HOST_UNIX )
     message(STATUS "Compiling shared library on Unix")
@@ -71,6 +71,9 @@ include_directories( libs/gmock-gtest)
 include_directories( src)
 
 
+# Python installation path 
+set (PYTHON_PATH "python")
+
 # Build sources
 add_subdirectory( libs/libjson )
 add_subdirectory( libs/sha256 )
@@ -79,6 +82,7 @@ add_subdirectory( src )
 add_subdirectory( fortran )
 add_subdirectory( tools )
 add_subdirectory( unittest )
+add_subdirectory( python )
 
 file(APPEND ${TEST_SCRIPT} "echo \"RETURNING $res\" \n exit $res\n")
 file(INSTALL ${TEST_SCRIPT} DESTINATION ${CMAKE_BINARY_DIR}/install

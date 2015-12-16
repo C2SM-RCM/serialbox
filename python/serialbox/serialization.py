@@ -1,6 +1,10 @@
 #This file is released under terms of BSD license`
 #See LICENSE.txt for more information
 
+"""Internal serialization module that wraps the dynamic library of serialbox. 
+This module is used by the Serializer module.
+"""
+
 from __future__ import print_function
 import os, sys
 from os.path import join as pjoin
@@ -29,7 +33,6 @@ for d in dirs:
     # OS X
 
     libfile = pjoin(d, 'libSerialBox_Wrapper.'+library_postfix)
-    print("Trying path: {}".format(libfile))
     try:
         wrapper_try = ctypes.cdll.LoadLibrary(libfile)
         if wrapper_try is not None:
