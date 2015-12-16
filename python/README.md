@@ -80,7 +80,7 @@ In order to visualize the `pp` field stored in `data` from the code above it is 
 
 ```python
 from serialbox import Visualizer
-Visualizer(data, 'pp_in')
+Visualizer(data, 'pp')
 ```
 
 This will open a window displaying the data:
