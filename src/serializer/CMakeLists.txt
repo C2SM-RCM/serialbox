@@ -34,7 +34,7 @@ set(
 
 # Compilation stage
 
-add_library(serial_box_files OBJECT ${GENERIC_SOURCES} ${GENERIC_HEADERS})
+add_library(serialbox_files OBJECT ${GENERIC_SOURCES} ${GENERIC_HEADERS})
 
 add_library(
     SerialBox STATIC ${GENERIC_SOURCES}
