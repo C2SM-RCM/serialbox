@@ -1,14 +1,10 @@
 #This file is released under terms of BSD license`
 #See LICENSE.txt for more information
 
-"""
-Serializer module used to read serialized data
-"""
+"""Serializer module used to read serialized data"""
 
 class Savepoint(dict):
-    """
-    Represents a serializer savepoint
-    """
+    """Represents a serializer savepoint"""
     def __init__(self, ser, savepoint):
         self.savepoint = savepoint
         self.serializer = ser

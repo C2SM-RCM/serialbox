@@ -5,7 +5,6 @@
 import unittest
 
 class Test(unittest.TestCase):
-
 	def test_load_serializer(self):
 		from serialbox import Serializer
 
@@ -14,3 +13,4 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
 	unittest.main()
+	
