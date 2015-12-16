@@ -28,7 +28,7 @@ set(CXX11_FLAGS "-std=c++11")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-function(sertools_add_test test_name )
+function(serialbox_add_test test_name )
   #ignore the execute prefix in case it is not a valid executable prefix
   add_test(NAME ${test_name} COMMAND $<TARGET_FILE:${test_name}> ${ARGN})
   file(APPEND ${TEST_SCRIPT} "${CMAKE_CURRENT_BINARY_DIR}/${test_name}" " ${ARGN}" "\n")
