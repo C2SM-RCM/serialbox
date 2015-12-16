@@ -71,6 +71,9 @@ include_directories( libs/gmock-gtest)
 include_directories( src)
 
 
+# Python installation path 
+set (PYTHON_PATH "python")
+
 # Build sources
 add_subdirectory( libs/libjson )
 add_subdirectory( libs/sha256 )
@@ -79,6 +82,7 @@ add_subdirectory( src )
 add_subdirectory( fortran )
 add_subdirectory( tools )
 add_subdirectory( unittest )
+add_subdirectory( python )
 
 file(APPEND ${TEST_SCRIPT} "echo \"RETURNING $res\" \n exit $res\n")
 file(INSTALL ${TEST_SCRIPT} DESTINATION ${CMAKE_BINARY_DIR}/install

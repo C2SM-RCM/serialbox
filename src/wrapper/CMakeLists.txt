@@ -14,13 +14,6 @@ add_library(
 target_link_libraries( SerialBoxWrapper SerialBox Utils json sha256 )
 install( TARGETS SerialBoxWrapper DESTINATION lib/ )
 
-set (PYTHON_PATH "python/serialbox")
-
-INSTALL(DIRECTORY
-    "${CMAKE_SOURCE_DIR}/python/"
-    DESTINATION
-    "${PYTHON_PATH}")
-
 add_library(SerialBox_Wrapper SHARED
     $<TARGET_OBJECTS:json_files>
     $<TARGET_OBJECTS:sha256_files>
@@ -29,4 +22,6 @@ add_library(SerialBox_Wrapper SHARED
     $<TARGET_OBJECTS:serialbox_wrapper_files>
 )
 install(TARGETS SerialBoxWrapper DESTINATION "lib")
-install(TARGETS SerialBox_Wrapper DESTINATION ${PYTHON_PATH})
+
+# The python library expects a serialbox dynamic library distributed with itself.
+install(TARGETS SerialBox_Wrapper DESTINATION ${PYTHON_PATH}/serialbox/)
