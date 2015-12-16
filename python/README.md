@@ -23,7 +23,7 @@ To use the serialbox python module either
 
 ### Reading and Visualizing Serialized Data
 
-In our we example we use data serialized by jenkins on CSCS machines. Depending on the machine this location might be different. You can of course also use your own generated data:
+In our example we want to look at serialized data from another process:
 
 ```python
 datapath = "/scratch/jenkins/data/double/normal/"
