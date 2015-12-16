@@ -1,7 +1,14 @@
 #This file is released under terms of BSD license`
 #See LICENSE.txt for more information
 
+"""
+Serializer module used to read serialized data
+"""
+
 class Savepoint(dict):
+    """
+    Represents a serializer savepoint
+    """
     def __init__(self, ser, savepoint):
         self.savepoint = savepoint
         self.serializer = ser
@@ -71,7 +78,19 @@ def _nested_set(dic, keys, value):
     dic[keys[-1]] = value
 
 class Serializer(dict):
+    """The serializer that allows accessing serialized data""" 
     def __init__(self, directory=".", prefix="Field", openmode="r"):
+        """Create a serializer
+
+        Arguments:
+        directory -- The directory where the data is loaded
+        prefix -- The prefix of the serialized data
+        openmode -- The data mode: Anything other than `r` is currently not supported
+        """
+        
+        if openmode != "r":
+            raise ValueError("Only reads are supported at the moment")
+
         from .serialization import serializer
         self.serializer = serializer(directory, prefix, openmode)
         fnames = self.serializer.fieldnames

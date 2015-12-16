@@ -1,6 +1,9 @@
 #This file is released under terms of BSD license`
 #See LICENSE.txt for more information
 
+"""
+Visualizer module used for visualization of serialized data.
+"""
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.widgets import Slider, CheckButtons

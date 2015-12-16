@@ -1,6 +1,12 @@
 #This file is released under terms of BSD license`
 #See LICENSE.txt for more information
 
+"""
+Internal serialization module that wraps the dynamic library of serialbox. 
+
+This module is used by the Serializer module.
+"""
+
 from __future__ import print_function
 import os, sys
 from os.path import join as pjoin
