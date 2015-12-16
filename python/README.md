@@ -71,11 +71,20 @@ Out[4]: { 'FastWavesSCUnittest.UV-out' = [...], 'AdvectionPDBottUnittest.Init-in
 
 #### Visualizing
 
-To help visualizing the data serialbox contains a built-in Visualizer based on matplotlib. Simply 
+To help visualizing the data serialbox contains a built-in Visualizer based on matplotlib. The visualizer expects two arguments: 
 
-    from serialbox import Visualizer
-    Visualizer(data, 'pp_in')
+- The 3D numpy array loaded by the serializer
+- The name of the plot
 
-## Creating the Shared Library
+In order to visualize the `pp` field stored in `data` from the code above it is sufficient to simply execute
 
-The shared library is directly created with CMAKE.
+```python
+from serialbox import Visualizer
+Visualizer(data, 'pp_in')
+```
+
+This will open a window displaying the data:
+
+![Visualizer window](visualizer.png)
+
+Each k level is represented as a simple slice in the window.
