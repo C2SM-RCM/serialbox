@@ -44,21 +44,22 @@ By default the Serializer loads the data stored in `Field.json`. If your data is
 err = Serializer(datapath, "Error")
 ```
 
-In python the key-value format of the serializer is represented as a hash table. For example, if you are interested in the `pp` variable exported as a savepoint in a Fortran program: 
-
-    !$ser savepoint TimeIntegratorUnittest.DoRKStage-out LargeTimeStep=ntstep RKStageNumber=irk
-    !$ser data pp=pp(:,:,:,nnew)
-
- Then you can directly translate the configuration to the hash table:
+In python the key-value format of the serializer is represented as a hash table. For example, if a savepoint is represented with the keys `TimeIntegratorUnittest.DoRKStage-out`, `LargeTimeStep=0` and `RKStageNumber=1` then this savepoint can be accessed as:
 
 ```python
-data = ser['TimeIntegratorUnittest.DoRKStage-out']['LargeTimeStep'][0]['RKStageNumber'][1]['pp']
+savepoint =  ser['TimeIntegratorUnittest.DoRKStage-out']['LargeTimeStep'][0]['RKStageNumber'][1]
+```
+
+To then load the `pp` variable from the savepoint simply add `pp` to the hash table and we get:
+
+```python
+data = savepoint['pp']
 ```
 
 `data` will now contain a numpy array that you can directly use with matplotlib and numpy. The interface allows removing the halo from the data by specifing `"inner"` as an additional argument:
 
 ```python
-data = ser['TimeIntegratorUnittest.DoRKStage-out']['LargeTimeStep'][0]['RKStageNumber'][1]['pp', 'inner']
+data = savepoint['pp', 'inner']
 ```
 
 The serializer allows dynamic exploration of the data. The representation of the Serializer object returns only the stored savepoints.
