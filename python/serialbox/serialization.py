@@ -29,7 +29,6 @@ for d in dirs:
     # OS X
 
     libfile = pjoin(d, 'libSerialBox_Wrapper.'+library_postfix)
-    print("Trying path: {}".format(libfile))
     try:
         wrapper_try = ctypes.cdll.LoadLibrary(libfile)
         if wrapper_try is not None:
