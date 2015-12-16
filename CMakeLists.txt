@@ -34,7 +34,7 @@ function(serialbox_add_test test_name )
   file(APPEND ${TEST_SCRIPT} "${CMAKE_CURRENT_BINARY_DIR}/${test_name}" " ${ARGN}" "\n")
   file(APPEND ${TEST_SCRIPT} "if [ $? -ne 0 ] ; then\n echo \"Error: problem found in Unittest\"\nfi\n")
   file(APPEND ${TEST_SCRIPT} "res=$((res || $? ))\n")
-endfunction(sertools_add_test)
+endfunction(serialbox_add_test)
 
 if( CMAKE_HOST_UNIX )
     message(STATUS "Compiling shared library on Unix")
