@@ -4,7 +4,7 @@ This folder contains the SerialBox python tools.
 
 - `pp_ser.py` - the SerialBox preproccessor to add the serialization directives to a Fortran program. For documentation see the docs folder. 
 - `serialbox` - the SerialBox python module that allows de-serializing and visualizing data stored by SerialBox
-- `test.py` - contains the unittests for the Python Tools
+- `test.py` - the unittests for the Python Tools
 
 ## The `serialbox` Python Module
 
