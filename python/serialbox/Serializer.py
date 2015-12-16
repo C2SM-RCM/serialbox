@@ -1,9 +1,6 @@
 #This file is released under terms of BSD license`
 #See LICENSE.txt for more information
 
-from .serialization import serializer
-
-
 class Savepoint(dict):
     def __init__(self, ser, savepoint):
         self.savepoint = savepoint
@@ -75,6 +72,7 @@ def _nested_set(dic, keys, value):
 
 class Serializer(dict):
     def __init__(self, directory=".", prefix="Field", openmode="r"):
+        from .serialization import serializer
         self.serializer = serializer(directory, prefix, openmode)
         fnames = self.serializer.fieldnames
         finfos = self.serializer.fieldinfos
