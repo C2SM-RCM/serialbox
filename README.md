@@ -1,4 +1,4 @@
-# SerialBox
+# serialbox
 
 <img src="doc/logo.png" width="200" height="150" />
 
@@ -18,7 +18,7 @@ As an example, porting scientific codes to graphical processing units, that requ
   * src/utils: logger and other C++ utilities
   * wrapper: a C wrapper that allows to interoperate the core C++ functionality from other languages like Fortran
 * doc/ : latex documentation, tutorials and presentations
-* python/ : contains various python tools based on the SerialBox format, namely
+* [python/](python/README.md) : contains various python tools based on the SerialBox format, namely
   * pp_ser: a tiny DSL/parser that facilitates inserting SerialBox statements into your Fortran Code. 
   * Visualizer: a python tool that helps visualizing serialized data
 * tools/ : various tools used to validation, dumping, converting or comparing of multiple serialized runs, etc. 
