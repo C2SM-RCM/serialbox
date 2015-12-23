@@ -3,6 +3,8 @@
 #See LICENSE.txt for more information
 
 from __future__ import print_function
+import linecache
+
 
 """
 pp_ser.py
@@ -643,25 +645,52 @@ class pp_ser:
             self.__module = ''
         return m
 
+    def __check_intent_in(self, line):
+        lhs = re.sub(r'!.*', '', line) # Remove comments at end of the line
+        var_with_dim = [x.strip().replace(' ', '') for x in re.split(r',(?![^(]*\))', lhs)]
+        var = [re.sub(r'\(.*?\)', '', x) for x in var_with_dim]
+        fields_in_this_line = [x for x in self.intentin_to_remove if x in var]
+        self.intentin_removed.extend([x for x in fields_in_this_line if x not in self.intentin_removed])
+
+        if fields_in_this_line:
+            l =  '#ifdef ' + self.ifdef + '\n'
+            r = re.compile(r', *intent *\(in\)', re.IGNORECASE)
+            l += r.sub('', self.__line)
+            l += '#else\n' + self.__line + '#endif\n'
+            self.__line = l
+        return fields_in_this_line
+
+
     def __re_def(self):
         r = re.compile(r'.*intent *\(in\)[^:]*::\s*([^!]*)\s*.*', re.IGNORECASE)
+        r_cont = re.compile(r'.*intent *\(in\)[^:]*::\s*([^!]*)\s*.*&', re.IGNORECASE)
+
+        # Line contains intent with continuation
+        m_cont = r_cont.search(self.__line)
         m = r.search(self.__line)
-        if m:
+        if m_cont:
             splitted = self.__line.split('::')
             splitted[1] = re.sub(r'!.*', '', splitted[1]) # Remove comments at end of the line
-            var_with_dim = [x.strip().replace(' ', '') for x in re.split(r',(?![^(]*\))', splitted[1])]
-            var = [re.sub(r'\(.*?\)', '', x) for x in var_with_dim]
-            fields_in_this_line = [x for x in self.intentin_to_remove if x in var]
-            self.intentin_removed.extend([x for x in fields_in_this_line if x not in self.intentin_removed])
+            if not self.__check_intent_in(splitted[1]):
+                # look ahead to find the variable
+                lookahead_index = self.__linenum + 1
+                # set to line after the intent declaration
+                lookahead_index += 1
+                # look ahead
+                nextline = linecache.getline(os.path.join(self.infile), lookahead_index)
+                while nextline:
+                    self.__check_intent_in(nextline)
+                    if(nextline.find('&')!=-1):
+                        lookahead_index += 1
+                        nextline = linecache.getline(os.path.join(self.infile), lookahead_index)
+                    else:
+                        nextline = None
 
-            if fields_in_this_line:
-                l =  '#ifdef ' + self.ifdef + '\n'
-                r = re.compile(r', *intent *\(in\)', re.IGNORECASE)
-                l += r.sub('', self.__line)
-                l += '#else\n' + self.__line + '#endif\n'
-
-                self.__line = l
-            return fields_in_this_line
+        # Match a standard declaration with variable and intent on the same line
+        elif m:
+            splitted = self.__line.split('::')
+            splitted[1] = re.sub(r'!.*', '', splitted[1]) # Remove comments at end of the line
+            self.__check_intent_in(splitted[1])
         return m
 
     # evaluate one line
