@@ -673,7 +673,7 @@ class pp_ser:
             splitted[1] = re.sub(r'!.*', '', splitted[1]) # Remove comments at end of the line
             if not self.__check_intent_in(splitted[1]):
                 # look ahead to find the variable
-                lookahead_index = self.__linenum + 1
+                lookahead_index = self.__linenum
                 # set to line after the intent declaration
                 lookahead_index += 1
                 # look ahead
