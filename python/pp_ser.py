@@ -440,6 +440,7 @@ class pp_ser:
         self.__calls.add(self.methods['dataread'])
         self.__calls.add(self.methods['getmode'])
         l = ''
+        l = '! file: ' + self.infile + ' lineno: #' + str(self.__linenum) + '\n'
         tab = ''
         if if_statement:
             l += 'IF (' + if_statement + ') THEN\n'
