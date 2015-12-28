@@ -1,6 +1,7 @@
 set(
     SOURCES
     "m_serialize.f90"
+    "utils_ppser.f90"
 )
 
 add_library(fortranser_files OBJECT ${SOURCES})
