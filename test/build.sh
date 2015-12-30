@@ -9,13 +9,11 @@ exitError()
 
 cmakeConfigure()
 {
-    local enable_single=$1
-    local fcomp=$2
-    local idir=$3
+    local fcomp=$1
+    local idir=$2
 
     # construct cmake arguments
     local CMAKEARGS=(..
-           "-DSINGLEPRECISION=${enable_single}"
            "-DCMAKE_Fortran_COMPILER=${fcomp}"
            "-DCMAKE_INSTALL_PREFIX=${idir}"
            "-DCMAKE_CXX_COMPILER=g++"
@@ -31,7 +29,7 @@ cmakeConfigure()
 
 echo "TEST $@"
 
-TEMP=`getopt -o h,f:,s,i:,z --long single,fcompiler:,idir:,local \
+TEMP=`getopt -o h,f:,i:,z --long fcompiler:,idir:,local \
              -n 'build' -- "$@"`
 if [ $? -ne 0 ]
 then
@@ -42,7 +40,6 @@ eval set -- "$TEMP"
 
 while true; do
     case "$1" in
-        --single|-s) single_precision="ON"; shift;;
         --fcompiler|-f ) fortran_compiler="$2"; shift 2;;
         --idir|-i) install_dir="$2"; shift 2;;
         --local) install_local="yes"; shift;;
@@ -51,10 +48,6 @@ while true; do
         * ) break ;;
     esac
 done
-
-if [[ -z ${single_precision} ]] ; then
-    single_precision="OFF"
-fi
 
 if [[ -z ${fortran_compiler} ]] ; then
     exitError 4410 ${LINENO} "compiler option has to be specified"
@@ -76,7 +69,7 @@ if [[ ${install_local} == "yes" ]]; then
     install_dir=${base_path}/install
 fi
 
-cmakeConfigure "${single_precision}" "${fortran_compiler}" "${install_dir}"
+cmakeConfigure "${fortran_compiler}" "${install_dir}"
 
 make install 
 

@@ -213,6 +213,6 @@ TEST_F(FieldsTableUnittest, DeserilalizeTable)
     ASSERT_EQ(3, info.jPlusHaloSize());
     ASSERT_EQ(0, info.kMinusHaloSize());
     ASSERT_EQ(1, info.kPlusHaloSize());
-    ASSERT_EQ(7.25, info.metainfo().AsReal("Init"));
+    ASSERT_EQ(7.25, info.metainfo().AsReal<double>("Init"));
 }
 

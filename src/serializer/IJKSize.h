@@ -4,7 +4,6 @@
 //See LICENSE.txt for more information
 
 #include <cassert>
-#include "Definitions.h"
 
 namespace ser {
     /**

@@ -84,9 +84,9 @@ bool compareData(const Serializer& serializer1, const Serializer& serializer2,
 				{
 					int index = i * jSize * kSize * lSize + j * kSize * lSize + k * lSize + l;
 
-					const Real val = data1[index];
-					const Real ref = data2[index];
-					const Real err = std::fabs(ref) > 1. ?
+					const T val = data1[index];
+					const T ref = data2[index];
+					const T err = std::fabs(ref) > 1. ?
 					                 std::fabs((ref - val) / ref) : std::fabs(ref - val);
 
 					const bool f = err > tolerance                     // Error is too large (e.g. val is infinite, ref is not)
@@ -137,8 +137,8 @@ void printDifference(const Serializer& serializer1, const Serializer& serializer
 					{
 						++nErrors;
 
-						const Real val = data1[index];
-						const Real ref = data2[index];
+						const T val = data1[index];
+						const T ref = data2[index];
 						maxAbsError = std::max(maxAbsError, std::fabs(val - ref));
 						maxRelError = std::max(maxRelError, std::fabs((val - ref) / ref));
 					}
