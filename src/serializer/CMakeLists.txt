@@ -14,7 +14,6 @@ set(
 
 set(
     GENERIC_HEADERS
-    "Definitions.h"
     "SerializationException.h"
     "TypeName.h"
     "MetainfoSet.h"

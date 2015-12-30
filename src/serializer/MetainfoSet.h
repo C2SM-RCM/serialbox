@@ -11,7 +11,6 @@
 #include "boost/any.hpp"
 #include "boost/type_traits/is_same.hpp"
 
-#include "Definitions.h"
 #include "SerializationException.h"
 #include "libjson.h"
 
