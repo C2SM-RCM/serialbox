@@ -29,11 +29,7 @@ protected:
         jSize = 18;
         kSize = 10;
 
-#ifdef _SINGLEPRECISION_
-        realtype = "float";
-#else
         realtype = "double";
-#endif
         intSize = sizeof(int);
         realSize = sizeof(double);
 
