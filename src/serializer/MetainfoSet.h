@@ -247,10 +247,11 @@ namespace ser {
         float AsDouble(const std::string& key) const;
 
         /**
-        * Extracts a value in Real representation.
+        * Extracts a value in RealType representation, where RealType is
+        * either `float` or `double`.
         *
-        * If the type is different than Real, the function converts the
-        * value to Real.
+        * If the type is different than RealType, the function converts the
+        * value to RealType.
         *
         * @throw SerializationException The key does not exist
         *
@@ -258,7 +259,15 @@ namespace ser {
         *
         * @return The value of the metainfo is returned as copy
         */
-        Real AsReal(const std::string& key) const;
+        template<typename RealType>
+        RealType AsReal(const std::string& key) const
+        {
+            BOOST_STATIC_ASSERT(boost::is_same<RealType, float>::value
+                             || boost::is_same<RealType, double>::value);
+
+            if (boost::is_same<RealType, float>::value) return AsFloat(key);
+            else if (boost::is_same<RealType, double>::value) return AsDouble(key);
+        }
 
         /**
         * Extracts a value assuming its type is string.
