@@ -67,6 +67,70 @@ char fs_serializer_openmode(void* serializer)
     return ' ';
 }
 
+int fs_serializer_metainfo(void* serializer)
+{
+    return reinterpret_cast<const Serializer*>(serializer)->globalMetainfo().size();
+}
+
+void fs_serializer_metainfo_key_lengths(void* serializer, int* lengths)
+{
+    const std::vector<std::string> keys = reinterpret_cast<Serializer*>(serializer)->globalMetainfo().keys();
+    const int N = keys.size();
+    for (int i = 0; i < N; ++i)
+        lengths[i] = keys.at(i).size();
+}
+
+void fs_serializer_metainfo_get_keys(void* serializer, char** keys)
+{
+    const std::vector<std::string> mkeys = reinterpret_cast<Serializer*>(serializer)->globalMetainfo().keys();
+    const int N = mkeys.size();
+
+    for (int i = 0; i < N; ++i)
+    {
+        std::strcpy(keys[i], mkeys.at(i).c_str());
+    }
+}
+
+void fs_serializer_metainfo_get_types(void* serializer, int* types)
+{
+    const std::vector<int> mtypes = reinterpret_cast<Serializer*>(serializer)->globalMetainfo().types();
+    const int N = mtypes.size();
+    for (int i = 0; i < N; ++i)
+        types[i] = mtypes.at(i);
+}
+
+void fs_get_serializer_metainfo_b(void* serializer, const char* name, int name_length, bool* value)
+{
+    Serializer& sp = *reinterpret_cast<Serializer*>(serializer);
+    sp.globalMetainfo().ExtractValue(std::string(name, name_length), *value);
+}
+
+void fs_get_serializer_metainfo_i(void* serializer, const char* name, int name_length, int* value)
+{
+    Serializer& sp = *reinterpret_cast<Serializer*>(serializer);
+    sp.globalMetainfo().ExtractValue(std::string(name, name_length), *value);
+}
+
+void fs_get_serializer_metainfo_f(void* serializer, const char* name, int name_length, float* value)
+{
+    Serializer& sp = *reinterpret_cast<Serializer*>(serializer);
+    sp.globalMetainfo().ExtractValue(std::string(name, name_length), *value);
+}
+
+void fs_get_serializer_metainfo_d(void* serializer, const char* name, int name_length, double* value)
+{
+    Serializer& sp = *reinterpret_cast<Serializer*>(serializer);
+    sp.globalMetainfo().ExtractValue(std::string(name, name_length), *value);
+}
+
+void fs_get_serializer_metainfo_s(void* serializer, const char* name, int name_length, char* value)
+{
+    Serializer& sp = *reinterpret_cast<Serializer*>(serializer);
+    std::string v;
+    sp.globalMetainfo().ExtractValue(std::string(name, name_length), v);
+    std::strcpy(value, v.c_str());
+}
+
 void fs_add_serializer_metainfo_b(void* serializer, const char* name, int name_length,   bool value)
 {
     reinterpret_cast<Serializer*>(serializer)->AddMetainfo(std::string(name, name_length), value);

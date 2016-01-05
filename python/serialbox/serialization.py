@@ -62,6 +62,15 @@ def type2dtype(typestr, typesize):
 # Extract wrapper functions
 fs_create_serializer = wrapper.fs_create_serializer                               ; fs_create_serializer.restype = ctypes.c_void_p
 fs_destroy_serializer = wrapper.fs_destroy_serializer
+fs_serializer_metainfo = wrapper.fs_serializer_metainfo                             ; fs_serializer_metainfo.restype = ctypes.c_int
+fs_serializer_metainfo_key_lengths = wrapper.fs_serializer_metainfo_key_lengths
+fs_serializer_metainfo_get_keys = wrapper.fs_serializer_metainfo_get_keys
+fs_serializer_metainfo_get_types = wrapper.fs_serializer_metainfo_get_types
+fs_get_serializer_metainfo_b = wrapper.fs_get_serializer_metainfo_b
+fs_get_serializer_metainfo_i = wrapper.fs_get_serializer_metainfo_i
+fs_get_serializer_metainfo_f = wrapper.fs_get_serializer_metainfo_f
+fs_get_serializer_metainfo_d = wrapper.fs_get_serializer_metainfo_d
+fs_get_serializer_metainfo_s = wrapper.fs_get_serializer_metainfo_s
 fs_add_serializer_metainfo_b = wrapper.fs_add_serializer_metainfo_b
 fs_add_serializer_metainfo_i = wrapper.fs_add_serializer_metainfo_i
 fs_add_serializer_metainfo_f = wrapper.fs_add_serializer_metainfo_f
@@ -437,6 +446,49 @@ class serializer(object):
     @property
     def fieldinfos(self):
         return [self._fieldinfo(f) for f in self.fieldnames]
+
+    @property
+    def metainfo(self):
+        # Retrieve key lengths
+        n_keys = int(fs_serializer_metainfo(self.serializer))
+        key_lengths = (ctypes.c_int*n_keys)()
+        fs_serializer_metainfo_key_lengths(self.serializer, key_lengths)
+
+        # Retrieve keys
+        keys = ((ctypes.c_char_p)*n_keys)()
+        keys[:] = [('\0'*key_lengths[i]).encode() for i in range(n_keys)]
+        fs_serializer_metainfo_get_keys(self.serializer, keys)
+
+        # Retrieve types
+        types = (ctypes.c_int*n_keys)()
+        fs_serializer_metainfo_get_types(self.serializer, types)
+
+        metainfo = {}
+        for i in range(n_keys):
+            keystr = keys[i].decode()
+            key, keylength = extract_string(keystr)
+            if (types[i] == -1):
+                v = ctypes.c_bool()
+                f = fs_get_serializer_metainfo_b(self.serializer, key, keylength, ctypes.pointer(v))
+                metainfo[keystr] = v.value
+            elif (types[i] == -2):
+                v = ctypes.c_int()
+                f = fs_get_serializer_metainfo_i(self.serializer, key, keylength, ctypes.pointer(v))
+                metainfo[keystr] = v.value
+            elif (types[i] == -3):
+                v = ctypes.c_float()
+                f = fs_get_serializer_metainfo_f(self.serializer, key, keylength, ctypes.pointer(v))
+                metainfo[keystr] = v.value
+            elif (types[i] == -4):
+                v = ctypes.c_double()
+                f = fs_get_serializer_metainfo_d(self.serializer, key, keylength, ctypes.pointer(v))
+                metainfo[keystr] = v.value
+            elif (types[i] >= 0):
+                v = ctypes.create_string_buffer(types[i])
+                f = fs_get_serializer_metainfo_s(self.serializer, key, keylength, v)
+                metainfo[keystr] = v.value.decode()
+
+        return metainfo
 
     def add_metainfo(self, key, value):
         key, keylength = extract_string(key)
