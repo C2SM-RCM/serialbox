@@ -62,7 +62,7 @@ def type2dtype(typestr, typesize):
 # Extract wrapper functions
 fs_create_serializer = wrapper.fs_create_serializer                               ; fs_create_serializer.restype = ctypes.c_void_p
 fs_destroy_serializer = wrapper.fs_destroy_serializer
-fs_serializer_metainfo = wrapper.fs_serializer_metainfo                             ; fs_serializer_metainfo.restype = ctypes.c_int
+fs_serializer_metainfo_size = wrapper.fs_serializer_metainfo_size                 ; fs_serializer_metainfo_size.restype = ctypes.c_int
 fs_serializer_metainfo_key_lengths = wrapper.fs_serializer_metainfo_key_lengths
 fs_serializer_metainfo_get_keys = wrapper.fs_serializer_metainfo_get_keys
 fs_serializer_metainfo_get_types = wrapper.fs_serializer_metainfo_get_types
@@ -100,7 +100,7 @@ fs_create_savepoint = wrapper.fs_create_savepoint                               
 fs_duplicate_savepoint = wrapper.fs_duplicate_savepoint                           ; fs_duplicate_savepoint.restype = ctypes.c_void_p
 fs_destroy_savepoint = wrapper.fs_destroy_savepoint
 fs_reinitialize_savepoint = wrapper.fs_reinitialize_savepoint
-fs_savepoint_metainfo = wrapper.fs_savepoint_metainfo                             ; fs_savepoint_metainfo.restype = ctypes.c_int
+fs_savepoint_metainfo_size = wrapper.fs_savepoint_metainfo_size                   ; fs_savepoint_metainfo_size.restype = ctypes.c_int
 fs_savepoint_name_length = wrapper.fs_savepoint_name_length                       ; fs_savepoint_name_length.restype = ctypes.c_int
 fs_savepoint_get_name = wrapper.fs_savepoint_get_name
 fs_savepoint_key_lengths = wrapper.fs_savepoint_key_lengths
@@ -282,7 +282,7 @@ class savepoint(object):
     @property
     def metainfo_tuples(self):
         # Retrieve key lengths
-        n_keys = int(fs_savepoint_metainfo(self.savepoint))
+        n_keys = int(fs_savepoint_metainfo_size(self.savepoint))
         key_lengths = (ctypes.c_int*n_keys)()
         fs_savepoint_key_lengths(self.savepoint, key_lengths)
 
@@ -301,7 +301,7 @@ class savepoint(object):
     @property
     def metainfo(self):
         # Retrieve key lengths
-        n_keys = int(fs_savepoint_metainfo(self.savepoint))
+        n_keys = int(fs_savepoint_metainfo_size(self.savepoint))
         key_lengths = (ctypes.c_int*n_keys)()
         fs_savepoint_key_lengths(self.savepoint, key_lengths)
 
@@ -358,9 +358,6 @@ class savepoint(object):
             fs_add_savepoint_metainfo_s(self.savepoint, key, keylength, value, valuelength)
         else:
             raise AttributeError("Error: type of value not supported")
-
-    def metainfo_number(self):
-        return int(fs_savepoint_metainfo(self.savepoint))
 
 
 class serializer(object):
@@ -450,7 +447,7 @@ class serializer(object):
     @property
     def metainfo(self):
         # Retrieve key lengths
-        n_keys = int(fs_serializer_metainfo(self.serializer))
+        n_keys = int(fs_serializer_metainfo_size(self.serializer))
         key_lengths = (ctypes.c_int*n_keys)()
         fs_serializer_metainfo_key_lengths(self.serializer, key_lengths)
 

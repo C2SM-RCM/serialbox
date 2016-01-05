@@ -67,7 +67,7 @@ char fs_serializer_openmode(void* serializer)
     return ' ';
 }
 
-int fs_serializer_metainfo(void* serializer)
+int fs_serializer_metainfo_size(void* serializer)
 {
     return reinterpret_cast<const Serializer*>(serializer)->globalMetainfo().size();
 }
@@ -437,7 +437,7 @@ void fs_get_savepoint_metainfo_s(void* savepoint, const char* name, int name_len
     std::strcpy(value, v.c_str());
 }
 
-int fs_savepoint_metainfo(void* savepoint)
+int fs_savepoint_metainfo_size(void* savepoint)
 {
     return reinterpret_cast<const Savepoint*>(savepoint)->metainfo().size();
 }
