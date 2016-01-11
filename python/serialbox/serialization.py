@@ -52,7 +52,9 @@ def type2dtype(typestr, typesize):
         'int4' : np.int32,
         'int8' : np.int64,
         'float4' : np.float32,
-        'double8' : np.float64
+        'float324' : np.float32,
+        'double8' : np.float64,
+        'float648' : np.float64
         }
     try:
         return conv["{0}{1}".format(typestr,typesize)]
