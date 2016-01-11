@@ -407,7 +407,9 @@ class serializer(object):
         return field
 
     def save_field(self, name, field, savepoint):
-        self.register_field(name, field)
+        if name not in self.fieldnames:
+            self.register_field(name, field)
+
         name, namelength = extract_string(name)
 
         # Extract strides
@@ -416,15 +418,28 @@ class serializer(object):
         fs_write_field(self.serializer, savepoint.savepoint, name, namelength,
                 field.ctypes.data, strides[0], strides[1], strides[2], strides[3])
 
-    def register_field(self, name, field):
+    def register_field(self, name, field, **kwargs):
         name, namelength = extract_string(name)
         dtype, dtypelength = extract_string(field.dtype.name)
         size = [field.shape[i] if i < len(field.shape) else 1 for i in range(4)]
 
+        # Extract halo
+        iminushalo = kwargs.get('iminushalo', 0)
+        iplushalo = kwargs.get('iplushalo', 0)
+        jminushalo = kwargs.get('jminushalo', 0)
+        jplushalo = kwargs.get('jplushalo', 0)
+        kminushalo = kwargs.get('kminushalo', 0)
+        kplushalo = kwargs.get('kplushalo', 0)
+        lminushalo = kwargs.get('lminushalo', 0)
+        lplushalo = kwargs.get('lplushalo', 0)
+
+        # Call C routine
         fs_register_field(self.serializer, name, namelength,
                 dtype, dtypelength, field.dtype.itemsize,
                 size[0], size[1], size[2], size[3],
-                0, 0, 0, 0, 0, 0, 0, 0)
+                iminushalo, iplushalo, jminushalo, jplushalo,
+                kminushalo, kplushalo, lminushalo, lplushalo
+                )
 
     @property
     def fieldnames(self):
@@ -432,10 +447,11 @@ class serializer(object):
         n_fields = fs_fields(self.serializer)
         name_lengths = (ctypes.c_int*n_fields)()
         fs_fieldname_lengths(self.serializer, name_lengths)
+        name_length = max(name_lengths)
 
         # Get field names
         names = ((ctypes.c_char_p)*n_fields)()
-        names[:] = [('\0'*name_lengths[i]).encode() for i in range(n_fields)]
+        names[:] = [('\0'*name_length).encode() for i in range(n_fields)]
         fs_get_fieldnames(self.serializer, names)
 
         return [n.decode() for n in names]
