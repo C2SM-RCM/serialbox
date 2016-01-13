@@ -6,7 +6,6 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <cstdint>
 #include <ios>
 
 #include "Savepoint.h"
