@@ -104,14 +104,16 @@ namespace ser{
         /**
         * Checks if an entry of the field with the same checksum exists. This can be used
         * to avoid storing to the disk if the same state of a field is already stored.
+        * In case the record is found, the corresponding offset will be stored in the
+        * given variable, otherwise its value is not modified.
         *
         * @param fieldName The name of the field
         * @param checksum The checksum of the content
+        * @param[out] offset The offset of the found record, if any, is stored here
         *
-        * @return The offset of the already serialized field is returned if found.
-        *         Otherwise, a negative value is returned.
+        * @return True is returned iff a record is found
         */
-        int AlreadySerialized(const std::string& fieldName, const std::string& checksum) const;
+        bool AlreadySerialized(const std::string& fieldName, const std::string& checksum, offset_t& offset) const;
 
         /**
         * Produces a string represetation of the table

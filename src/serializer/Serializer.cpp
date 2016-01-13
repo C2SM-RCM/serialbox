@@ -192,11 +192,11 @@ void Serializer::WriteField(const std::string& fieldName, const Savepoint& savep
             info.iSize(), info.jSize(), info.kSize(), info.lSize(),
             iStride, jStride, kStride, lStride, binaryData);
 
-    // Control in offset table if data must be stored
-    int offset = offsetTable_.AlreadySerialized(fieldName, checksum);
-
-    if (offset < 0)
+    // Check in offset table if data must be stored
+    OffsetTable::offset_t offset;
+    if (!offsetTable_.AlreadySerialized(fieldName, checksum, offset))
     {
+        // Record is not found: we need to write the data
         // Open file stream
         std::ofstream fs;
         offset = pFileFormat_->OpenStreamAppend(fs, fieldName, savepoint);

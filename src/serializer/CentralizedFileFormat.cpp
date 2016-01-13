@@ -111,7 +111,7 @@ void CentralizedFileFormat::CleanTables()
     pOffsetTable_->Cleanup();
 }
 
-int CentralizedFileFormat::OpenStreamAppend(std::ofstream& stream, const std::string& fieldName, const Savepoint&) const
+OffsetTable::offset_t CentralizedFileFormat::OpenStreamAppend(std::ofstream& stream, const std::string& fieldName, const Savepoint&) const
 {
     // Discard savepoint because we are just appending data to the file
 

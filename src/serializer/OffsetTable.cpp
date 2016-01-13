@@ -148,7 +148,7 @@ OffsetTable::offset_t OffsetTable::GetOffset(int savepointID, const std::string&
     return iter->second.offset;
 }
 
-int OffsetTable::AlreadySerialized(const std::string& fieldName, const std::string& checksum) const
+bool OffsetTable::AlreadySerialized(const std::string& fieldName, const std::string& checksum, OffsetTable::offset_t& offset) const
 {
     // Loop backwards
     for (std::vector<OffsetTableEntry>::const_reverse_iterator iter = entries_.rbegin(); iter != entries_.rend(); ++iter)
@@ -157,9 +157,12 @@ int OffsetTable::AlreadySerialized(const std::string& fieldName, const std::stri
         if (entry == iter->end())
             continue;
         if (entry->second.checksum == checksum)
-            return entry->second.offset;
+        {
+            offset = entry->second.offset;
+            return true;
+        }
     }
-    return -1;
+    return false;
 }
 
 std::string OffsetTable::ToString() const
@@ -277,7 +280,7 @@ void OffsetTable::TableFromJSON(const JSONNode& node)
         // Interpret offsets and add records
         for (JSONNode::const_iterator o_iter = offsetsnode.begin(); o_iter != offsetsnode.end(); ++o_iter)
         {
-            int offset = (*o_iter)[0].as_int();
+            const offset_t offset = (*o_iter)[0].as_int();
             const std::string checksum = (*o_iter)[1].as_string();
             AddFieldRecord(savepointID, o_iter->name(), offset, checksum);
         }
