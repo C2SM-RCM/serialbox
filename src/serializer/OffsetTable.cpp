@@ -101,7 +101,7 @@ int OffsetTable::GetSavepointID(const Savepoint& savepoint) const
     return (iter == savepointIndex_.end() ? -1 : iter->second);
 }
 
-int OffsetTable::GetOffset(const Savepoint& savepoint, const std::string& fieldName) const
+OffsetTable::offset_t OffsetTable::GetOffset(const Savepoint& savepoint, const std::string& fieldName) const
 {
     // Find savepoint ID
     std::map<Savepoint, int>::const_iterator iter = savepointIndex_.find(savepoint);
@@ -118,7 +118,7 @@ int OffsetTable::GetOffset(const Savepoint& savepoint, const std::string& fieldN
     return GetOffset(iter->second, fieldName);
 }
 
-int OffsetTable::GetOffset(int savepointID, const std::string& fieldName) const
+OffsetTable::offset_t OffsetTable::GetOffset(int savepointID, const std::string& fieldName) const
 {
     // Check that ID is valid
     if (static_cast<unsigned>(savepointID) >= entries_.size())
@@ -131,17 +131,24 @@ int OffsetTable::GetOffset(int savepointID, const std::string& fieldName) const
         throw exception;
     }
 
-    // Check that field is saved at savepoint or return -1
-    // If there is return offset
+    // Check that field is saved at savepoint
     const OffsetTableEntry& entry = entries_[savepointID];
     const_iterator iter = entry.find(fieldName);
     if (iter == entry.end())
-        return -1;
-    else
-        return iter->second.offset;
+    {
+        std::ostringstream msg;
+        msg << "Error: field " << fieldName << " is not registered at the savepoint "
+            << savepoints_[savepointID].ToString() << "\n";
+        SerializationException exception;
+        exception.Init(msg.str());
+        throw exception;
+    }
+
+    // Return offset
+    return iter->second.offset;
 }
 
-int OffsetTable::AlreadySerialized(const std::string& fieldName, const std::string& checksum) const
+bool OffsetTable::AlreadySerialized(const std::string& fieldName, const std::string& checksum, OffsetTable::offset_t& offset) const
 {
     // Loop backwards
     for (std::vector<OffsetTableEntry>::const_reverse_iterator iter = entries_.rbegin(); iter != entries_.rend(); ++iter)
@@ -150,9 +157,12 @@ int OffsetTable::AlreadySerialized(const std::string& fieldName, const std::stri
         if (entry == iter->end())
             continue;
         if (entry->second.checksum == checksum)
-            return entry->second.offset;
+        {
+            offset = entry->second.offset;
+            return true;
+        }
     }
-    return -1;
+    return false;
 }
 
 std::string OffsetTable::ToString() const
@@ -270,7 +280,7 @@ void OffsetTable::TableFromJSON(const JSONNode& node)
         // Interpret offsets and add records
         for (JSONNode::const_iterator o_iter = offsetsnode.begin(); o_iter != offsetsnode.end(); ++o_iter)
         {
-            int offset = (*o_iter)[0].as_int();
+            const offset_t offset = (*o_iter)[0].as_int();
             const std::string checksum = (*o_iter)[1].as_string();
             AddFieldRecord(savepointID, o_iter->name(), offset, checksum);
         }

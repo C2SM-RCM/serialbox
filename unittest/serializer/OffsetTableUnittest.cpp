@@ -79,18 +79,21 @@ TEST_F(OffsetTableUnittest, Checksum)
     OffsetTable table;
     table.AddNewSavepoint(sp0, 0);
     table.AddNewSavepoint(sp1, 1);
-    int offset;
+    OffsetTable::offset_t offset;
 
-    ASSERT_EQ(-1, offset = table.AlreadySerialized("Field1", computeChecksum(data, 4)));
+    ASSERT_FALSE(table.AlreadySerialized("Field1", computeChecksum(data, 4), offset));
     ASSERT_NO_THROW(table.AddFieldRecord(0, "Field1",   0, computeChecksum(data, 4)));
-    ASSERT_EQ(-1, offset = table.AlreadySerialized("Field1", computeChecksum(data, 8)));
+    ASSERT_FALSE(table.AlreadySerialized("Field1", computeChecksum(data, 8), offset));
     ASSERT_NO_THROW(table.AddFieldRecord(1, "Field1", 100, computeChecksum(data, 8)));
-    ASSERT_EQ(-1, offset = table.AlreadySerialized("Field2", computeChecksum(data, 8)));
+    ASSERT_FALSE(table.AlreadySerialized("Field2", computeChecksum(data, 8), offset));
     ASSERT_NO_THROW(table.AddFieldRecord(0, "Field2", 200, computeChecksum(data, 8)));
 
-    ASSERT_EQ(  0, table.AlreadySerialized("Field1", computeChecksum(data,4)));
-    ASSERT_EQ(100, table.AlreadySerialized("Field1", computeChecksum(data,8)));
-    ASSERT_EQ(200, table.AlreadySerialized("Field2", computeChecksum(data,8)));
+    ASSERT_TRUE(table.AlreadySerialized("Field1", computeChecksum(data, 4), offset));
+    ASSERT_EQ(0, offset);
+    ASSERT_TRUE(table.AlreadySerialized("Field1", computeChecksum(data, 8), offset));
+    ASSERT_EQ(100, offset);
+    ASSERT_TRUE(table.AlreadySerialized("Field2", computeChecksum(data, 8), offset));
+    ASSERT_EQ(200, offset);
     ASSERT_NO_THROW(table.AddFieldRecord(1, "Field2", 200, computeChecksum(data, 8)));
 
     ASSERT_EQ(  0, table.GetOffset(sp0, "Field1"));
@@ -165,15 +168,20 @@ TEST_F(OffsetTableUnittest, TableToJSON)
     ASSERT_EQ(1, table2.GetSavepointID(sp[1]));
 
     // Check methods
+    OffsetTable::offset_t offset;
     ASSERT_EQ(  0, table2.GetOffset(sp0, "Field1"));
     ASSERT_EQ(  0, table2.GetOffset(sp0, "Field2"));
     ASSERT_EQ(100, table2.GetOffset(sp1, "Field1"));
     ASSERT_EQ(100, table2.GetOffset(sp1, "Field2"));
-    ASSERT_EQ(  0, table2.AlreadySerialized("Field1", computeChecksum(somedata, 4)));
-    ASSERT_EQ(100, table2.AlreadySerialized("Field1", computeChecksum(somedata, 12)));
-    ASSERT_EQ(  0, table2.AlreadySerialized("Field2", computeChecksum(somedata, 8)));
-    ASSERT_EQ(100, table2.AlreadySerialized("Field2", computeChecksum(somedata, 16)));
-    ASSERT_EQ( -1, table2.AlreadySerialized("Field1", computeChecksum(somedata, 8)));
-    ASSERT_EQ( -1, table2.AlreadySerialized("Field2", computeChecksum(somedata, 4)));
+    ASSERT_TRUE(table2.AlreadySerialized("Field1", computeChecksum(somedata, 4), offset));
+    ASSERT_EQ(  0, offset);
+    ASSERT_TRUE(table2.AlreadySerialized("Field1", computeChecksum(somedata, 12), offset));
+    ASSERT_EQ(100, offset);
+    ASSERT_TRUE(table2.AlreadySerialized("Field2", computeChecksum(somedata, 8), offset));
+    ASSERT_EQ(  0, offset);
+    ASSERT_TRUE(table2.AlreadySerialized("Field2", computeChecksum(somedata, 16), offset));
+    ASSERT_EQ(100, offset);
+    ASSERT_FALSE(table2.AlreadySerialized("Field1", computeChecksum(somedata, 8), offset));
+    ASSERT_FALSE(table2.AlreadySerialized("Field2", computeChecksum(somedata, 4), offset));
 }
 

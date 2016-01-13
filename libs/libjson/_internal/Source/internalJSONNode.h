@@ -156,8 +156,8 @@ public:
 	   DECL_CAST_OP(short)
 	   DECL_CAST_OP(int)
 	   DECL_CAST_OP(long)
+	   DECL_CAST_OP(long long)
 	   #ifndef JSON_ISO_STRICT
-		  DECL_CAST_OP(long long)
 		  operator long double() const json_nothrow;
 	   #endif
 	   operator float() const json_nothrow;
@@ -466,11 +466,9 @@ inline JSONNode * internalJSONNode::at(json_index_t pos) json_nothrow {
     IMP_SMALLER_INT_CAST_OP(unsigned short, USHRT_MAX, 0)
     IMP_SMALLER_INT_CAST_OP(int, INT_MAX, INT_MIN)
     IMP_SMALLER_INT_CAST_OP(unsigned int, UINT_MAX, 0)
+    IMP_SMALLER_INT_CAST_OP(long long, LLONG_MAX, LLONG_MIN)
+    IMP_SMALLER_INT_CAST_OP(unsigned long long, ULLONG_MAX, 0)
 
-    #ifndef JSON_ISO_STRICT
-	   IMP_SMALLER_INT_CAST_OP(long, LONG_MAX, LONG_MIN)
-	   IMP_SMALLER_INT_CAST_OP(unsigned long, ULONG_MAX, 0)
-    #endif
 #endif
 
 inline internalJSONNode::operator json_string() const json_nothrow {

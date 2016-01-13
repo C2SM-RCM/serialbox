@@ -161,7 +161,7 @@ public:
 
 
     json_string as_string(void) const json_nothrow json_read_priority;
-    int as_int(void) const json_nothrow json_read_priority;
+    json_int_t as_int(void) const json_nothrow json_read_priority;
     json_number as_float(void) const json_nothrow json_read_priority;
     bool as_bool(void) const json_nothrow json_read_priority;
     
@@ -666,9 +666,9 @@ inline void JSONNode::set_name(const json_string & newname) json_nothrow{
 	   return static_cast<json_string>(*internal);
     }
 
-    inline int JSONNode::as_int(void) const json_nothrow {
+    inline json_int_t JSONNode::as_int(void) const json_nothrow {
 	   JSON_CHECK_INTERNAL();
-	   return static_cast<int>(*internal);
+	   return static_cast<json_int_t>(*internal);
     }
 
     inline json_number JSONNode::as_float(void) const json_nothrow {
