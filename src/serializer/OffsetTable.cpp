@@ -101,7 +101,7 @@ int OffsetTable::GetSavepointID(const Savepoint& savepoint) const
     return (iter == savepointIndex_.end() ? -1 : iter->second);
 }
 
-int OffsetTable::GetOffset(const Savepoint& savepoint, const std::string& fieldName) const
+OffsetTable::offset_t OffsetTable::GetOffset(const Savepoint& savepoint, const std::string& fieldName) const
 {
     // Find savepoint ID
     std::map<Savepoint, int>::const_iterator iter = savepointIndex_.find(savepoint);
@@ -118,7 +118,7 @@ int OffsetTable::GetOffset(const Savepoint& savepoint, const std::string& fieldN
     return GetOffset(iter->second, fieldName);
 }
 
-int OffsetTable::GetOffset(int savepointID, const std::string& fieldName) const
+OffsetTable::offset_t OffsetTable::GetOffset(int savepointID, const std::string& fieldName) const
 {
     // Check that ID is valid
     if (static_cast<unsigned>(savepointID) >= entries_.size())
@@ -131,14 +131,21 @@ int OffsetTable::GetOffset(int savepointID, const std::string& fieldName) const
         throw exception;
     }
 
-    // Check that field is saved at savepoint or return -1
-    // If there is return offset
+    // Check that field is saved at savepoint
     const OffsetTableEntry& entry = entries_[savepointID];
     const_iterator iter = entry.find(fieldName);
     if (iter == entry.end())
-        return -1;
-    else
-        return iter->second.offset;
+    {
+        std::ostringstream msg;
+        msg << "Error: field " << fieldName << " is not registered at the savepoint "
+            << savepoints_[savepointID].ToString() << "\n";
+        SerializationException exception;
+        exception.Init(msg.str());
+        throw exception;
+    }
+
+    // Return offset
+    return iter->second.offset;
 }
 
 int OffsetTable::AlreadySerialized(const std::string& fieldName, const std::string& checksum) const

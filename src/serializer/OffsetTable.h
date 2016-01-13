@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <cstdint>
 
 #include "Savepoint.h"
 
@@ -22,8 +23,11 @@ namespace ser{
     */
     class OffsetTable
     {
-        typedef int offset_t;
+    public:
+        typedef std::uint64_t offset_t;
         typedef std::string checksum_t;
+
+    private:
         typedef struct { offset_t offset; checksum_t checksum; } OffsetTableEntryValue;
         typedef std::map<std::string, OffsetTableEntryValue> OffsetTableEntry;
         typedef OffsetTableEntry::const_iterator const_iterator;
@@ -87,15 +91,15 @@ namespace ser{
         * is returned, but no exception is thrown.
         *
         * @throw SerializationException The savepoint is not registered in the table
+        *        or the the specified field is not registered at the given savepoint
         *
         * @param savepoint Guess what...
         * @param fieldName Idem
         *
-        * @return The offset is returned if the record is found, otherwise a negative
-        * value is returned.
+        * @return The offset is returned if the record is found.
         */
-        int GetOffset(const Savepoint& savepoint, const std::string& fieldName) const;
-        int GetOffset(int savepointID, const std::string& fieldName) const;
+        offset_t GetOffset(const Savepoint& savepoint, const std::string& fieldName) const;
+        offset_t GetOffset(int savepointID, const std::string& fieldName) const;
 
         /**
         * Checks if an entry of the field with the same checksum exists. This can be used

@@ -129,10 +129,13 @@ void CentralizedFileFormat::OpenStreamRead(std::ifstream& stream, const std::str
     fname << directory_ << "/" << prefix_ << "_" << fieldName << ".dat";
 
     // Check if field is already saved at savepoint and get offset
-    const int offset = pOffsetTable_->GetOffset(savepoint, fieldName);
-    if (offset < 0)
+    OffsetTable::offset_t offset;
+    try {
+        offset = pOffsetTable_->GetOffset(savepoint, fieldName);
+    }
+    catch (SerializationException)
     {
-        // Throw exception
+        // Throw more detailed exception
         std::ostringstream errorstr;
         errorstr << "Error: field " << fieldName << " is not saved into serializer "
             << "at savepoint " << savepoint.ToString();
