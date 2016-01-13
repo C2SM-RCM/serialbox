@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <cstdint>
+#include <ios>
 
 #include "Savepoint.h"
 
@@ -24,7 +25,7 @@ namespace ser{
     class OffsetTable
     {
     public:
-        typedef std::uint64_t offset_t;
+        typedef std::streamoff offset_t;
         typedef std::string checksum_t;
 
     private:
