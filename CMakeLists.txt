@@ -8,7 +8,6 @@ SET(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/install/" CACHE PATH "installation
 project( SerialBox )
 enable_language (Fortran)
 find_package( Boost )
-include_directories( SYSTEM ${Boost_INCLUDE_DIRS} )
 
 set(ENABLE_DOC "OFF" CACHE BOOL "enable building doc" )
 if(ENABLE_DOC)
@@ -63,13 +62,6 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
     set(CMAKE_MACOSX_RPATH "${CMAKE_INSTALL_RPATH}")
 endif ()
-
-# Serialization
-include_directories( SYSTEM libs/libjson )
-include_directories( libs/sha256 )
-include_directories( libs/gmock-gtest)
-include_directories( src)
-
 
 # Python installation path 
 set (PYTHON_PATH "python")
