@@ -1,4 +1,6 @@
 
+include_directories( SYSTEM ${CMAKE_SOURCE_DIR}/libs/libjson )
+include_directories( ${CMAKE_SOURCE_DIR}/src)
 
 add_executable(
     dump
