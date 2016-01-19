@@ -84,9 +84,9 @@ bool compareData(const Serializer& serializer1, const Serializer& serializer2,
 				{
 					int index = i * jSize * kSize * lSize + j * kSize * lSize + k * lSize + l;
 
-					const Real val = data1[index];
-					const Real ref = data2[index];
-					const Real err = std::fabs(ref) > 1. ?
+					const T val = data1[index];
+					const T ref = data2[index];
+					const T err = std::fabs(ref) > 1. ?
 					                 std::fabs((ref - val) / ref) : std::fabs(ref - val);
 
 					const bool f = err > tolerance                     // Error is too large (e.g. val is infinite, ref is not)
@@ -103,7 +103,7 @@ bool compareData(const Serializer& serializer1, const Serializer& serializer2,
 	return !notequal;
 }
 
-template <typename T>
+template <typename T, typename U>
 void printDifference(const Serializer& serializer1, const Serializer& serializer2,
                      const Savepoint& savepoint,
                      const DataFieldInfo& info1, const DataFieldInfo& info2,
@@ -124,8 +124,8 @@ void printDifference(const Serializer& serializer1, const Serializer& serializer
 	int nValues = (bounds.iUpper - bounds.iLower + 1) * (bounds.jUpper - bounds.jLower + 1) *
 	              (bounds.kUpper - bounds.kLower + 1) * (bounds.lUpper - bounds.lLower + 1);
 	int nErrors = 0;
-	double maxRelError = 0;
-	double maxAbsError = 0;
+	U maxRelError = 0;
+	U maxAbsError = 0;
 
 	for (int i = bounds.iLower; i <= bounds.iUpper; ++i)
 		for (int j = bounds.jLower; j <= bounds.jUpper; ++j)
@@ -137,8 +137,8 @@ void printDifference(const Serializer& serializer1, const Serializer& serializer
 					{
 						++nErrors;
 
-						const Real val = data1[index];
-						const Real ref = data2[index];
+						const T val = data1[index];
+						const T ref = data2[index];
 						maxAbsError = std::max(maxAbsError, std::fabs(val - ref));
 						maxRelError = std::max(maxRelError, std::fabs((val - ref) / ref));
 					}
@@ -217,13 +217,19 @@ int compare(const std::string& directory1, const std::string& basename1,
 			{
 				equal = compareData<int>(serializer1, serializer2, savepoints[i], info1, info2, bounds, tolerance, failed);
 				if (!equal)
-					printDifference<int>(serializer1, serializer2, savepoints[i], info1, info2, bounds, failed);
+					printDifference<int,double>(serializer1, serializer2, savepoints[i], info1, info2, bounds, failed);
 			}
 			else if (info1.type() == "double")
 			{
 				equal = compareData<double>(serializer1, serializer2, savepoints[i], info1, info2, bounds, tolerance, failed);
 				if (!equal)
-					printDifference<double>(serializer1, serializer2, savepoints[i], info1, info2, bounds, failed);
+					printDifference<double,double>(serializer1, serializer2, savepoints[i], info1, info2, bounds, failed);
+			}
+			else if (info1.type() == "float")
+			{
+				equal = compareData<float>(serializer1, serializer2, savepoints[i], info1, info2, bounds, tolerance, failed);
+				if (!equal)
+					printDifference<float,float>(serializer1, serializer2, savepoints[i], info1, info2, bounds, failed);
 			}
 			else
 			{
