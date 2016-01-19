@@ -1,0 +1,53 @@
+diff --git a/libs/libjson/_internal/Source/JSONNode.h b/libs/libjson/_internal/Source/JSONNode.h
+index 7812753..4ced605 100644
+--- a/libs/libjson/_internal/Source/JSONNode.h
++++ b/libs/libjson/_internal/Source/JSONNode.h
+@@ -161,7 +161,7 @@ public:
+ 
+ 
+     json_string as_string(void) const json_nothrow json_read_priority;
+-    int as_int(void) const json_nothrow json_read_priority;
++    json_int_t as_int(void) const json_nothrow json_read_priority;
+     json_number as_float(void) const json_nothrow json_read_priority;
+     bool as_bool(void) const json_nothrow json_read_priority;
+     
+@@ -666,9 +666,9 @@ inline void JSONNode::set_name(const json_string & newname) json_nothrow{
+ 	   return static_cast<json_string>(*internal);
+     }
+ 
+-    inline int JSONNode::as_int(void) const json_nothrow {
++    inline json_int_t JSONNode::as_int(void) const json_nothrow {
+ 	   JSON_CHECK_INTERNAL();
+-	   return static_cast<int>(*internal);
++	   return static_cast<json_int_t>(*internal);
+     }
+ 
+     inline json_number JSONNode::as_float(void) const json_nothrow {
+diff --git a/libs/libjson/_internal/Source/internalJSONNode.h b/libs/libjson/_internal/Source/internalJSONNode.h
+index 2dd3a1e..8372a13 100644
+--- a/libs/libjson/_internal/Source/internalJSONNode.h
++++ b/libs/libjson/_internal/Source/internalJSONNode.h
+@@ -156,8 +156,8 @@ public:
+ 	   DECL_CAST_OP(short)
+ 	   DECL_CAST_OP(int)
+ 	   DECL_CAST_OP(long)
++	   DECL_CAST_OP(long long)
+ 	   #ifndef JSON_ISO_STRICT
+-		  DECL_CAST_OP(long long)
+ 		  operator long double() const json_nothrow;
+ 	   #endif
+ 	   operator float() const json_nothrow;
+@@ -466,11 +466,9 @@ inline JSONNode * internalJSONNode::at(json_index_t pos) json_nothrow {
+     IMP_SMALLER_INT_CAST_OP(unsigned short, USHRT_MAX, 0)
+     IMP_SMALLER_INT_CAST_OP(int, INT_MAX, INT_MIN)
+     IMP_SMALLER_INT_CAST_OP(unsigned int, UINT_MAX, 0)
++    IMP_SMALLER_INT_CAST_OP(long long, LLONG_MAX, LLONG_MIN)
++    IMP_SMALLER_INT_CAST_OP(unsigned long long, ULLONG_MAX, 0)
+ 
+-    #ifndef JSON_ISO_STRICT
+-	   IMP_SMALLER_INT_CAST_OP(long, LONG_MAX, LONG_MIN)
+-	   IMP_SMALLER_INT_CAST_OP(unsigned long, ULONG_MAX, 0)
+-    #endif
+ #endif
+ 
+ inline internalJSONNode::operator json_string() const json_nothrow {
