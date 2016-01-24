@@ -114,7 +114,7 @@ TEST_F(OffsetTableUnittest, TableToJSON)
     sp1.AddMetainfo("hd", .5);
 
     // Just for the sake of getting some valid checksums
-    double somedata[] = { 1.1, 2.2, 3.3, 4.4 };
+    float somedata[] = { 1.1f, 2.2f, 3.3f, 4.4f };
 
     // Fill table
     OffsetTable table;

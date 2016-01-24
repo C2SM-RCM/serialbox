@@ -31,45 +31,51 @@ TEST_F(SerializerUnittest, Write)
     // Create 4D field with JILK storage plus stride 2
     const int isize = 6, jsize = 8, ksize = 7, lsize = 4;
     const int kstride = 2, lstride = kstride*ksize, istride = lstride*lsize, jstride = istride*isize;
-    const int ibstride = istride*sizeof(double), jbstride = jstride*sizeof(double),
-              kbstride = kstride*sizeof(double), lbstride = lstride*sizeof(double);
+    const int ibstrided = istride*sizeof(double), jbstrided = jstride*sizeof(double),
+              kbstrided = kstride*sizeof(double), lbstrided = lstride*sizeof(double);
+    const int ibstridef = istride*sizeof(float), jbstridef = jstride*sizeof(float),
+              kbstridef = kstride*sizeof(float), lbstridef = lstride*sizeof(float);
     const int allocsize = jstride*jsize;
-    std::vector<double> data(allocsize);
+    std::vector<double> dataD(allocsize);
+    std::vector<float> dataF(allocsize);
 
     for (int i = 0; i < isize; ++i)
         for (int j = 0; j < jsize; ++j)
             for (int k = 0; k < ksize; ++k)
                 for (int l = 0; l < lsize; ++l)
                 {
-                    data[i*istride + j*jstride + k*kstride + l*lstride]
+                    dataD[i*istride + j*jstride + k*kstride + l*lstride]
+                        = i*12.25 + j*k*1. - 2.75 / (l+10.);
+                    dataF[i*istride + j*jstride + k*kstride + l*lstride]
                         = i*12.25 + j*k*1. - 2.75 / (l+10.);
                 }
 
     // Register various versions of this field
     serializer.RegisterField("ik"  , "double", 8, isize,     1, ksize,     1, 0, 0, 0, 0, 0, 0, 0, 0);
-    serializer.RegisterField("jk"  , "double", 8,     1, jsize, ksize,     1, 0, 0, 0, 0, 0, 0, 0, 0);
+    serializer.RegisterField("jk"  , "float" , 4,     1, jsize, ksize,     1, 0, 0, 0, 0, 0, 0, 0, 0);
     serializer.RegisterField("ikl" , "double", 8, isize,     1, ksize, lsize, 0, 0, 0, 0, 0, 0, 0, 0);
-    serializer.RegisterField("ijkl", "double", 8, isize, jsize, ksize, lsize, 0, 0, 0, 0, 0, 0, 0, 0);
+    serializer.RegisterField("ijkl", "float" , 4, isize, jsize, ksize, lsize, 0, 0, 0, 0, 0, 0, 0, 0);
 
     // Setting a savepoint and serializing all fields
     Savepoint sp;
     sp.Init("MySavepoint");
     sp.AddMetainfo("Value", 3.125);
+    sp.AddMetainfo("ValueF", 3.625f);
     sp.AddMetainfo("MyName", "Andrea Arteaga");
     sp.AddMetainfo("MyAge", 26);
     sp.AddMetainfo("ILikeThis", true);
 
     const int ilevel = 3, jlevel = 0, llevel = 2;
 
-    const double*   pIKData = data.data() + jstride*jlevel + lstride*llevel;
-    const double*   pJKData = data.data() + istride*ilevel + lstride*llevel;
-    const double*  pIKLData = data.data() + jstride*jlevel;
-    const double* pIJKLData = data.data();
+    const double*   pIKData = dataD.data() + jstride*jlevel + lstride*llevel;
+    const float*    pJKData = dataF.data() + istride*ilevel + lstride*llevel;
+    const double*  pIKLData = dataD.data() + jstride*jlevel;
+    const float*  pIJKLData = dataF.data();
 
-    serializer.WriteField(  "ik", sp,   pIKData, ibstride, jbstride, kbstride, lbstride);
-    serializer.WriteField(  "jk", sp,   pJKData, ibstride, jbstride, kbstride, lbstride);
-    serializer.WriteField( "ikl", sp,  pIKLData, ibstride, jbstride, kbstride, lbstride);
-    serializer.WriteField("ijkl", sp, pIJKLData, ibstride, jbstride, kbstride, lbstride);
+    serializer.WriteField(  "ik", sp,   pIKData, ibstrided, jbstrided, kbstrided, lbstrided);
+    serializer.WriteField(  "jk", sp,   pJKData, ibstridef, jbstridef, kbstridef, lbstridef);
+    serializer.WriteField( "ikl", sp,  pIKLData, ibstrided, jbstrided, kbstrided, lbstrided);
+    serializer.WriteField("ijkl", sp, pIJKLData, ibstridef, jbstridef, kbstridef, lbstridef);
 
     // Check metainfo
     std::ifstream dbfs("Data.json");
@@ -92,6 +98,7 @@ TEST_F(SerializerUnittest, Write)
     ASSERT_EQ(std::string("MySavepoint"), offsettable[0]["__name"].as_string());
     ASSERT_EQ(0, offsettable[0]["__id"].as_int());
     ASSERT_EQ(3.125, offsettable[0]["Value"].as_float());
+    ASSERT_EQ(3.625f, offsettable[0]["ValueF"].as_float());
     ASSERT_EQ(std::string("Andrea Arteaga"), offsettable[0]["MyName"].as_string());
     ASSERT_EQ(26, offsettable[0]["MyAge"].as_int());
     ASSERT_TRUE(offsettable[0]["ILikeThis"].as_bool());
@@ -116,7 +123,7 @@ TEST_F(SerializerUnittest, Write)
             {
                 const int j = jlevel, l = llevel;
                 const double value = *(pNewData + k*isize + i);
-                const double reference = data[i*istride + j*jstride + k*kstride + l*lstride];
+                const double reference = dataD[i*istride + j*jstride + k*kstride + l*lstride];
                 ASSERT_EQ(reference, value) << "i=" << i << ", k=" << k;
             }
     }
@@ -128,20 +135,20 @@ TEST_F(SerializerUnittest, Write)
         fs.seekg(0, fs.end);
         int filelength = fs.tellg();
         fs.seekg(0, fs.beg);
-        ASSERT_EQ(sizeof(double)*jsize*ksize, filelength);
+        ASSERT_EQ(sizeof(float)*jsize*ksize, filelength);
 
         std::vector<char> rawdata(filelength);
         fs.read(rawdata.data(), filelength);
         fs.close();
 
         // Check data
-        const double* pNewData = reinterpret_cast<const double*>(rawdata.data());
+        const float* pNewData = reinterpret_cast<const float*>(rawdata.data());
         for (int j = 0; j < jsize; ++j)
             for (int k = 0; k < ksize; ++k)
             {
                 const int i = ilevel, l = llevel;
-                const double value = *(pNewData + k*jsize + j);
-                const double reference = data[i*istride + j*jstride + k*kstride + l*lstride];
+                const float value = *(pNewData + k*jsize + j);
+                const float reference = dataF[i*istride + j*jstride + k*kstride + l*lstride];
                 ASSERT_EQ(reference, value) << "j=" << j << ", k=" << k;
             }
     }
@@ -167,7 +174,7 @@ TEST_F(SerializerUnittest, Write)
                 {
                     const int j = jlevel;
                     const double value = *(pNewData + l*ksize*isize + k*isize + i);
-                    const double reference = data[i*istride + j*jstride + k*kstride + l*lstride];
+                    const double reference = dataD[i*istride + j*jstride + k*kstride + l*lstride];
                     ASSERT_EQ(reference, value) << "i=" << i << ", k=" << k << ", l=" << l;
                 }
     }
@@ -179,27 +186,28 @@ TEST_F(SerializerUnittest, Write)
         fs.seekg(0, fs.end);
         int filelength = fs.tellg();
         fs.seekg(0, fs.beg);
-        ASSERT_EQ(sizeof(double)*isize*jsize*ksize*lsize, filelength);
+        ASSERT_EQ(sizeof(float)*isize*jsize*ksize*lsize, filelength);
 
         std::vector<char> rawdata(filelength);
         fs.read(rawdata.data(), filelength);
         fs.close();
 
         // Check data
-        const double* pNewData = reinterpret_cast<const double*>(rawdata.data());
+        const float* pNewData = reinterpret_cast<const float*>(rawdata.data());
         for (int i = 0; i < isize; ++i)
             for (int j = 0; j < jsize; ++j)
                 for (int k = 0; k < ksize; ++k)
                     for (int l = 0; l < lsize; ++l)
                     {
-                        const double value = *(pNewData + l*ksize*jsize*isize + k*jsize*isize + j*isize + i);
-                        const double reference = data[i*istride + j*jstride + k*kstride + l*lstride];
+                        const float value = *(pNewData + l*ksize*jsize*isize + k*jsize*isize + j*isize + i);
+                        const float reference = dataF[i*istride + j*jstride + k*kstride + l*lstride];
                         ASSERT_EQ(reference, value) << "i=" << i << ", j=" << j << ", k=" << k << ", l=" << l;
                     }
     }
 
     // Second savepoint: some fields are rewritten, others are kept the same
-    data[0] += 1.;
+    dataD[0] += 1.;
+    dataF[0] += 1.;
     // ik does not change
     // jk does not change
     // ikl changes
@@ -207,10 +215,10 @@ TEST_F(SerializerUnittest, Write)
 
     sp.Init("SecondSavepoint");
 
-    serializer.WriteField(  "ik", sp,   pIKData, ibstride, jbstride, kbstride, lbstride);
-    serializer.WriteField(  "jk", sp,   pJKData, ibstride, jbstride, kbstride, lbstride);
-    serializer.WriteField( "ikl", sp,  pIKLData, ibstride, jbstride, kbstride, lbstride);
-    serializer.WriteField("ijkl", sp, pIJKLData, ibstride, jbstride, kbstride, lbstride);
+    serializer.WriteField(  "ik", sp,   pIKData, ibstrided, jbstrided, kbstrided, lbstrided);
+    serializer.WriteField(  "jk", sp,   pJKData, ibstridef, jbstridef, kbstridef, lbstridef);
+    serializer.WriteField( "ikl", sp,  pIKLData, ibstrided, jbstrided, kbstrided, lbstrided);
+    serializer.WriteField("ijkl", sp, pIJKLData, ibstridef, jbstridef, kbstridef, lbstridef);
 
     // Load offsettable again
     dbfs.open("Data.json");
@@ -239,9 +247,9 @@ TEST_F(SerializerUnittest, Write)
         const std::string fieldname = offsettable[1]["__offsets"][i].name();
         int filelength_expect;
         if (fieldname ==   "ik") filelength_expect = 1*sizeof(double)*isize*  1  *ksize*  1  ;
-        if (fieldname ==   "jk") filelength_expect = 1*sizeof(double)*  1  *jsize*ksize*  1  ;
+        if (fieldname ==   "jk") filelength_expect = 1*sizeof(float )*  1  *jsize*ksize*  1  ;
         if (fieldname ==  "ikl") filelength_expect = 2*sizeof(double)*isize*  1  *ksize*lsize;
-        if (fieldname == "ijkl") filelength_expect = 2*sizeof(double)*isize*jsize*ksize*lsize;
+        if (fieldname == "ijkl") filelength_expect = 2*sizeof(float )*isize*jsize*ksize*lsize;
 
         std::ifstream fs(("Data_" + fieldname + ".dat").c_str(), std::ios::binary);
         fs.seekg(0, fs.end);
