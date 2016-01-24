@@ -13,9 +13,9 @@ protected:
 
     // These vectors are used as Fortran-style storage
     std::vector<int> fieldInt2, fieldInt3;
-    std::vector<Real> fieldReal1, fieldReal3;
+    std::vector<double> fieldReal1, fieldReal3;
     std::vector<int> fieldcheckInt2, fieldcheckInt3;
-    std::vector<Real> fieldcheckReal1, fieldcheckReal3;
+    std::vector<double> fieldcheckReal1, fieldcheckReal3;
 
     std::string realtype;
     int iSize, jSize, kSize;
@@ -35,7 +35,7 @@ protected:
         realtype = "double";
 #endif
         intSize = sizeof(int);
-        realSize = sizeof(Real);
+        realSize = sizeof(double);
 
         // Allocate fields
         fieldInt2.resize(iSize*kSize);
