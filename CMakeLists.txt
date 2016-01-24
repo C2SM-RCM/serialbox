@@ -44,13 +44,6 @@ if( CMAKE_HOST_UNIX )
     set ( CMAKE_EXE_LINKER_FLAGS "${CMAKE_LINK_FLAGS} ${CMAKE_THREAD_LIBS_INIT}")
 endif()
 
-# Single precision
-set( SINGLEPRECISION "OFF" CACHE BOOL "Single precision" )
-if( SINGLEPRECISION )
-    add_definitions( -DSINGLEPRECISION )
-endif( SINGLEPRECISION )
-
-
 # OSX specific configuration
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
