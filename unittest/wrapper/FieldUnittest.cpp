@@ -203,7 +203,7 @@ TEST_F(FieldUnittest, Register)
 TEST_F(FieldUnittest, FieldMetainfo)
 {
     fs_register_field(&ser, "field1", 6, "int"   , 3, 4, 42,  1, 80,  1, 3, 3, 0, 0, 0, 1, 0, 0);
-    fs_register_field(&ser, "field2", 6, "double", 6, 8,  1, 28, 80, 12, 0, 0, 2, 2, 0, 0, 1, 1);
+    fs_register_field(&ser, "field2", 6, "float", 5, 4,  1, 28, 80, 12, 0, 0, 2, 2, 0, 0, 1, 1);
 
     // Add some metainfo
     fs_add_field_metainfo_b(&ser, "field1", 6, "FirstField", 10, true);

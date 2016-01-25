@@ -27,7 +27,7 @@ TEST_F(OffsetTableUnittest, Savepoint)
     sp.AddMetainfo("LargeTimeStep", 1);
     sp.AddMetainfo("RKStageNumber", 2);
     sp.AddMetainfo("ldyn_bbc", false);
-    sp.AddMetainfo("hd", (Real).5);
+    sp.AddMetainfo("hd", .5);
 
     JSONNode node = sp.ToJSON();
 
@@ -43,7 +43,7 @@ TEST_F(OffsetTableUnittest, Savepoint)
     sp3.AddMetainfo("LargeTimeStep", 1);
     sp3.AddMetainfo("RKStageNumber", 3);
     sp3.AddMetainfo("ldyn_bbc", false);
-    sp3.AddMetainfo("hd", (Real).5);
+    sp3.AddMetainfo("hd", .5);
     ASSERT_NE(sp, sp3);
 
     Savepoint sp4;
@@ -73,7 +73,7 @@ TEST_F(OffsetTableUnittest, Checksum)
     sp0.AddMetainfo("ldyn_bbc", false);
     sp1.Init("DycoreUnittest.DoStep-out");
     sp1.AddMetainfo("LargeTimeStep", 2);
-    sp1.AddMetainfo("hd", (Real).5);
+    sp1.AddMetainfo("hd", .5);
 
     // Test that offset table recognizes checksums
     OffsetTable table;
@@ -111,10 +111,10 @@ TEST_F(OffsetTableUnittest, TableToJSON)
     sp0.AddMetainfo("ldyn_bbc", false);
     sp1.Init("DycoreUnittest.DoStep-out");
     sp1.AddMetainfo("LargeTimeStep", 2);
-    sp1.AddMetainfo("hd", (Real).5);
+    sp1.AddMetainfo("hd", .5);
 
     // Just for the sake of getting some valid checksums
-    double somedata[] = { 1.1, 2.2, 3.3, 4.4 };
+    float somedata[] = { 1.1f, 2.2f, 3.3f, 4.4f };
 
     // Fill table
     OffsetTable table;

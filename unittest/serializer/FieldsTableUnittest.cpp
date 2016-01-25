@@ -37,10 +37,11 @@ TEST_F(FieldsTableUnittest, Serilalize)
     info1.AddMetainfo("ADV", true);
 
     info2.Init(
-            "Field2", "double", 8, 3,
+            "Field2", "float", 4, 3,
             38, 24, 61, 1,
             3, 3, 3, 3, 0, 1, 0, 0);
-    info2.AddMetainfo("Init", 7.4);
+    info2.AddMetainfo("InitD", 7.25);
+    info2.AddMetainfo("InitF", 7.25f);
 
     // Registering fields into table
     table.RegisterField(info1);
@@ -89,11 +90,13 @@ TEST_F(FieldsTableUnittest, Serilalize)
     ASSERT_EQ(node[1]["__jplushalosize"].as_int(), 3);
     ASSERT_EQ(node[1]["__kminushalosize"].as_int(), 0);
     ASSERT_EQ(node[1]["__kplushalosize"].as_int(), 1);
-    ASSERT_EQ(node[1]["Init"].as_float(), 7.4);
+    ASSERT_EQ(node[1]["InitD"].as_float(), 7.25);
+    ASSERT_EQ(node[1]["InitF"].as_float(), 7.25f);
 }
 
 TEST_F(FieldsTableUnittest, DeserilalizeField)
 {
+    // Double
     const std::string field_txt =
         "{"
         "  \"__name\" : \"Field1\","
@@ -132,6 +135,46 @@ TEST_F(FieldsTableUnittest, DeserilalizeField)
     ASSERT_EQ(0, info1.kMinusHaloSize());
     ASSERT_EQ(0, info1.kPlusHaloSize());
     ASSERT_EQ(true, info1.metainfo().AsBool("ADV"));
+
+    // Float
+    const std::string field_txt2 =
+        "{"
+        "  \"__name\" : \"Field2\","
+        "  \"__id\" : 0,"
+        "  \"__elementtype\" : \"float\", "
+        "  \"__bytesperelement\" : 4,"
+        "  \"__rank\" : 3,"
+        "  \"__isize\" : 38,"
+        "  \"__jsize\" : 24,"
+        "  \"__ksize\" : 60,"
+        "  \"__iminushalosize\" : 3,"
+        "  \"__iplushalosize\" : 3,"
+        "  \"__jminushalosize\" : 3,"
+        "  \"__jplushalosize\" : 3,"
+        "  \"__kminushalosize\" : 0,"
+        "  \"__kplushalosize\" : 0,"
+        "  \"Init\" : 8.125"
+        "}"
+    ;
+
+    JSONNode node2 = libjson::parse(field_txt2);
+    DataFieldInfo info2;
+    info2.FromJSON(node2);
+
+    ASSERT_EQ("Field2", info2.name());
+    ASSERT_EQ("float", info2.type());
+    ASSERT_EQ(4, info2.bytesPerElement());
+    ASSERT_EQ(3, info2.rank());
+    ASSERT_EQ(38, info2.iSize());
+    ASSERT_EQ(24, info2.jSize());
+    ASSERT_EQ(60, info2.kSize());
+    ASSERT_EQ(3, info2.iMinusHaloSize());
+    ASSERT_EQ(3, info2.iPlusHaloSize());
+    ASSERT_EQ(3, info2.jMinusHaloSize());
+    ASSERT_EQ(3, info2.jPlusHaloSize());
+    ASSERT_EQ(0, info2.kMinusHaloSize());
+    ASSERT_EQ(0, info2.kPlusHaloSize());
+    ASSERT_EQ(8.125f, info2.metainfo().AsFloat("Init"));
 }
 
 TEST_F(FieldsTableUnittest, DeserilalizeTable)
@@ -213,6 +256,6 @@ TEST_F(FieldsTableUnittest, DeserilalizeTable)
     ASSERT_EQ(3, info.jPlusHaloSize());
     ASSERT_EQ(0, info.kMinusHaloSize());
     ASSERT_EQ(1, info.kPlusHaloSize());
-    ASSERT_EQ(7.25, info.metainfo().AsReal("Init"));
+    ASSERT_EQ(7.25, info.metainfo().AsReal<double>("Init"));
 }
 
