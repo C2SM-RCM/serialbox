@@ -52,7 +52,9 @@ def type2dtype(typestr, typesize):
         'int4' : np.int32,
         'int8' : np.int64,
         'float4' : np.float32,
-        'double8' : np.float64
+        'float324' : np.float32,
+        'double8' : np.float64,
+        'float648' : np.float64
         }
     try:
         return conv["{0}{1}".format(typestr,typesize)]
@@ -62,6 +64,15 @@ def type2dtype(typestr, typesize):
 # Extract wrapper functions
 fs_create_serializer = wrapper.fs_create_serializer                               ; fs_create_serializer.restype = ctypes.c_void_p
 fs_destroy_serializer = wrapper.fs_destroy_serializer
+fs_serializer_metainfo_size = wrapper.fs_serializer_metainfo_size                 ; fs_serializer_metainfo_size.restype = ctypes.c_int
+fs_serializer_metainfo_key_lengths = wrapper.fs_serializer_metainfo_key_lengths
+fs_serializer_metainfo_get_keys = wrapper.fs_serializer_metainfo_get_keys
+fs_serializer_metainfo_get_types = wrapper.fs_serializer_metainfo_get_types
+fs_get_serializer_metainfo_b = wrapper.fs_get_serializer_metainfo_b
+fs_get_serializer_metainfo_i = wrapper.fs_get_serializer_metainfo_i
+fs_get_serializer_metainfo_f = wrapper.fs_get_serializer_metainfo_f
+fs_get_serializer_metainfo_d = wrapper.fs_get_serializer_metainfo_d
+fs_get_serializer_metainfo_s = wrapper.fs_get_serializer_metainfo_s
 fs_add_serializer_metainfo_b = wrapper.fs_add_serializer_metainfo_b
 fs_add_serializer_metainfo_i = wrapper.fs_add_serializer_metainfo_i
 fs_add_serializer_metainfo_f = wrapper.fs_add_serializer_metainfo_f
@@ -91,7 +102,7 @@ fs_create_savepoint = wrapper.fs_create_savepoint                               
 fs_duplicate_savepoint = wrapper.fs_duplicate_savepoint                           ; fs_duplicate_savepoint.restype = ctypes.c_void_p
 fs_destroy_savepoint = wrapper.fs_destroy_savepoint
 fs_reinitialize_savepoint = wrapper.fs_reinitialize_savepoint
-fs_savepoint_metainfo = wrapper.fs_savepoint_metainfo                             ; fs_savepoint_metainfo.restype = ctypes.c_int
+fs_savepoint_metainfo_size = wrapper.fs_savepoint_metainfo_size                   ; fs_savepoint_metainfo_size.restype = ctypes.c_int
 fs_savepoint_name_length = wrapper.fs_savepoint_name_length                       ; fs_savepoint_name_length.restype = ctypes.c_int
 fs_savepoint_get_name = wrapper.fs_savepoint_get_name
 fs_savepoint_key_lengths = wrapper.fs_savepoint_key_lengths
@@ -273,7 +284,7 @@ class savepoint(object):
     @property
     def metainfo_tuples(self):
         # Retrieve key lengths
-        n_keys = int(fs_savepoint_metainfo(self.savepoint))
+        n_keys = int(fs_savepoint_metainfo_size(self.savepoint))
         key_lengths = (ctypes.c_int*n_keys)()
         fs_savepoint_key_lengths(self.savepoint, key_lengths)
 
@@ -292,7 +303,7 @@ class savepoint(object):
     @property
     def metainfo(self):
         # Retrieve key lengths
-        n_keys = int(fs_savepoint_metainfo(self.savepoint))
+        n_keys = int(fs_savepoint_metainfo_size(self.savepoint))
         key_lengths = (ctypes.c_int*n_keys)()
         fs_savepoint_key_lengths(self.savepoint, key_lengths)
 
@@ -350,9 +361,6 @@ class savepoint(object):
         else:
             raise AttributeError("Error: type of value not supported")
 
-    def metainfo_number(self):
-        return int(fs_savepoint_metainfo(self.savepoint))
-
 
 class serializer(object):
     def __init__(self, directory, prefix, openmode):
@@ -401,7 +409,9 @@ class serializer(object):
         return field
 
     def save_field(self, name, field, savepoint):
-        self.register_field(name, field)
+        if name not in self.fieldnames:
+            self.register_field(name, field)
+
         name, namelength = extract_string(name)
 
         # Extract strides
@@ -410,15 +420,28 @@ class serializer(object):
         fs_write_field(self.serializer, savepoint.savepoint, name, namelength,
                 field.ctypes.data, strides[0], strides[1], strides[2], strides[3])
 
-    def register_field(self, name, field):
+    def register_field(self, name, field, **kwargs):
         name, namelength = extract_string(name)
         dtype, dtypelength = extract_string(field.dtype.name)
         size = [field.shape[i] if i < len(field.shape) else 1 for i in range(4)]
 
+        # Extract halo
+        iminushalo = kwargs.get('iminushalo', 0)
+        iplushalo = kwargs.get('iplushalo', 0)
+        jminushalo = kwargs.get('jminushalo', 0)
+        jplushalo = kwargs.get('jplushalo', 0)
+        kminushalo = kwargs.get('kminushalo', 0)
+        kplushalo = kwargs.get('kplushalo', 0)
+        lminushalo = kwargs.get('lminushalo', 0)
+        lplushalo = kwargs.get('lplushalo', 0)
+
+        # Call C routine
         fs_register_field(self.serializer, name, namelength,
                 dtype, dtypelength, field.dtype.itemsize,
                 size[0], size[1], size[2], size[3],
-                0, 0, 0, 0, 0, 0, 0, 0)
+                iminushalo, iplushalo, jminushalo, jplushalo,
+                kminushalo, kplushalo, lminushalo, lplushalo
+                )
 
     @property
     def fieldnames(self):
@@ -426,10 +449,11 @@ class serializer(object):
         n_fields = fs_fields(self.serializer)
         name_lengths = (ctypes.c_int*n_fields)()
         fs_fieldname_lengths(self.serializer, name_lengths)
+        name_length = max(name_lengths)+1
 
         # Get field names
         names = ((ctypes.c_char_p)*n_fields)()
-        names[:] = [('\0'*name_lengths[i]).encode() for i in range(n_fields)]
+        names[:] = [('\0'*name_length).encode() for i in range(n_fields)]
         fs_get_fieldnames(self.serializer, names)
 
         return [n.decode() for n in names]
@@ -437,6 +461,49 @@ class serializer(object):
     @property
     def fieldinfos(self):
         return [self._fieldinfo(f) for f in self.fieldnames]
+
+    @property
+    def metainfo(self):
+        # Retrieve key lengths
+        n_keys = int(fs_serializer_metainfo_size(self.serializer))
+        key_lengths = (ctypes.c_int*n_keys)()
+        fs_serializer_metainfo_key_lengths(self.serializer, key_lengths)
+
+        # Retrieve keys
+        keys = ((ctypes.c_char_p)*n_keys)()
+        keys[:] = [('\0'*key_lengths[i]).encode() for i in range(n_keys)]
+        fs_serializer_metainfo_get_keys(self.serializer, keys)
+
+        # Retrieve types
+        types = (ctypes.c_int*n_keys)()
+        fs_serializer_metainfo_get_types(self.serializer, types)
+
+        metainfo = {}
+        for i in range(n_keys):
+            keystr = keys[i].decode()
+            key, keylength = extract_string(keystr)
+            if (types[i] == -1):
+                v = ctypes.c_bool()
+                f = fs_get_serializer_metainfo_b(self.serializer, key, keylength, ctypes.pointer(v))
+                metainfo[keystr] = v.value
+            elif (types[i] == -2):
+                v = ctypes.c_int()
+                f = fs_get_serializer_metainfo_i(self.serializer, key, keylength, ctypes.pointer(v))
+                metainfo[keystr] = v.value
+            elif (types[i] == -3):
+                v = ctypes.c_float()
+                f = fs_get_serializer_metainfo_f(self.serializer, key, keylength, ctypes.pointer(v))
+                metainfo[keystr] = v.value
+            elif (types[i] == -4):
+                v = ctypes.c_double()
+                f = fs_get_serializer_metainfo_d(self.serializer, key, keylength, ctypes.pointer(v))
+                metainfo[keystr] = v.value
+            elif (types[i] >= 0):
+                v = ctypes.create_string_buffer(types[i])
+                f = fs_get_serializer_metainfo_s(self.serializer, key, keylength, v)
+                metainfo[keystr] = v.value.decode()
+
+        return metainfo
 
     def add_metainfo(self, key, value):
         key, keylength = extract_string(key)

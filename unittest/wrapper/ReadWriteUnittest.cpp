@@ -13,13 +13,14 @@ protected:
 
     // These vectors are used as Fortran-style storage
     std::vector<int> fieldInt2, fieldInt3;
-    std::vector<Real> fieldReal1, fieldReal3;
+    std::vector<double> fieldDouble1, fieldDouble3;
+    std::vector<float> fieldFloat1, fieldFloat3;
     std::vector<int> fieldcheckInt2, fieldcheckInt3;
-    std::vector<Real> fieldcheckReal1, fieldcheckReal3;
+    std::vector<double> fieldcheckDouble1, fieldcheckDouble3;
+    std::vector<float> fieldcheckFloat1, fieldcheckFloat3;
 
-    std::string realtype;
     int iSize, jSize, kSize;
-    int intSize, realSize;
+    int intSize, doubleSize, floatSize;
 
     Serializer ser;
     Savepoint sp;
@@ -29,23 +30,23 @@ protected:
         jSize = 18;
         kSize = 10;
 
-#ifdef _SINGLEPRECISION_
-        realtype = "float";
-#else
-        realtype = "double";
-#endif
         intSize = sizeof(int);
-        realSize = sizeof(Real);
+        doubleSize = sizeof(double);
+        floatSize = sizeof(float);
 
         // Allocate fields
         fieldInt2.resize(iSize*kSize);
         fieldInt3.resize(iSize*jSize*kSize);
-        fieldReal1.resize(jSize);
-        fieldReal3.resize(iSize*jSize*kSize);
+        fieldDouble1.resize(jSize);
+        fieldDouble3.resize(iSize*jSize*kSize);
+        fieldFloat1.resize(jSize);
+        fieldFloat3.resize(iSize*jSize*kSize);
         fieldcheckInt2.resize(iSize*kSize);
         fieldcheckInt3.resize(iSize*jSize*kSize);
-        fieldcheckReal1.resize(jSize);
-        fieldcheckReal3.resize(iSize*jSize*kSize);
+        fieldcheckDouble1.resize(jSize);
+        fieldcheckDouble3.resize(iSize*jSize*kSize);
+        fieldcheckFloat1.resize(jSize);
+        fieldcheckFloat3.resize(iSize*jSize*kSize);
 
         // Initialize serialization objects
         ser.Init("./", "ReadWriteUnittest", SerializerOpenModeWrite);
@@ -54,8 +55,10 @@ protected:
         // Register fields
         ser.RegisterField("int3", "int", intSize, iSize, jSize, kSize, 1, 0, 0, 0, 0, 0, 0, 0, 0);
         ser.RegisterField("int2", "int", intSize, iSize, 1, kSize, 1, 0, 0, 0, 0, 0, 0, 0, 0);
-        ser.RegisterField("real3", realtype, realSize, iSize, jSize, kSize, 1, 0, 0, 0, 0, 0, 0, 0, 0);
-        ser.RegisterField("real1", realtype, realSize, 1, jSize, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0);
+        ser.RegisterField("double3", "double", doubleSize, iSize, jSize, kSize, 1, 0, 0, 0, 0, 0, 0, 0, 0);
+        ser.RegisterField("double1", "double", doubleSize, 1, jSize, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0);
+        ser.RegisterField("float3", "float", floatSize, iSize, jSize, kSize, 1, 0, 0, 0, 0, 0, 0, 0, 0);
+        ser.RegisterField("float1", "float", floatSize, 1, jSize, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0);
 
         FillFields();
     }
@@ -65,8 +68,10 @@ protected:
         std::remove("ReadWriteUnittest.json");
         std::remove("ReadWriteUnittest_int3.dat");
         std::remove("ReadWriteUnittest_int2.dat");
-        std::remove("ReadWriteUnittest_real3.dat");
-        std::remove("ReadWriteUnittest_real1.dat");
+        std::remove("ReadWriteUnittest_double3.dat");
+        std::remove("ReadWriteUnittest_double1.dat");
+        std::remove("ReadWriteUnittest_float3.dat");
+        std::remove("ReadWriteUnittest_float1.dat");
     }
 
     void FillFields() {
@@ -75,7 +80,8 @@ protected:
                 for (int k = 0; k < kSize; ++k)
                 {
                     fieldInt3[i + j*iSize + k*iSize*jSize] = i + 2*j - 12*k*i;
-                    fieldReal3[i + j*iSize + k*iSize*jSize] = 1.125*i + 2.25*j - 12.5*k*i;
+                    fieldDouble3[i + j*iSize + k*iSize*jSize] = 1.125*i + 2.25*j - 12.5*k*i;
+                    fieldFloat3[i + j*iSize + k*iSize*jSize] = 1.5f*i + 4.25f*j - 16.0f*k*i;
                 }
 
         for (int i = 0; i < iSize; ++i)
@@ -86,7 +92,8 @@ protected:
 
         for (int j = 0; j < jSize; ++j)
         {
-            fieldReal1[j] = j*j+2.875;
+            fieldDouble1[j] = j*j+2.875;
+            fieldFloat1[j] = j*j+3.5f;
         }
     }
 
@@ -113,20 +120,26 @@ TEST_F(ReadWriteUnittest, Write)
     // Write fields
     fs_write_field(&ser, &sp, "int3", 4, fieldInt3.data(), intSize, intSize*iSize, intSize*iSize*jSize, 0);
     fs_write_field(&ser, &sp, "int2", 4, fieldInt2.data(), intSize, 0, intSize*iSize, 0);
-    fs_write_field(&ser, &sp, "real3", 5, fieldReal3.data(), realSize, realSize*iSize, realSize*iSize*jSize, 0);
-    fs_write_field(&ser, &sp, "real1", 5, fieldReal1.data(), 0, realSize, 0, 0);
+    fs_write_field(&ser, &sp, "double3", 7, fieldDouble3.data(), doubleSize, doubleSize*iSize, doubleSize*iSize*jSize, 0);
+    fs_write_field(&ser, &sp, "double1", 7, fieldDouble1.data(), 0, doubleSize, 0, 0);
+    fs_write_field(&ser, &sp, "float3", 6, fieldFloat3.data(), floatSize, floatSize*iSize, floatSize*iSize*jSize, 0);
+    fs_write_field(&ser, &sp, "float1", 6, fieldFloat1.data(), 0, floatSize, 0, 0);
 
     // Load with C++
     ser.ReadField("int3", sp, fieldcheckInt3.data(), intSize, intSize*iSize, intSize*iSize*jSize, 0);
     ser.ReadField("int2", sp, fieldcheckInt2.data(), intSize, 0, intSize*iSize, 0);
-    ser.ReadField("real3", sp, fieldcheckReal3.data(), realSize, realSize*iSize, realSize*iSize*jSize, 0);
-    ser.ReadField("real1", sp, fieldcheckReal1.data(), 0, realSize, 0, 0);
+    ser.ReadField("double3", sp, fieldcheckDouble3.data(), doubleSize, doubleSize*iSize, doubleSize*iSize*jSize, 0);
+    ser.ReadField("double1", sp, fieldcheckDouble1.data(), 0, doubleSize, 0, 0);
+    ser.ReadField("float3", sp, fieldcheckFloat3.data(), floatSize, floatSize*iSize, floatSize*iSize*jSize, 0);
+    ser.ReadField("float1", sp, fieldcheckFloat1.data(), 0, floatSize, 0, 0);
 
     // Check
     ASSERT_TRUE(CheckVector(fieldInt3, fieldcheckInt3));
     ASSERT_TRUE(CheckVector(fieldInt2, fieldcheckInt2));
-    ASSERT_TRUE(CheckVector(fieldReal3, fieldcheckReal3));
-    ASSERT_TRUE(CheckVector(fieldReal1, fieldcheckReal1));
+    ASSERT_TRUE(CheckVector(fieldDouble3, fieldcheckDouble3));
+    ASSERT_TRUE(CheckVector(fieldDouble1, fieldcheckDouble1));
+    ASSERT_TRUE(CheckVector(fieldFloat3, fieldcheckFloat3));
+    ASSERT_TRUE(CheckVector(fieldFloat1, fieldcheckFloat1));
 }
 
 /**
@@ -138,19 +151,25 @@ TEST_F(ReadWriteUnittest, Read)
     // Write with C++
     ser.WriteField("int3", sp, fieldInt3.data(), intSize, intSize*iSize, intSize*iSize*jSize, 0);
     ser.WriteField("int2", sp, fieldInt2.data(), intSize, 0, intSize*iSize, 0);
-    ser.WriteField("real3", sp, fieldReal3.data(), realSize, realSize*iSize, realSize*iSize*jSize, 0);
-    ser.WriteField("real1", sp, fieldReal1.data(), 0, realSize, 0, 0);
+    ser.WriteField("double3", sp, fieldDouble3.data(), doubleSize, doubleSize*iSize, doubleSize*iSize*jSize, 0);
+    ser.WriteField("double1", sp, fieldDouble1.data(), 0, doubleSize, 0, 0);
+    ser.WriteField("float3", sp, fieldFloat3.data(), floatSize, floatSize*iSize, floatSize*iSize*jSize, 0);
+    ser.WriteField("float1", sp, fieldFloat1.data(), 0, floatSize, 0, 0);
 
     // Load fields
     fs_read_field(&ser, &sp, "int3", 4, fieldcheckInt3.data(), intSize, intSize*iSize, intSize*iSize*jSize, 0);
     fs_read_field(&ser, &sp, "int2", 4, fieldcheckInt2.data(), intSize, 0, intSize*iSize, 0);
-    fs_read_field(&ser, &sp, "real3", 5, fieldcheckReal3.data(), realSize, realSize*iSize, realSize*iSize*jSize, 0);
-    fs_read_field(&ser, &sp, "real1", 5, fieldcheckReal1.data(), 0, realSize, 0, 0);
+    fs_read_field(&ser, &sp, "double3", 7, fieldcheckDouble3.data(), doubleSize, doubleSize*iSize, doubleSize*iSize*jSize, 0);
+    fs_read_field(&ser, &sp, "double1", 7, fieldcheckDouble1.data(), 0, doubleSize, 0, 0);
+    fs_read_field(&ser, &sp, "float3", 6, fieldcheckFloat3.data(), floatSize, floatSize*iSize, floatSize*iSize*jSize, 0);
+    fs_read_field(&ser, &sp, "float1", 6, fieldcheckFloat1.data(), 0, floatSize, 0, 0);
 
     // Check
     ASSERT_TRUE(CheckVector(fieldInt3, fieldcheckInt3));
     ASSERT_TRUE(CheckVector(fieldInt2, fieldcheckInt2));
-    ASSERT_TRUE(CheckVector(fieldReal3, fieldcheckReal3));
-    ASSERT_TRUE(CheckVector(fieldReal1, fieldcheckReal1));
+    ASSERT_TRUE(CheckVector(fieldDouble3, fieldcheckDouble3));
+    ASSERT_TRUE(CheckVector(fieldDouble1, fieldcheckDouble1));
+    ASSERT_TRUE(CheckVector(fieldFloat3, fieldcheckFloat3));
+    ASSERT_TRUE(CheckVector(fieldFloat1, fieldcheckFloat1));
 }
 

@@ -10,10 +10,15 @@ extern "C"
                                char openmode);
     void fs_destroy_serializer(void* serializer);
     char fs_serializer_openmode(void* serializer);
-    //int  fs_serializer_metainfo(void* savepoint);
-    //void fs_serializer_metainfo_key_lengths(void* savepoint, int* lengths);
-    //void fs_serializer_metainfo_get_keys(void* savepoint, char** lengths);
-    //void fs_serializer_metainfo_get_types(void* savepoint, int* types);
+    int  fs_serializer_metainfo_size(void* savepoint);
+    void fs_serializer_metainfo_key_lengths(void* savepoint, int* lengths);
+    void fs_serializer_metainfo_get_keys(void* savepoint, char** lengths);
+    void fs_serializer_metainfo_get_types(void* savepoint, int* types);
+    void fs_get_serializer_metainfo_b(void* serializer, const char* name, int name_length,   bool* value);
+    void fs_get_serializer_metainfo_i(void* serializer, const char* name, int name_length,    int* value);
+    void fs_get_serializer_metainfo_f(void* serializer, const char* name, int name_length,  float* value);
+    void fs_get_serializer_metainfo_d(void* serializer, const char* name, int name_length, double* value);
+    void fs_get_serializer_metainfo_s(void* serializer, const char* name, int name_length, char* value);
     void fs_add_serializer_metainfo_b(void* serializer, const char* name, int name_length,    bool value);
     void fs_add_serializer_metainfo_i(void* serializer, const char* name, int name_length,     int value);
     void fs_add_serializer_metainfo_f(void* serializer, const char* name, int name_length,   float value);
@@ -58,7 +63,7 @@ extern "C"
     void* fs_duplicate_savepoint(void* savepoint);
     void fs_destroy_savepoint(void* savepoint);
     void fs_reinitialize_savepoint(void* savepoint, const char* name, int name_length);
-    int fs_savepoint_metainfo(void* savepoint);
+    int fs_savepoint_metainfo_size(void* savepoint);
     int fs_savepoint_name_length(void* savepoint);
     void fs_savepoint_get_name(void* savepoint, char* name);
     void fs_savepoint_key_lengths(void* savepoint, int* lengths);

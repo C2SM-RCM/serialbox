@@ -56,7 +56,7 @@ TEST(SavepointUnittest, Metainfo)
     fs_add_savepoint_metainfo_s(&sp, "MyOS", 4, "GNU/Linux", 9);
 
     // Get metainfo number
-    ASSERT_EQ(6, fs_savepoint_metainfo(&sp));
+    ASSERT_EQ(6, fs_savepoint_metainfo_size(&sp));
 
     // Get keys of metainfo
     int key_length[6];
