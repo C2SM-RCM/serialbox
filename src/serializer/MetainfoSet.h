@@ -261,8 +261,8 @@ namespace ser {
         template<typename RealType>
         RealType AsReal(const std::string& key) const
         {
-            BOOST_STATIC_ASSERT(boost::is_same<RealType, float>::value
-                             || boost::is_same<RealType, double>::value);
+            BOOST_STATIC_ASSERT((boost::is_same<RealType, float>::value
+                             || boost::is_same<RealType, double>::value));
 
             if (boost::is_same<RealType, float>::value) return AsFloat(key);
             else if (boost::is_same<RealType, double>::value) return AsDouble(key);
