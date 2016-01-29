@@ -430,11 +430,6 @@ class pp_ser:
 
         (dirs, keys, values, if_statement) = self.__ser_arg_parse(args)
 
-        # only key=value pairs with optional removeintentin allowed
-        if len(dirs) != 0:
-            if not(len(dirs) == 1 and 'removeintentin' in dirs):
-                self.__exit_error(directive = args[0],
-                              msg = 'Must specify a list of key=value pairs with optional removeintentin')
         # generate serialization code
         self.__calls.add(self.methods['datawrite'])
         self.__calls.add(self.methods['dataread'])
@@ -446,11 +441,10 @@ class pp_ser:
             l += 'IF (' + if_statement + ') THEN\n'
             tab = '  '
 
-        if 'removeintentin' in dirs:
-            for v in values:
-                v = re.sub(r'\(.+\)', '', v)
-                if v not in self.intentin_to_remove:
-                    self.intentin_to_remove.append(v)
+        for v in values:
+            v = re.sub(r'\(.+\)', '', v)
+            if v not in self.intentin_to_remove:
+                self.intentin_to_remove.append(v)
 
         l += tab + 'SELECT CASE ( ' + self.methods['getmode'] + '() )\n'
         l += tab + '  ' + 'CASE(' + str(self.modes['write']) + ')\n'
