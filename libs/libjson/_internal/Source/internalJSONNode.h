@@ -144,6 +144,7 @@ public:
 	   DECL_SET_INTEGER(short)
 	   DECL_SET_INTEGER(int)
 	   DECL_SET_INTEGER(long)
+	   DECL_SET_INTEGER(long long)
 	   #ifndef JSON_ISO_STRICT
 		  DECL_SET_INTEGER(long long)
 		  void Set(long double val) json_nothrow json_write_priority;
