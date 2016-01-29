@@ -79,12 +79,12 @@
     #endif
 
     #define DECLARE_FOR_ALL_TYPES(foo)\
-       foo(char) json_nothrow;      foo(unsigned char) json_nothrow;\
-       foo(short) json_nothrow;     foo(unsigned short) json_nothrow;\
-       foo(int) json_nothrow;       foo(unsigned int) json_nothrow;\
-       foo(long) json_nothrow;      foo(unsigned long) json_nothrow;\
-       foo(long long) json_nothrow; foo(unsigned long long) json_nothrow; \
-       foo(float) json_nothrow;     foo(double) json_nothrow;\
+	   foo(char) json_nothrow;      foo(unsigned char) json_nothrow;\
+	   foo(short) json_nothrow;     foo(unsigned short) json_nothrow;\
+	   foo(int) json_nothrow;       foo(unsigned int) json_nothrow;\
+	   foo(long) json_nothrow;      foo(unsigned long) json_nothrow;\
+	   foo(long long) json_nothrow; foo(unsigned long long) json_nothrow;\
+	   foo(float) json_nothrow;     foo(double) json_nothrow;\
 	   foo(bool) json_nothrow;\
 	   foo(const json_string &) json_nothrow;\
 	   foo(const json_char *) json_nothrow;\
@@ -92,12 +92,12 @@
 	   DECLARE_FOR_LONG_DOUBLE(foo)
 
     #define DECLARE_FOR_ALL_CAST_TYPES_CONST(foo)\
-       foo(char) const json_nothrow;	  foo(unsigned char) const json_nothrow;\
-       foo(short) const json_nothrow;	  foo(unsigned short) const json_nothrow;\
-       foo(int) const json_nothrow;       foo(unsigned int) const json_nothrow;\
-       foo(long) const json_nothrow;	  foo(unsigned long) const json_nothrow;\
-       foo(long long) const json_nothrow; foo(unsigned long long) const json_nothrow;\
-       foo(float) const json_nothrow;     foo(double) const json_nothrow;\
+	    foo(char) const json_nothrow;      foo(unsigned char) const json_nothrow;\
+	    foo(short) const json_nothrow;     foo(unsigned short) const json_nothrow;\
+	    foo(int) const json_nothrow;       foo(unsigned int) const json_nothrow;\
+	    foo(long) const json_nothrow;      foo(unsigned long) const json_nothrow;\
+	    foo(long long) const json_nothrow; foo(unsigned long long) const json_nothrow;\
+	    foo(float) const json_nothrow;     foo(double) const json_nothrow;\
 	   foo(bool) const json_nothrow;\
 	   foo(const json_string &) const json_nothrow;\
 	   DECLARE_FOR_LONG_LONG_CONST(foo)\
@@ -109,12 +109,12 @@
 	   foo(const json_char *) const json_nothrow;
 
     #define IMPLEMENT_FOR_ALL_NUMBERS(foo)\
-	   foo(char) foo(unsigned char)\
-	   foo(short) foo(unsigned short)\
-	   foo(int) foo(unsigned int)\
-	   foo(long) foo(unsigned long)\
-       foo(long long) foo(unsigned long long)\
-	   foo(float) foo(double)\
+	   foo(char)      foo(unsigned char)\
+	   foo(short)     foo(unsigned short)\
+	   foo(int)       foo(unsigned int)\
+	   foo(long)      foo(unsigned long)\
+	   foo(long long) foo(unsigned long long)\
+	   foo(float)     foo(double)\
 	   IMPLEMENT_FOR_LONG_LONG(foo)\
 	   IMPLEMENT_FOR_LONG_DOUBLE(foo)
 
