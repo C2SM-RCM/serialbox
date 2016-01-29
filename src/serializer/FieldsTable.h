@@ -5,8 +5,9 @@
 
 #include <map>
 #include <string>
-#include "libjson.h"
 #include "DataFieldInfo.h"
+
+class JSONNode;
 
 namespace ser {
 
@@ -139,3 +140,4 @@ namespace ser {
     };
 
 } //namespace ser
+

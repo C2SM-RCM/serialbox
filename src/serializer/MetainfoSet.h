@@ -12,8 +12,8 @@
 #include "boost/type_traits/is_same.hpp"
 
 #include "SerializationException.h"
-#include "libjson.h"
 
+class JSONNode;
 
 namespace ser {
 
