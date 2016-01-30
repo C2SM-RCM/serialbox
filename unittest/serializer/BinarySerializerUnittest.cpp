@@ -10,7 +10,7 @@
 
 using namespace ser;
 
-TEST(BinarySerializerUnittest, TestItAll)
+TEST(BinarySerializerUnittest, TestItAllDouble)
 {
     BinarySerializer bs;
     bs.Init();
@@ -55,6 +55,69 @@ TEST(BinarySerializerUnittest, TestItAll)
     // Prepare string stream
     bs.ReadArray(pDataCheck, sizeof(double), isize, jsize, ksize, lsize,
         istride*sizeof(double), jstride*sizeof(double), kstride*sizeof(double), lstride*sizeof(double), sVector);
+
+    // Check reconstructed array
+    for (int i = 0; i < isize; ++i)
+        for (int j = 0; j < jsize; ++j)
+            for (int k = 0; k < ksize; ++k)
+                for (int l = 0; l < lsize; ++l)
+                {
+                    ASSERT_EQ(
+                        pData     [i*istride + j*jstride + l*lstride + k*kstride],
+                        pDataCheck[i*istride + j*jstride + l*lstride + k*kstride]
+                        );
+                }
+
+    // Release memory
+    delete[] pData;
+    delete[] pDataCheck;
+}
+
+TEST(BinarySerializerUnittest, TestItAllFloat)
+{
+    BinarySerializer bs;
+    bs.Init();
+
+    // Create some data (layout: JKIL, plus one stride in l)
+    const int isize = 5, jsize = 6, ksize = 9, lsize = 8;
+    const int lstride = 2, istride = lstride*lsize, kstride = istride*isize, jstride = kstride*ksize;
+    const int allocsize = jstride*jsize;
+    ASSERT_EQ(5*6*9*8*2, allocsize);
+    float *pData      = new float[allocsize];
+    float *pDataCheck = new float[allocsize];
+
+    for (int i = 0; i < isize; ++i)
+        for (int j = 0; j < jsize; ++j)
+            for (int k = 0; k < ksize; ++k)
+                for (int l = 0; l < lsize; ++l)
+                {
+                    pData[i*istride + j*jstride + l*lstride + k*kstride]
+                        = i*3. + j*2.5 - k*10.25 + l*6.825;
+                }
+
+    // Serialize array
+    std::vector<char> sVector;
+    const std::string checksum =
+    bs.WriteArray(pData, sizeof(float), isize, jsize, ksize, lsize,
+        istride*sizeof(float), jstride*sizeof(float), kstride*sizeof(float), lstride*sizeof(float), sVector);
+
+    // Check binary data
+    const float* sData = reinterpret_cast<const float*>(sVector.data());
+    for (int l = 0; l < lsize; ++l)
+        for (int k = 0; k < ksize; ++k)
+            for (int j = 0; j < jsize; ++j)
+                for (int i = 0; i < isize; ++i)
+                {
+                    ASSERT_EQ(pData[i*istride + j*jstride + l*lstride + k*kstride], *sData);
+                    sData += 1;
+                }
+
+    // Check checksum
+    ASSERT_EQ(computeChecksum(sVector.data(), sVector.size()), checksum);
+
+    // Prepare string stream
+    bs.ReadArray(pDataCheck, sizeof(float), isize, jsize, ksize, lsize,
+        istride*sizeof(float), jstride*sizeof(float), kstride*sizeof(float), lstride*sizeof(float), sVector);
 
     // Check reconstructed array
     for (int i = 0; i < isize; ++i)

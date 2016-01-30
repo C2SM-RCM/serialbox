@@ -1,0 +1,11 @@
+# Release 0.1.1
+ * Bug fix for BOOST_STATIC_ASSERT
+ 
+# Release 0.1
+
+ * Seamlessly support single precision and double precision floating point values
+ * Fix issue with files larger than 2 GiB
+ * Support variable declaration in multiple lines in pp_ser
+ * Correctly install utils_ppser fortran module
+ * Python can access global metainformation of serializers, register fields
+   with nontrivial halo and use handle single precision numpy fields

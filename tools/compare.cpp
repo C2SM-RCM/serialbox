@@ -84,9 +84,9 @@ bool compareData(const Serializer& serializer1, const Serializer& serializer2,
 				{
 					int index = i * jSize * kSize * lSize + j * kSize * lSize + k * lSize + l;
 
-					const T val = data1[index];
-					const T ref = data2[index];
-					const T err = std::fabs(ref) > 1. ?
+					const double val = static_cast<double>(data1[index]);
+					const double ref = static_cast<double>(data2[index]);
+					const double err = std::fabs(ref) > 1. ?
 					                 std::fabs((ref - val) / ref) : std::fabs(ref - val);
 
 					const bool f = err > tolerance                     // Error is too large (e.g. val is infinite, ref is not)
@@ -137,8 +137,8 @@ void printDifference(const Serializer& serializer1, const Serializer& serializer
 					{
 						++nErrors;
 
-						const T val = data1[index];
-						const T ref = data2[index];
+						const double val = static_cast<double>(data1[index]);
+						const double ref = static_cast<double>(data2[index]);
 						maxAbsError = std::max(maxAbsError, std::fabs(val - ref));
 						maxRelError = std::max(maxRelError, std::fabs((val - ref) / ref));
 					}
@@ -230,6 +230,12 @@ int compare(const std::string& directory1, const std::string& basename1,
 				equal = compareData<float>(serializer1, serializer2, savepoints[i], info1, info2, bounds, tolerance, failed);
 				if (!equal)
 					printDifference<float,float>(serializer1, serializer2, savepoints[i], info1, info2, bounds, failed);
+			}
+			else if (info1.type() == "float")
+			{
+				equal = compareData<float>(serializer1, serializer2, savepoints[i], info1, info2, bounds, tolerance, failed);
+				if (!equal)
+					printDifference<float>(serializer1, serializer2, savepoints[i], info1, info2, bounds, failed);
 			}
 			else
 			{

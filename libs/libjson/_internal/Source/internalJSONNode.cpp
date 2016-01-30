@@ -324,6 +324,7 @@ void internalJSONNode::Set(const json_string & val) json_nothrow {
     SET_INTEGER(short)
     SET_INTEGER(int)
     SET_INTEGER(long)
+    SET_INTEGER(long long)
     #ifndef JSON_ISO_STRICT 
 	   SET_INTEGER(long long)
 	   SET_FLOAT(long double)

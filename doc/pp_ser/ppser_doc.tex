@@ -97,26 +97,13 @@ Examples:
 Serialize the data field.
 
 \begin{lstlisting}
-!$ser data field=variable [field2=variable2 ...] [removeintentin] [if if_statement]
-\end{lstlisting}
-
-If \texttt{removeintentin} is stated, \ppser{} will find the declarations of all the variables in that directive and remove \texttt{INTENT(IN)}:
-\begin{lstlisting}
-!$ser data pp=pp(:) removeintentin
-\end{lstlisting}
-is translated to
-\begin{lstlisting}
-#ifdef SERIALIZE
-  REAL(wp) :: pp(kbdim)
-#else
-  REAL(wp), INTENT (IN) :: pp(kbdim)
-#endif
+!$ser data field=variable [field2=variable2 ...] [if if_statement]
 \end{lstlisting}
 
 Examples:
 \begin{lstlisting}
 !$ser data pt=pt(:,kk) pq=pq(:,kk)
-!$ser data pp=pp(:) removeintentin
+!$ser data pp=pp(:) 
 !$ser data pp_field=pp pq=pq if test_counter<30
 \end{lstlisting}
 
@@ -128,7 +115,7 @@ or writing data from the accelerator.
 Examples:
 \begin{lstlisting}
 !$ser accdata pt=pt(:,kk) pq=pq(:,kk)
-!$ser data pp=pp(:) removeintentin
+!$ser data pp=pp(:)
 \end{lstlisting}
 
 \subsection{\texttt{VERBATIM}}
@@ -195,7 +182,7 @@ ACC_PREFIX DATA PCOPY(pt(:,kk), pq(:,kk)), IF (i_am_accel_node)
     !$ser savepoint cuadjtq.DoStep-in
     !$ser mode write
     !$ser data pt=pt(:,kk) pq=pq(:,kk)
-    !$ser data pp=pp(:) removeintentin
+    !$ser data pp=pp(:)
 
 ACC_PREFIX PARALLEL, IF (i_am_accel_node)
 ...

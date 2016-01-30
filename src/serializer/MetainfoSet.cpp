@@ -288,31 +288,6 @@ float MetainfoSet::AsDouble(const std::string& key) const
     return (double)0.;
 }
 
-Real MetainfoSet::AsReal(const std::string& key) const
-{
-    std::map<std::string, boost::any>::const_iterator iter = checkKeyExists(key);
-    const boost::any& a = iter->second;
-    const std::type_info& t = a.type();
-
-         if(t == typeid(bool)) return boost::any_cast<bool>(a);
-    else if(t == typeid(int)) return boost::any_cast<int>(a);
-    else if(t == typeid(float)) return boost::any_cast<float>(a);
-    else if(t == typeid(double)) return boost::any_cast<double>(a);
-    else if(t == typeid(std::string))
-    {
-        Real v;
-        std::stringstream ss;
-        ss << boost::any_cast<std::string>(a);
-        ss >> v;
-        return v;
-    }
-
-    // Reaching this point is a bug.
-    std::cerr << "Bug in MetainfoSet: type of '" << key << "' not recognized\n";
-    std::exit(1);
-    return (Real)0.;
-}
-
 std::string MetainfoSet::AsString(const std::string& key) const
 {
     std::ostringstream ss;
@@ -361,7 +336,7 @@ std::vector< JSONNode> MetainfoSet::GenerateNodes() const
 
 void MetainfoSet::AddNode(const JSONNode& node)
 {
-    Real r;
+    JSON_NUMBER_TYPE r;
     switch (node.type())
     {
     case JSON_BOOL:
@@ -370,7 +345,7 @@ void MetainfoSet::AddNode(const JSONNode& node)
         return AddMetainfo(node.name(), node.as_string());
     case JSON_NUMBER:
         r = node.as_float();
-        if (r == static_cast<Real>(static_cast<int>(r)))
+        if (r == static_cast<JSON_NUMBER_TYPE>(static_cast<int>(r)))
             return AddMetainfo(node.name(), static_cast<int>(r));
         else
             return AddMetainfo(node.name(), r);
