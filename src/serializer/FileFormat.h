@@ -4,6 +4,7 @@
 //See LICENSE.txt for more information
 
 #include <string>
+#include "OffsetTable.h"
 
 namespace ser {
 
@@ -53,7 +54,7 @@ namespace ser {
         *
         * @return The offset from the beginning of the file is returned
         */
-        virtual int OpenStreamAppend(std::ofstream& stream, const std::string& fieldName, const Savepoint& savepoint) const =0;
+        virtual OffsetTable::offset_t OpenStreamAppend(std::ofstream& stream, const std::string& fieldName, const Savepoint& savepoint) const =0;
 
         /**
         * Opens a stream for reading data

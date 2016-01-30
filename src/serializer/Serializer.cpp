@@ -168,15 +168,22 @@ void Serializer::WriteField(const std::string& fieldName, const Savepoint& savep
         savepointID = offsetTable_.AddNewSavepoint(savepoint);
 
     // Check if field is already saved at savepoint
-    if (offsetTable_.GetOffset(savepointID, fieldName) >= 0)
+    try
     {
-        // Throw exception
+        offsetTable_.GetOffset(savepointID, fieldName);
+
+        // Field is already there: throw exception
         std::ostringstream errorstr;
         errorstr << "Error: field " << fieldName << " was already saved into "
             << "serializer at savepoint " << savepoint.ToString();
         SerializationException exception;
         exception.Init(errorstr.str());
         throw exception;
+    }
+    catch (SerializationException&)
+    {
+        // Field is not there (or savepoint does not exist)
+        // No error, continue
     }
 
     // Obtain buffer and checksum
@@ -185,11 +192,11 @@ void Serializer::WriteField(const std::string& fieldName, const Savepoint& savep
             info.iSize(), info.jSize(), info.kSize(), info.lSize(),
             iStride, jStride, kStride, lStride, binaryData);
 
-    // Control in offset table if data must be stored
-    int offset = offsetTable_.AlreadySerialized(fieldName, checksum);
-
-    if (offset < 0)
+    // Check in offset table if data must be stored
+    OffsetTable::offset_t offset;
+    if (!offsetTable_.AlreadySerialized(fieldName, checksum, offset))
     {
+        // Record is not found: we need to write the data
         // Open file stream
         std::ofstream fs;
         offset = pFileFormat_->OpenStreamAppend(fs, fieldName, savepoint);
@@ -233,8 +240,26 @@ void Serializer::ReadField(const std::string& fieldName, const Savepoint& savepo
     // Search in previous savepoints
     if (alsoPrevious)
     {
-        while(savepointID >= 0 && offsetTable_.GetOffset(savepointID, fieldName) < 0)
-            --savepointID;
+        OffsetTable::offset_t offset;
+        bool found = false;
+        while(!found)
+        {
+            try
+            {
+                offsetTable_.GetOffset(savepointID, fieldName);
+
+                // Field is found
+                found = true;
+                break;
+            }
+            catch (SerializationException&)
+            {
+                // Field is not found: proceed with previous savepoint
+            }
+
+            if(--savepointID < 0)
+                break;
+        }
 
         if (savepointID < 0)
         {

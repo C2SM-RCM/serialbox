@@ -42,7 +42,7 @@ namespace ser {
 
         virtual void CleanTables();
 
-        virtual int OpenStreamAppend(std::ofstream& stream, const std::string& fieldName, const Savepoint& savepoint) const;
+        virtual OffsetTable::offset_t OpenStreamAppend(std::ofstream& stream, const std::string& fieldName, const Savepoint& savepoint) const;
 
         virtual void OpenStreamRead(std::ifstream& stream, const std::string& fieldName, const Savepoint& savepoint) const;
 
