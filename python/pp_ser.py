@@ -762,9 +762,6 @@ class pp_ser:
                 self.__line = ''
             self.lexer(final=True)
 
-            if generate and (len(self.intentin_to_remove) != len(self.intentin_removed)):
-                diff = [x for x in self.intentin_to_remove if x not in self.intentin_removed]
-                self.__exit_error(msg = 'cannot find INTENT(IN) declaration for ' + ', '.join(diff))
 
         finally:
             input_file.close()
