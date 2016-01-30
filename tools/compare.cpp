@@ -103,7 +103,7 @@ bool compareData(const Serializer& serializer1, const Serializer& serializer2,
 	return !notequal;
 }
 
-template <typename T, typename U>
+template <typename T>
 void printDifference(const Serializer& serializer1, const Serializer& serializer2,
                      const Savepoint& savepoint,
                      const DataFieldInfo& info1, const DataFieldInfo& info2,
@@ -124,8 +124,8 @@ void printDifference(const Serializer& serializer1, const Serializer& serializer
 	int nValues = (bounds.iUpper - bounds.iLower + 1) * (bounds.jUpper - bounds.jLower + 1) *
 	              (bounds.kUpper - bounds.kLower + 1) * (bounds.lUpper - bounds.lLower + 1);
 	int nErrors = 0;
-	U maxRelError = 0;
-	U maxAbsError = 0;
+	double maxRelError = 0;
+	double maxAbsError = 0;
 
 	for (int i = bounds.iLower; i <= bounds.iUpper; ++i)
 		for (int j = bounds.jLower; j <= bounds.jUpper; ++j)
@@ -217,19 +217,13 @@ int compare(const std::string& directory1, const std::string& basename1,
 			{
 				equal = compareData<int>(serializer1, serializer2, savepoints[i], info1, info2, bounds, tolerance, failed);
 				if (!equal)
-					printDifference<int,double>(serializer1, serializer2, savepoints[i], info1, info2, bounds, failed);
+					printDifference<int>(serializer1, serializer2, savepoints[i], info1, info2, bounds, failed);
 			}
 			else if (info1.type() == "double")
 			{
 				equal = compareData<double>(serializer1, serializer2, savepoints[i], info1, info2, bounds, tolerance, failed);
 				if (!equal)
-					printDifference<double,double>(serializer1, serializer2, savepoints[i], info1, info2, bounds, failed);
-			}
-			else if (info1.type() == "float")
-			{
-				equal = compareData<float>(serializer1, serializer2, savepoints[i], info1, info2, bounds, tolerance, failed);
-				if (!equal)
-					printDifference<float,float>(serializer1, serializer2, savepoints[i], info1, info2, bounds, failed);
+					printDifference<double>(serializer1, serializer2, savepoints[i], info1, info2, bounds, failed);
 			}
 			else if (info1.type() == "float")
 			{
