@@ -18,7 +18,7 @@ cmakeConfigure()
            "-DCMAKE_INSTALL_PREFIX=${idir}"
            "-DCMAKE_CXX_COMPILER=g++"
            "-DCMAKE_C_COMPILER=gcc"
-           "-DBoost_INCLUDE_DIR=${BOOST_INCLUDE_PATH}"
+           "-DBOOST_ROOT=${BOOST_PATH}"
     )
 
     local logfile=`pwd`/cmake.log
@@ -72,5 +72,5 @@ fi
 
 cmakeConfigure "${fortran_compiler}" "${install_dir}"
 
-make install 
+make install VERBOSE=1
 
