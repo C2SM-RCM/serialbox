@@ -72,5 +72,5 @@ fi
 
 cmakeConfigure "${fortran_compiler}" "${install_dir}"
 
-make install VERBOSE=1
+make install
 
