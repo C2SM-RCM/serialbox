@@ -18,6 +18,7 @@ cmakeConfigure()
            "-DCMAKE_INSTALL_PREFIX=${idir}"
            "-DCMAKE_CXX_COMPILER=g++"
            "-DCMAKE_C_COMPILER=gcc"
+           "-DBoost_INCLUDE_DIR=${BOOST_INCLUDE_PATH}"
     )
 
     local logfile=`pwd`/cmake.log
