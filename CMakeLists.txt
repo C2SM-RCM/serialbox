@@ -23,9 +23,16 @@ set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/fortran )
 
 install(DIRECTORY ${CMAKE_BINARY_DIR}/fortran/ DESTINATION include/fortran FILES_MATCHING PATTERN "*.mod" PATTERN "CMake*" EXCLUDE )
 
-set(CXX11_FLAGS "-std=c++11")
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+# Based on http://stackoverflow.com/a/31010221/592024
+if (CMAKE_VERSION VERSION_LESS "3.1")
+    if("${CMAKE_Fortran_COMPILER}" MATCHES "ftn")
+        set (CMAKE_CXX_FLAGS "-h std=c++11 ${CMAKE_CXX_FLAGS}")
+    else()
+         set (CMAKE_CXX_FLAGS "--std=c++11 ${CMAKE_CXX_FLAGS}")
+    endif()
+else()
+    set (CMAKE_CXX_STANDARD 11)
+endif()
 
 function(serialbox_add_test test_name )
   #ignore the execute prefix in case it is not a valid executable prefix

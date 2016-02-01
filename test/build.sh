@@ -16,8 +16,8 @@ cmakeConfigure()
     local CMAKEARGS=(..
            "-DCMAKE_Fortran_COMPILER=${fcomp}"
            "-DCMAKE_INSTALL_PREFIX=${idir}"
-           "-DCMAKE_CXX_COMPILER=g++"
-           "-DCMAKE_C_COMPILER=gcc"
+           "-DCMAKE_CXX_COMPILER=CC"
+           "-DCMAKE_C_COMPILER=cc"
            "-DBOOST_ROOT=${BOOST_PATH}"
     )
 
@@ -75,7 +75,7 @@ if [ $? -ne 0 ]; then
     exitError 4430 ${LINENO} "Unable to configure cmake"
 fi
 
-make install
+make install 
 if [ $? -ne 0 ]; then
     exitError 4420 ${LINENO} "Unable to configure cmake"
 fi
