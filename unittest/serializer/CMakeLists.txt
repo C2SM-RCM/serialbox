@@ -14,6 +14,6 @@ add_executable(
 )
 
 serialbox_add_test(SerializerUnittest)
-target_link_libraries( SerializerUnittest gmock-gtest SerialBox json sha256 Utils )
+target_link_libraries( SerializerUnittest gmock-gtest Serialbox json sha256 Utils )
 install( TARGETS SerializerUnittest DESTINATION bin/ )
 

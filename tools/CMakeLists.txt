@@ -17,9 +17,9 @@ add_executable(
 set_target_properties(
     compare PROPERTIES COMPILE_FLAGS "${CXX11_FLAGS}"
 )
-target_link_libraries( compare SerialBox Utils json sha256)
+target_link_libraries( compare Serialbox Utils json sha256)
 
-target_link_libraries( dump SerialBox Utils json sha256)
+target_link_libraries( dump Serialbox Utils json sha256)
 
 install(TARGETS compare DESTINATION "bin")
 install(TARGETS dump DESTINATION "bin")

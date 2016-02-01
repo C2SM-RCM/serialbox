@@ -10,7 +10,7 @@ add_executable(
     WrapperUnittest
     ${SOURCES}
 )
-target_link_libraries( WrapperUnittest SerialBoxWrapper gmock-gtest SerialBoxWrapper SerialBox SerialBoxWrapper json sha256 Utils )
+target_link_libraries( WrapperUnittest SerialboxWrapper gmock-gtest SerialboxWrapper Serialbox SerialboxWrapper json sha256 Utils )
 install( TARGETS WrapperUnittest DESTINATION bin/ )
 serialbox_add_test(WrapperUnittest)
 
