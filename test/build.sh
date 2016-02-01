@@ -71,6 +71,11 @@ if [[ ${install_local} == "yes" ]]; then
 fi
 
 cmakeConfigure "${fortran_compiler}" "${install_dir}"
+if [ $? -ne 0 ]; then
+    exitError 4430 ${LINENO} "Unable to configure cmake"
+fi
 
 make install
-
+if [ $? -ne 0 ]; then
+    exitError 4420 ${LINENO} "Unable to configure cmake"
+fi
