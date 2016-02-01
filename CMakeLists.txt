@@ -60,7 +60,7 @@ endif ()
 set (PYTHON_PATH "python")
 
 # Add boost include dir to includes:
-INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
+include_directories(${Boost_INCLUDE_DIR})
 
 # Build sources
 add_subdirectory( libs/libjson )
