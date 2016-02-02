@@ -58,17 +58,13 @@ SUBROUTINE ppser_initialize(directory, prefix, mode, prefix_ref, mpi_rank)
   INTEGER                          :: intvalue
   INTEGER, OPTIONAL, INTENT(IN)    :: mpi_rank
   CHARACTER(LEN=1), DIMENSION(128) :: buffer
-  CHARACTER(LEN=7)                 :: suffix
+  CHARACTER(LEN=15)                 :: suffix
 
   ! Initialize serializer and savepoint
   IF ( .NOT. ppser_initialized ) THEN
     IF ( present(mpi_rank) ) THEN
-      IF (mpi_rank < 10) THEN
-        WRITE(suffix, '(A5,I1)') "_rank", mpi_rank
-      ELSE
-        WRITE(suffix, '(A5,I2)') "_rank", mpi_rank
-      END IF
-    END IF
+      WRITE(suffix, '(A5,I0)') "_rank", mpi_rank
+   END IF
     CALL fs_create_serializer(directory, TRIM(prefix)//TRIM(suffix), 'w', ppser_serializer)
     CALL fs_create_savepoint('', ppser_savepoint)
     IF ( PRESENT(mode) ) ppser_mode = mode
