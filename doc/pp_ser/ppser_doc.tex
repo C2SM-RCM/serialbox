@@ -61,7 +61,7 @@ $ ./pp_ser.py -d . --no-prefix
 Initialize the serialization framework.
 
 \begin{lstlisting}
-!$ser init directory=dir prefix=pre [mode=] [prefix_ref=] [if if_statement]
+!$ser init directory=dir prefix=pre [mode=] [prefix_ref=] [mpi_rank=] [if if_statement]
 \end{lstlisting}
 
 \begin{itemize}
@@ -69,12 +69,13 @@ Initialize the serialization framework.
 \item \texttt{prefix}: the prefix of the main database file names
 \item \texttt{mode}: 0 or 1
 \item \texttt{prefix\_ref}: the prefix of the reference database file names. If reference database is set, the serializer reads from the reference database and writes to the main database.
+\item \texttt{mpi\_rank}: the MPI rank (optional). If the MPI rank is set, database files will be suffixed with it. 
 \item \texttt{if\_statement}: under which condition is the directive executed
 \end{itemize}
 
 Examples:
 \begin{lstlisting}
-!$ser init directory='.' prefix='Field'
+!$ser init directory='.' prefix='Field' mpi_rank=my_cart_id
 !$ser init directory='.' prefix='database' prefix_ref='ref_database'
 !$ser init directory='.' prefix='Field' if ser_test_mode==0
 \end{lstlisting}
@@ -281,23 +282,5 @@ END module mo_cuadjust
 
 If \texttt{ser\_test\_mode} is 0, we are generating the reference database. If it is 1, we are generating the test database.
 
-\subsection{Multiple MPI nodes}
-When we are running on multiple MPI nodes, we do not want the serializer to write to the same database. To solve this, we add the MPI rank to the prefix of the database.
-\begin{lstlisting}
-MODULE mo_cuadjust
-  !$ser verbatim USE mo_mpi,        ONLY: get_my_global_mpi_id
-  IMPLICIT NONE
-SUBROUTINE cuadjtq()
-!get mpi rank
-    !$ser verbatim mpi_id = get_my_global_mpi_id()
-    !$ser verbatim Write( str_prefix, '(I1)' ) mpi_id
-    !$ser verbatim str_prefix = 'rank'//trim(str_prefix)//'_field'
-
-!initialize the serialization framework
-    !$ser init directory='.' prefix='ref_'//str_prefix
-
-END SUBROUTINE cuadjtq
-END module mo_cuadjust
-\end{lstlisting}
 
 \end{document}
