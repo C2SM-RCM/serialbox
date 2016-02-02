@@ -25,7 +25,7 @@ install(DIRECTORY ${CMAKE_BINARY_DIR}/fortran/ DESTINATION include/fortran FILES
 
 # Based on http://stackoverflow.com/a/31010221/592024
 if (CMAKE_VERSION VERSION_LESS "3.1")
-    if("${CMAKE_Fortran_COMPILER}" MATCHES "ftn")
+    if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Cray")
         set (CMAKE_CXX_FLAGS "-h std=c++11 ${CMAKE_CXX_FLAGS}")
     else()
          set (CMAKE_CXX_FLAGS "--std=c++11 ${CMAKE_CXX_FLAGS}")
