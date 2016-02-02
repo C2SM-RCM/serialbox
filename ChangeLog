@@ -1,5 +1,7 @@
 # Next release
  * SerialBox changed to Serialbox everywhere
+ * Handle execution with multiple MPI processes with an mpi_rank option for
+ the !$ser init directive
 
 # Release 0.1.1
  * Bug fix for BOOST_STATIC_ASSERT
