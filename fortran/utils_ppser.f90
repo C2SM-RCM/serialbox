@@ -62,7 +62,7 @@ SUBROUTINE ppser_initialize(directory, prefix, mode, prefix_ref, mpi_rank)
 
   ! Initialize serializer and savepoint
   IF ( .NOT. ppser_initialized ) THEN
-    IF ( present(mpi_rank) ) THEN
+    IF ( PRESENT(mpi_rank) ) THEN
       WRITE(suffix, '(A5,I0)') "_rank", mpi_rank
       CALL fs_create_serializer(directory, TRIM(prefix)//TRIM(suffix), 'w', ppser_serializer)
     ELSE 
