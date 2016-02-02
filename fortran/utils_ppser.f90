@@ -50,26 +50,26 @@ CONTAINS
 
 !============================================================================
 
-SUBROUTINE ppser_initialize(directory, prefix, mode, prefix_ref)
+SUBROUTINE ppser_initialize(directory, prefix, mode, prefix_ref, mpi_rank)
   CHARACTER(LEN=*), INTENT(IN)     :: directory, prefix
   INTEGER, OPTIONAL, INTENT(IN)    :: mode
   CHARACTER(LEN=*), OPTIONAL, INTENT(IN)     :: prefix_ref
   REAL                             :: realvalue
   INTEGER                          :: intvalue
+  INTEGER, OPTIONAL, INTENT(IN)    :: mpi_rank
   CHARACTER(LEN=1), DIMENSION(128) :: buffer
-  CHARACTER(LEN=6)                 :: suffix
+  CHARACTER(LEN=15)                 :: suffix
 
   ! Initialize serializer and savepoint
   IF ( .NOT. ppser_initialized ) THEN
-    ! IF (mode == 0) THEN
-      CALL fs_create_serializer(directory, TRIM(prefix), 'w', ppser_serializer)
-    ! ELSE
-    !   CALL fs_create_serializer(directory, TRIM(prefix), 'a', ppser_serializer)
-    ! ENDIF
+    IF ( present(mpi_rank) ) THEN
+      WRITE(suffix, '(A5,I0)') "_rank", mpi_rank
+   END IF
+    CALL fs_create_serializer(directory, TRIM(prefix)//TRIM(suffix), 'w', ppser_serializer)
     CALL fs_create_savepoint('', ppser_savepoint)
     IF ( PRESENT(mode) ) ppser_mode = mode
     IF ( PRESENT(prefix_ref) ) THEN
-      CALL fs_create_serializer(directory, TRIM(prefix_ref), 'r', ppser_serializer_ref)
+      CALL fs_create_serializer(directory, TRIM(prefix_ref)//TRIM(suffix), 'r', ppser_serializer_ref)
     ENDIF
   ENDIF
   ppser_initialized = .TRUE.

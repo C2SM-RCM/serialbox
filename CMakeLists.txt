@@ -5,7 +5,7 @@ cmake_minimum_required( VERSION 2.8 )
 # able to change.
 SET(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/install/" CACHE PATH "installation prefix")
 
-project( SerialBox )
+project( Serialbox )
 enable_language (Fortran)
 find_package( Boost )
 

@@ -36,9 +36,9 @@ set(
 add_library(serialbox_files OBJECT ${GENERIC_SOURCES} ${GENERIC_HEADERS})
 
 add_library(
-    SerialBox STATIC ${GENERIC_SOURCES}
+    Serialbox STATIC ${GENERIC_SOURCES}
 )
-install (TARGETS SerialBox DESTINATION "lib")
+install (TARGETS Serialbox DESTINATION "lib")
 
 # Install headers
-install (FILES ${GENERIC_HEADERS} DESTINATION "include/SerialBox")
+install (FILES ${GENERIC_HEADERS} DESTINATION "include/Serialbox")

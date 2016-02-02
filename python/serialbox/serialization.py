@@ -32,7 +32,7 @@ for d in dirs:
 
     # OS X
 
-    libfile = pjoin(d, 'libSerialBox_Wrapper.'+library_postfix)
+    libfile = pjoin(d, 'libSerialbox_Wrapper.'+library_postfix)
     try:
         wrapper_try = ctypes.cdll.LoadLibrary(libfile)
         if wrapper_try is not None:
