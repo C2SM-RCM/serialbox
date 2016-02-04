@@ -150,7 +150,7 @@ void printDifference(const Serializer& serializer1, const Serializer& serializer
 
 	std::cout << " | Number of values: " << std::setw(6) << nValues << "\n";
 	std::cout << " | Number of errors: " << std::setw(6) << nErrors << "\n";
-	if (nNan > 0) std::cout << " | Number of Nan errors: " << std::setw(6) << nNan << "\n";
+	if (nNan > 0) std::cout << " | Number of NaN errors: " << std::setw(6) << nNan << "\n";
 	std::cout << " | Percentuage of errors: " << std::setprecision(2) << std::fixed << (100.*nErrors) / nValues << " %\n";
 	std::cout << " | Maximum absolute error: " << std::setw(17) << std::setfill(' ') << std::scientific << std::setprecision(10) << maxAbsError  << "\n";
 	std::cout << " | Maximum relative error: " << std::setw(17) << std::setfill(' ') << std::scientific << std::setprecision(10) << maxRelError  << "\n";
