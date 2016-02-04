@@ -124,7 +124,7 @@ void printDifference(const Serializer& serializer1, const Serializer& serializer
 	int nValues = (bounds.iUpper - bounds.iLower + 1) * (bounds.jUpper - bounds.jLower + 1) *
 	              (bounds.kUpper - bounds.kLower + 1) * (bounds.lUpper - bounds.lLower + 1);
 	int nErrors = 0;
-	int nNan = 0;
+	unsigned int nNan = 0;
 
 	double maxRelError = 0;
 	double maxAbsError = 0;
