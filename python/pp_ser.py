@@ -324,13 +324,11 @@ class pp_ser:
 
         # data type
         datatypes = dict(integer=["'int'", 'ppser_intlength'], real=['ppser_realtype', 'ppser_reallength'])
+
+        if dirs[1] not in datatypes:
+            self.__exit_error(directive = args[0], msg = 'Data type ' + dirs[1] + ' is not recognized. Valid type are "integer" and "real"')
+
         dirs[1:2] = datatypes[dirs[1]]
-        #try:
-        #    dirs[1:2] = datatypes[dirs[1]]
-        #except KeyError:
-        #    self.__exit_error(directive = args[0],
-        #                      msg = 'Data type '+dirs[1]+' is not recognized. Valid type are '
-        #                            + '"integer" and "real"')
 
         # implement some shortcuts for often recurring patterns
         if len(dirs) == 4:
