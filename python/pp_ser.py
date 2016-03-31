@@ -326,7 +326,7 @@ class pp_ser:
         datatypes = dict(integer=["'int'", 'ppser_intlength'], real=['ppser_realtype', 'ppser_reallength'])
 
         if dirs[1] not in datatypes:
-            self.__exit_error(directive = args[0], msg = 'Data type ' + dirs[1] + ' is not recognized. Valid type are "integer" and "real"')
+            self.__exit_error(directive = args[0], msg = 'Data type "{0}" not understood. Valid types are: {1}'.format(dirs[1], ', '.join('"' + d + '"' for d in datatypes.keys())))
 
         dirs[1:2] = datatypes[dirs[1]]
 
