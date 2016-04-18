@@ -445,8 +445,12 @@ class serializer(object):
 
     @property
     def fieldnames(self):
-        # Get name lengths
         n_fields = fs_fields(self.serializer)
+
+        if n_fields == 0:
+            return []
+
+        # Get name lengths
         name_lengths = (ctypes.c_int*n_fields)()
         fs_fieldname_lengths(self.serializer, name_lengths)
         name_length = max(name_lengths)+1
