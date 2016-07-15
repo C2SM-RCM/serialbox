@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 PROJECT(PERTURB_SERIALBOX_FORTRAN_SAMPLE NONE)
 ENABLE_LANGUAGE(Fortran)
 
-set(SERIALBOX_DIR "/Users/clementval/versioning/meteoswiss/serialbox/install/")
+set(SERIALBOX_DIR "${CMAKE_SOURCE_DIR}/../../install/")
 set(SERIALBOXI "${SERIALBOX_DIR}/${COMPILER}/include/SerialBox/")
 set(SERIALBOXL "${SERIALBOX_DIR}/lib")
 SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp -ffree-form -ffree-line-length-180 -J.")
