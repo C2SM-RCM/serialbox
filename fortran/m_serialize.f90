@@ -1686,7 +1686,7 @@ SUBROUTINE fs_read_and_perturb_int(serializer, savepoint, fieldname, field, rper
   INTEGER(KIND=C_INT), INTENT(OUT), TARGET :: field
   REAL, INTENT(IN)                         :: rperturb
 
-  CALL fs_read(serializer, savepoint, fieldname, field)
+  CALL fs_read_field(serializer, savepoint, fieldname, field)
 END SUBROUTINE fs_read_and_perturb_int
 
 SUBROUTINE fs_read_and_perturb_float(serializer, savepoint, fieldname, field, rperturb)
@@ -1697,7 +1697,7 @@ SUBROUTINE fs_read_and_perturb_float(serializer, savepoint, fieldname, field, rp
   REAL(KIND=C_FLOAT), INTENT(OUT), TARGET :: field
   REAL, INTENT(IN)                         :: rperturb
 
-  CALL fs_read(serializer, savepoint, fieldname, field)
+  CALL fs_read_field(serializer, savepoint, fieldname, field)
   CALL fld_perturb(field, rperturb)
 END SUBROUTINE fs_read_and_perturb_float
 
@@ -1709,10 +1709,9 @@ SUBROUTINE fs_read_and_perturb_double(serializer, savepoint, fieldname, field, r
   REAL(KIND=C_DOUBLE), INTENT(OUT), TARGET :: field
   REAL, INTENT(IN)                         :: rperturb
 
-  CALL fs_read(serializer, savepoint, fieldname, field)
+  CALL fs_read_field(serializer, savepoint, fieldname, field)
   CALL fld_perturb(field, rperturb)
 END SUBROUTINE fs_read_and_perturb_double
 
 
 END MODULE m_serialize
-
