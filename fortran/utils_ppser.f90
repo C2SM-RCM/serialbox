@@ -68,13 +68,13 @@ SUBROUTINE ppser_initialize(directory, prefix, mode, prefix_ref, mpi_rank, rprec
     IF ( PRESENT(mpi_rank) ) THEN
       WRITE(suffix, '(A5,I0)') "_rank", mpi_rank
       CALL fs_create_serializer(directory, TRIM(prefix)//TRIM(suffix), 'w', ppser_serializer)
-    ELSE 
+    ELSE
       CALL fs_create_serializer(directory, TRIM(prefix), 'w', ppser_serializer)
     END IF
     CALL fs_create_savepoint('', ppser_savepoint)
     IF ( PRESENT(mode) ) ppser_mode = mode
     IF ( PRESENT(prefix_ref) ) THEN
-      IF ( PRESENT(mpi_rank) ) THEN 
+      IF ( PRESENT(mpi_rank) ) THEN
         CALL fs_create_serializer(directory, TRIM(prefix_ref)//TRIM(suffix), 'r', ppser_serializer_ref)
       ELSE
         CALL fs_create_serializer(directory, TRIM(prefix_ref), 'r', ppser_serializer_ref)
