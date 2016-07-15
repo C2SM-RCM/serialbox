@@ -46,6 +46,11 @@ LOGICAL, SAVE :: lseedinit=.FALSE.
 
 INTERFACE fld_perturb
    MODULE PROCEDURE         &
+     fld_perturb_float_0d,  & 
+     fld_perturb_float_1d,  & 
+     fld_perturb_float_2d,  &
+     fld_perturb_float_3d,  &
+     fld_perturb_float_4d,  & 
      fld_perturb_double_0d, & 
      fld_perturb_double_1d, & 
      fld_perturb_double_2d, &
@@ -60,6 +65,149 @@ CONTAINS
   !==============================================================================
   !+ Subroutines that perturb a field randomly 
   !------------------------------------------------------------------------------
+
+  SUBROUTINE fld_perturb_float_0d( fld_data, rperturb )
+  
+    IMPLICIT NONE
+    
+    REAL(KIND=C_FLOAT), INTENT(INOUT) :: fld_data  ! field data
+    REAL, INTENT(IN)    :: rperturb
+    REAL(KIND=C_FLOAT)                :: repsmat          
+    INTEGER             :: ierr      ! error code
+  
+    IF (.NOT. lseedinit) CALL init_seed
+  
+    CALL RANDOM_NUMBER(repsmat) ! repsmat between 0 and 1
+    
+    ! apply perturbation
+    repsmat = rperturb * (2.0 * repsmat - 1.0)   ! repsmat between -rperturb and rperturb
+    fld_data = fld_data * (1.0 + repsmat)
+  
+  END SUBROUTINE fld_perturb_float_0d
+  
+  !------------------------------------------------------------------------------
+
+  SUBROUTINE fld_perturb_float_1d( fld_data, rperturb )
+  
+    IMPLICIT NONE
+    
+    REAL(KIND=C_FLOAT), INTENT(INOUT) :: fld_data(:)  ! field data
+    REAL, INTENT(IN) :: rperturb
+    REAL(KIND=C_FLOAT), ALLOCATABLE :: repsmat(:)          
+    INTEGER :: ni,  & ! field dimensions
+               ierr   ! error code
+  
+    ni = SIZE(fld_data, DIM=1)
+  
+    IF (.NOT. lseedinit) CALL init_seed
+  
+    ALLOCATE(repsmat(ni))
+  
+    CALL RANDOM_NUMBER(repsmat) ! repsmat between 0 and 1
+    
+    ! apply perturbation
+    repsmat = rperturb * (2.0 * repsmat - 1.0)   ! repsmat between -rperturb and rperturb
+    fld_data = fld_data * (1.0 + repsmat)
+    
+    DEALLOCATE(repsmat)
+  
+  END SUBROUTINE fld_perturb_float_1d
+  
+  !------------------------------------------------------------------------------
+  
+  SUBROUTINE fld_perturb_float_2d( fld_data, rperturb )
+  
+    IMPLICIT NONE
+  
+    REAL(KIND=C_FLOAT), INTENT(INOUT) :: fld_data(:,:)  ! field data
+    REAL, INTENT(IN) :: rperturb
+    REAL(KIND=C_FLOAT), ALLOCATABLE :: repsmat(:,:)     ! field data
+    INTEGER :: ni, nj, & ! field dimensions
+               ierr      ! error code
+  
+    ni = SIZE(fld_data, DIM=1)
+    nj = SIZE(fld_data, DIM=2)
+  
+    ALLOCATE(repsmat(ni, nj))
+  
+    IF (.NOT. lseedinit) CALL init_seed
+  
+    CALL RANDOM_NUMBER(repsmat) ! repsmat between 0 and 1
+  
+    ! apply perturbation
+    repsmat = rperturb * (2.0 * repsmat - 1.0)   ! repsmat between -rperturb and rperturb
+    fld_data = fld_data * (1.0 + repsmat)
+  
+    DEALLOCATE(repsmat)
+  
+  END SUBROUTINE fld_perturb_float_2d
+  
+  !------------------------------------------------------------------------------
+  
+  SUBROUTINE fld_perturb_float_3d( fld_data, rperturb )
+  
+    IMPLICIT NONE
+  
+    REAL(KIND=C_FLOAT), INTENT(INOUT) :: fld_data(:,:,:)  ! field data
+    REAL, INTENT(IN) :: rperturb
+    REAL :: reps
+    REAL(KIND=C_FLOAT), ALLOCATABLE :: repsmat(:,:,:)     ! field data
+    INTEGER :: ni, nj, nk,  & ! field dimensions
+               ierr           ! error code
+  
+    ni = SIZE(fld_data, DIM=1)
+    nj = SIZE(fld_data, DIM=2)
+    nk = SIZE(fld_data, DIM=3)
+  
+    ALLOCATE(repsmat(ni, nj, nk))
+  
+    IF (.NOT. lseedinit) CALL init_seed
+  
+    CALL RANDOM_NUMBER(repsmat) !repsmat between 0 and 1
+  
+    ! apply perturbation
+    repsmat = rperturb * (2.0 * repsmat - 1.0)   ! repsmat between -rperturb and rperturb
+    fld_data = fld_data * (1.0 + repsmat)
+  
+    DEALLOCATE(repsmat)
+  
+  END SUBROUTINE fld_perturb_float_3d
+
+  !------------------------------------------------------------------------------
+  
+  SUBROUTINE fld_perturb_float_4d( fld_data, rperturb )
+  
+    IMPLICIT NONE
+  
+    REAL(KIND=C_FLOAT), INTENT(INOUT) :: fld_data(:,:,:,:)  ! field data
+    REAL, INTENT(IN) :: rperturb
+    REAL :: reps
+    REAL(KIND=C_FLOAT), ALLOCATABLE :: repsmat(:,:,:,:)     ! field data
+    
+    INTEGER :: ni, nj, nk, nz, & ! field dimensions
+               ierr              ! error code
+  
+    ni = SIZE(fld_data, DIM=1)
+    nj = SIZE(fld_data, DIM=2)
+    nk = SIZE(fld_data, DIM=3)
+    nz = SIZE(fld_data, DIM=4)
+  
+    ALLOCATE(repsmat(ni, nj, nk, nz))
+  
+    IF (.NOT. lseedinit) CALL init_seed
+  
+    CALL RANDOM_NUMBER(repsmat) !repsmat between 0 and 1
+  
+    ! apply perturbation
+    repsmat = rperturb * (2.0 * repsmat - 1.0)   ! repsmat between -rperturb and rperturb
+    fld_data = fld_data * (1.0 + repsmat)
+  
+    DEALLOCATE(repsmat)
+  
+  END SUBROUTINE fld_perturb_float_4d
+
+  !------------------------------------------------------------------------------
+
   SUBROUTINE fld_perturb_double_0d( fld_data, rperturb )
   
     IMPLICIT NONE
@@ -198,7 +346,7 @@ CONTAINS
   
   END SUBROUTINE fld_perturb_double_4d
 
-
+  !------------------------------------------------------------------------------
 
   !==============================================================================
   ! init seed for random generator.
