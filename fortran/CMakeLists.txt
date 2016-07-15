@@ -5,6 +5,7 @@ endif()
 
 set(
     SOURCES
+    "m_perturb.f90"
     "m_serialize.f90"
     "utils_ppser.f90"
 )
