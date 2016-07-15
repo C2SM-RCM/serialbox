@@ -24,24 +24,12 @@ set(
 
 # generate preprocessed files with pp_ser
 ADD_CUSTOM_COMMAND(
-  OUTPUT pp/m_ser.f90
+  OUTPUT pp/m_ser.f90 pp/main_consumer.f90 pp/main_consumer_perturb.f90 pp/main_producer.f90
   COMMAND ${CMAKE_SOURCE_DIR}/../../python/pp_ser.py -d pp ${CMAKE_SOURCE_DIR}/m_ser.f90
-  DEPENDS m_ser.f90
-)
-ADD_CUSTOM_COMMAND(
-  OUTPUT pp/main_consumer.f90
   COMMAND ${CMAKE_SOURCE_DIR}/../../python/pp_ser.py -d pp ${CMAKE_SOURCE_DIR}/main_consumer.f90
-  DEPENDS main_consumer.f90
-)
-ADD_CUSTOM_COMMAND(
-  OUTPUT pp/main_consumer_perturb.f90
   COMMAND ${CMAKE_SOURCE_DIR}/../../python/pp_ser.py -d pp ${CMAKE_SOURCE_DIR}/main_consumer_perturb.f90
-  DEPENDS main_consumer_perturb.f90
-)
-ADD_CUSTOM_COMMAND(
-  OUTPUT pp/main_producer.f90
   COMMAND ${CMAKE_SOURCE_DIR}/../../python/pp_ser.py -d pp ${CMAKE_SOURCE_DIR}/main_producer.f90
-  DEPENDS main_producer.f90
+  DEPENDS m_ser.f90 main_consumer.f90 main_consumer_perturb.f90 main_producer.f90
 )
 
 ADD_EXECUTABLE(
