@@ -199,6 +199,16 @@ PRIVATE
       fs_read_double_4d
   END INTERFACE
 
+  !==============================================================================
+  !+ Module interface to read and perturb the given field at the given savepoint
+  !------------------------------------------------------------------------------
+  INTERFACE fs_read_and_perturb_field
+    MODULE PROCEDURE &
+!      fs_read_int,   &
+!      fs_read_float, &
+      fs_read_and_perturb_double
+  END INTERFACE
+
 CONTAINS
 
 !============================================================================
@@ -1429,7 +1439,6 @@ SUBROUTINE fs_read_float_0d(serializer, savepoint, fieldname, field)
                       C_LOC(padd), istride, jstride, kstride, lstride)
 END SUBROUTINE fs_read_float_0d
 
-
 SUBROUTINE fs_read_float_1d(serializer, savepoint, fieldname, field)
   TYPE(t_serializer), INTENT(IN)           :: serializer
   TYPE(t_savepoint) , INTENT(IN)           :: savepoint
@@ -1562,6 +1571,17 @@ SUBROUTINE fs_read_double_0d(serializer, savepoint, fieldname, field)
                       C_LOC(padd), istride, jstride, kstride, lstride)
 END SUBROUTINE fs_read_double_0d
 
+SUBROUTINE fs_read_and_perturb_double(serializer, savepoint, fieldname, field, rperturb)
+  USE m_perturb
+  TYPE(t_serializer), INTENT(IN)           :: serializer
+  TYPE(t_savepoint) , INTENT(IN)           :: savepoint
+  CHARACTER(LEN=*)                         :: fieldname
+  REAL(KIND=C_DOUBLE), INTENT(OUT), TARGET :: field
+  REAL, INTENT(IN)                         :: rperturb
+
+  CALL fs_read(serializer, savepoint, fieldname, field)
+  CALL fld_perturb(field, rperturb)
+END SUBROUTINE fs_read_and_perturb_double
 
 SUBROUTINE fs_read_double_1d(serializer, savepoint, fieldname, field)
   TYPE(t_serializer), INTENT(IN)           :: serializer
