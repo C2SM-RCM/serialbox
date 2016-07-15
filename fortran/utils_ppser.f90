@@ -43,9 +43,10 @@ USE m_serialize
   INTEGER            :: ppser_mode = 0
 
 PUBLIC :: &
-  ppser_serializer, ppser_savepoint, ppser_initialize, &
-  ppser_intlength, ppser_reallength, ppser_realtype,   &
-  ppser_set_mode, ppser_get_mode, ppser_serializer_ref
+  ppser_serializer, ppser_savepoint, ppser_initialize,  &
+  ppser_intlength, ppser_reallength, ppser_realtype,    &
+  ppser_set_mode, ppser_get_mode, ppser_serializer_ref, &
+  ppser_get_perturb
 
 CONTAINS
 
@@ -137,5 +138,12 @@ FUNCTION ppser_get_mode()
   ppser_get_mode = ppser_mode
 
 END FUNCTION ppser_get_mode
+
+FUNCTION ppser_get_perturb()
+  REAL :: ppser_get_perturb
+
+  ppser_get_perturb = zrperturb
+
+END FUNCTION ppser_get_perturb
 
 END MODULE utils_ppser
