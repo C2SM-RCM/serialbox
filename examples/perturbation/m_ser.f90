@@ -17,7 +17,7 @@ MODULE m_ser
 
   SUBROUTINE deserialize(a)
     IMPLICIT NONE
-    REAL, DIMENSION(:,:,:) :: a
+    REAL(KIND=8), DIMENSION(:,:,:) :: a
 
     !$ser init directory='.' prefix='SerialboxTest-output' prefix_ref='SerialboxTest'
     !$ser savepoint sp1

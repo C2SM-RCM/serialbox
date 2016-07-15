@@ -1,7 +1,7 @@
 PROGRAM main_consumer
   USE m_ser
   IMPLICIT NONE
-  REAL, DIMENSION(5,5,5) :: a
+  REAL(KIND=8), DIMENSION(5,5,5) :: a
 
   a = 0.0
   PRINT*,'Before read from serializer: sum(a)=', sum(a)
