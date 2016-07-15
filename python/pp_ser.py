@@ -588,9 +588,16 @@ class pp_ser:
                 if self.ifdef:
                     l += '#ifdef ' + self.ifdef + '\n'
                 if len(calls_fs) > 0:
-                    l += 'USE ' + self.module + ', ONLY: ' + ', '.join(calls_fs) + '\n'
+                    l += 'USE ' + self.module + ', ONLY: &\n'
+                    for s in calls_fs[:-1]:
+                        l += '  ' + s + ', &\n'
+                    l += '  ' + calls_fs[-1] + '\n'
                 if len(calls_pp) > 0:
-                    l += 'USE utils_ppser, ONLY: ' + ', '.join(calls_pp) + '\n'
+                    l += 'USE utils_ppser, ONLY:  &\n'
+                    for s in calls_pp[:-1]:
+                        l += '  ' + s + ', &\n'
+                    l += '  ' + calls_pp[-1] + '\n'
+
                 if self.ifdef:
                     l += '#endif\n'
                 l += '\n'
