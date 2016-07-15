@@ -28,4 +28,15 @@ MODULE m_ser
 
   END SUBROUTINE deserialize
 
+  SUBROUTINE deserialize_with_perturb(a)
+    IMPLICIT NONE
+    REAL(KIND=8), DIMENSION(:,:,:) :: a
+
+    !$ser init directory='.' prefix='SerialboxTest-output' prefix_ref='SerialboxTest'
+    !$ser savepoint sp1
+    !$ser mode read-perturb
+    !$ser data ser_a=a
+
+  END SUBROUTINE deserialize_with_perturb
+
 END MODULE m_ser
