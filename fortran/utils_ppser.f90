@@ -52,15 +52,15 @@ CONTAINS
 !============================================================================
 
 SUBROUTINE ppser_initialize(directory, prefix, mode, prefix_ref, mpi_rank, rprecision, rperturb)
-  CHARACTER(LEN=*), INTENT(IN)     :: directory, prefix
-  INTEGER, OPTIONAL, INTENT(IN)    :: mode
+  CHARACTER(LEN=*), INTENT(IN)       :: directory, prefix
+  INTEGER, OPTIONAL, INTENT(IN)      :: mode
   CHARACTER(LEN=*), OPTIONAL, INTENT(IN)     :: prefix_ref
-  REAL                             :: realvalue
-  INTEGER                          :: intvalue
-  INTEGER, OPTIONAL, INTENT(IN)    :: mpi_rank
-  REAL, OPTIONAL, INTENT(IN)       :: rprecision, rperturb
-  CHARACTER(LEN=1), DIMENSION(128) :: buffer
-  CHARACTER(LEN=15)                :: suffix
+  REAL                               :: realvalue
+  INTEGER                            :: intvalue
+  INTEGER, OPTIONAL, INTENT(IN)      :: mpi_rank
+  REAL(KIND=8), OPTIONAL, INTENT(IN) :: rprecision, rperturb
+  CHARACTER(LEN=1), DIMENSION(128)   :: buffer
+  CHARACTER(LEN=15)                  :: suffix
 
   ! Initialize serializer and savepoint
   IF ( .NOT. ppser_initialized ) THEN
