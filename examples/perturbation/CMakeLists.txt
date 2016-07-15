@@ -19,6 +19,7 @@ set(
   "m_ser.f90"
   "main_producer.f90"
   "main_consumer.f90"
+  "main_consumer_perturb.f90"
 )
 
 # generate preprocessed files with pp_ser
@@ -33,11 +34,15 @@ ADD_CUSTOM_COMMAND(
   DEPENDS main_consumer.f90
 )
 ADD_CUSTOM_COMMAND(
+  OUTPUT pp/main_consumer_perturb.f90
+  COMMAND ${CMAKE_SOURCE_DIR}/../../python/pp_ser.py -d pp ${CMAKE_SOURCE_DIR}/main_consumer_perturb.f90
+  DEPENDS main_consumer_perturb.f90
+)
+ADD_CUSTOM_COMMAND(
   OUTPUT pp/main_producer.f90
   COMMAND ${CMAKE_SOURCE_DIR}/../../python/pp_ser.py -d pp ${CMAKE_SOURCE_DIR}/main_producer.f90
   DEPENDS main_producer.f90
 )
-
 
 ADD_EXECUTABLE(
   main_producer
@@ -49,6 +54,12 @@ ADD_EXECUTABLE(
   main_consumer
   pp/m_ser.f90
   pp/main_consumer.f90
+)
+
+ADD_EXECUTABLE(
+  main_consumer_perturb
+  pp/m_ser.f90
+  pp/main_consumer_perturb.f90
 )
 
 target_link_libraries(main_producer FortranSer.a)
@@ -66,3 +77,11 @@ target_link_libraries(main_consumer Utils.a)
 target_link_libraries(main_consumer sha256.a)
 target_link_libraries(main_consumer json.a)
 target_link_libraries(main_consumer stdc++)
+
+target_link_libraries(main_consumer_perturb FortranSer.a)
+target_link_libraries(main_consumer_perturb SerialboxWrapper.a)
+target_link_libraries(main_consumer_perturb Serialbox.a)
+target_link_libraries(main_consumer_perturb Utils.a)
+target_link_libraries(main_consumer_perturb sha256.a)
+target_link_libraries(main_consumer_perturb json.a)
+target_link_libraries(main_consumer_perturb stdc++)
