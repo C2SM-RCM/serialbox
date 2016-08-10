@@ -51,16 +51,19 @@ CONTAINS
 
 !============================================================================
 
-SUBROUTINE ppser_initialize(directory, prefix, mode, prefix_ref, mpi_rank, rprecision, rperturb)
-  CHARACTER(LEN=*), INTENT(IN)       :: directory, prefix
-  INTEGER, OPTIONAL, INTENT(IN)      :: mode
-  CHARACTER(LEN=*), OPTIONAL, INTENT(IN)     :: prefix_ref
-  REAL                               :: realvalue
-  INTEGER                            :: intvalue
-  INTEGER, OPTIONAL, INTENT(IN)      :: mpi_rank
-  REAL(KIND=8), OPTIONAL, INTENT(IN) :: rprecision, rperturb
-  CHARACTER(LEN=1), DIMENSION(128)   :: buffer
-  CHARACTER(LEN=15)                  :: suffix
+SUBROUTINE ppser_initialize(directory, prefix, mode, prefix_ref, mpi_rank, rprecision, rperturb, realtype)
+  CHARACTER(LEN=*), INTENT(IN)           :: directory, prefix
+  INTEGER, OPTIONAL, INTENT(IN)          :: mode
+  CHARACTER(LEN=*), OPTIONAL, INTENT(IN) :: prefix_ref
+  INTEGER, OPTIONAL, INTENT(IN)          :: mpi_rank
+  REAL(KIND=8), OPTIONAL, INTENT(IN)     :: rprecision, rperturb
+  INTEGER, OPTIONAL, INTENT(IN)          :: realtype
+
+  CHARACTER(LEN=1), DIMENSION(128)       :: buffer
+  CHARACTER(LEN=15)                      :: suffix
+  REAL                                   :: realvalue
+  INTEGER                                :: intvalue
+  
 
   ! Initialize serializer and savepoint
   IF ( .NOT. ppser_initialized ) THEN
@@ -84,9 +87,9 @@ SUBROUTINE ppser_initialize(directory, prefix, mode, prefix_ref, mpi_rank, rprec
 
   ! Get data size
   intvalue = 0
-  realvalue = 0.
+  realvalue = 4 ! default real type value 
   ppser_intlength = INT(SIZE(TRANSFER(intvalue, buffer)))
-  ppser_reallength = INT(SIZE(TRANSFER(realvalue, buffer)))
+  ppser_reallength = realtype
 
   ! Get name of real
   ppser_realtype = 'double'
