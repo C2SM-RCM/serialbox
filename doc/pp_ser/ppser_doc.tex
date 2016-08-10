@@ -61,7 +61,7 @@ $ ./pp_ser.py -d . --no-prefix
 Initialize the serialization framework.
 
 \begin{lstlisting}
-!$ser init directory=dir prefix=pre [mode=] [prefix_ref=] [mpi_rank=] [rprecision=] [rperturb=] [if if_statement]
+!$ser init directory=dir prefix=pre [mode=] [prefix_ref=] [mpi_rank=] [rprecision=] [rperturb=] [realtype=] [if if_statement]
 \end{lstlisting}
 
 \begin{itemize}
@@ -72,6 +72,7 @@ Initialize the serialization framework.
 \item \texttt{mpi\_rank}: the MPI rank (optional). If the MPI rank is set, database files will be suffixed with it. 
 \item \texttt{rprecision}: specify the precision for the perturbation.
 \item \texttt{rperturb}: specify the desired magnitude of perturbation.
+\item \texttt{realtype}: specify the size of the real type with an integer value.
 \item \texttt{if\_statement}: under which condition is the directive executed
 \end{itemize}
 
