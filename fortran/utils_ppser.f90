@@ -61,7 +61,6 @@ SUBROUTINE ppser_initialize(directory, prefix, mode, prefix_ref, mpi_rank, rprec
 
   CHARACTER(LEN=1), DIMENSION(128)       :: buffer
   CHARACTER(LEN=15)                      :: suffix
-  REAL                                   :: realvalue
   INTEGER                                :: intvalue
   
 
@@ -87,9 +86,13 @@ SUBROUTINE ppser_initialize(directory, prefix, mode, prefix_ref, mpi_rank, rprec
 
   ! Get data size
   intvalue = 0
-  realvalue = 4 ! default real type value 
+  IF ( PRESENT(realtype) ) THEN
+    ppser_reallength = realtype
+  ELSE
+    ppser_reallength = 4 ! Default real length
+  END IF
+
   ppser_intlength = INT(SIZE(TRANSFER(intvalue, buffer)))
-  ppser_reallength = realtype
 
   ! Get name of real
   ppser_realtype = 'double'
