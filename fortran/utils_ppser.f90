@@ -138,4 +138,4 @@ FUNCTION ppser_get_mode()
 
 END FUNCTION ppser_get_mode
 
-END MODULE
+END MODULE utils_ppser
