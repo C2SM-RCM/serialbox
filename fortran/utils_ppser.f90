@@ -111,6 +111,12 @@ SUBROUTINE ppser_initialize(directory, prefix, mode, prefix_ref, mpi_rank, rprec
       !  ... where R is a random number from -1.0 to 1.0
       zrperturb = - rperturb * rprecision
     ENDIF
+  ELSE IF ( PRESENT(rprecision) ) THEN
+    PRINT*,'Perturbation initialization not complete. rperturb is missing' 
+    CALL EXIT(1)
+  ELSE IF ( PRESENT(rperturb) ) THEN
+    PRINT*,'Perturbation initialization not complete. rprecision is missing' 
+    CALL EXIT(1)
   ENDIF
 
 END SUBROUTINE ppser_initialize
