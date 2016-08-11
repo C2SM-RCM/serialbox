@@ -51,16 +51,18 @@ CONTAINS
 
 !============================================================================
 
-SUBROUTINE ppser_initialize(directory, prefix, mode, prefix_ref, mpi_rank, rprecision, rperturb)
-  CHARACTER(LEN=*), INTENT(IN)       :: directory, prefix
-  INTEGER, OPTIONAL, INTENT(IN)      :: mode
-  CHARACTER(LEN=*), OPTIONAL, INTENT(IN)     :: prefix_ref
-  REAL                               :: realvalue
-  INTEGER                            :: intvalue
-  INTEGER, OPTIONAL, INTENT(IN)      :: mpi_rank
-  REAL(KIND=8), OPTIONAL, INTENT(IN) :: rprecision, rperturb
-  CHARACTER(LEN=1), DIMENSION(128)   :: buffer
-  CHARACTER(LEN=15)                  :: suffix
+SUBROUTINE ppser_initialize(directory, prefix, mode, prefix_ref, mpi_rank, rprecision, rperturb, realtype)
+  CHARACTER(LEN=*), INTENT(IN)           :: directory, prefix
+  INTEGER, OPTIONAL, INTENT(IN)          :: mode
+  CHARACTER(LEN=*), OPTIONAL, INTENT(IN) :: prefix_ref
+  INTEGER, OPTIONAL, INTENT(IN)          :: mpi_rank
+  REAL(KIND=8), OPTIONAL, INTENT(IN)     :: rprecision, rperturb
+  INTEGER, OPTIONAL, INTENT(IN)          :: realtype
+
+  CHARACTER(LEN=1), DIMENSION(128)       :: buffer
+  CHARACTER(LEN=15)                      :: suffix
+  INTEGER                                :: intvalue
+  
 
   ! Initialize serializer and savepoint
   IF ( .NOT. ppser_initialized ) THEN
@@ -84,9 +86,13 @@ SUBROUTINE ppser_initialize(directory, prefix, mode, prefix_ref, mpi_rank, rprec
 
   ! Get data size
   intvalue = 0
-  realvalue = 0.
+  IF ( PRESENT(realtype) ) THEN
+    ppser_reallength = realtype
+  ELSE
+    ppser_reallength = 4 ! Default real length
+  END IF
+
   ppser_intlength = INT(SIZE(TRANSFER(intvalue, buffer)))
-  ppser_reallength = INT(SIZE(TRANSFER(realvalue, buffer)))
 
   ! Get name of real
   ppser_realtype = 'double'
@@ -108,6 +114,12 @@ SUBROUTINE ppser_initialize(directory, prefix, mode, prefix_ref, mpi_rank, rprec
       !  ... where R is a random number from -1.0 to 1.0
       zrperturb = - rperturb * rprecision
     ENDIF
+  ELSE IF ( PRESENT(rprecision) ) THEN
+    PRINT*,'Perturbation initialization not complete. rperturb is missing' 
+    CALL EXIT(1)
+  ELSE IF ( PRESENT(rperturb) ) THEN
+    PRINT*,'Perturbation initialization not complete. rprecision is missing' 
+    CALL EXIT(1)
   ENDIF
 
 END SUBROUTINE ppser_initialize
