@@ -337,7 +337,7 @@ class savepoint(object):
                 f = fs_get_savepoint_metainfo_d(self.savepoint, key, keylength, ctypes.pointer(v))
                 metainfo[keystr] = v.value
             elif (types[i] >= 0):
-                v = ctypes.create_string_buffer(types[i])
+                v = ctypes.create_string_buffer(types[i]+1)
                 f = fs_get_savepoint_metainfo_s(self.savepoint, key, keylength, v)
                 metainfo[keystr] = v.value.decode()
 
@@ -503,7 +503,7 @@ class serializer(object):
                 f = fs_get_serializer_metainfo_d(self.serializer, key, keylength, ctypes.pointer(v))
                 metainfo[keystr] = v.value
             elif (types[i] >= 0):
-                v = ctypes.create_string_buffer(types[i])
+                v = ctypes.create_string_buffer(types[i]+1)
                 f = fs_get_serializer_metainfo_s(self.serializer, key, keylength, v)
                 metainfo[keystr] = v.value.decode()
 
@@ -586,7 +586,7 @@ class serializer(object):
 
         # Get type
         datatype_length = fs_get_field_type_length(self.serializer, name, namelength)
-        datatype = ctypes.create_string_buffer(datatype_length)
+        datatype = ctypes.create_string_buffer(datatype_length+1)
         fs_get_field_type(self.serializer, name, namelength, datatype)
 
         # Get rank
