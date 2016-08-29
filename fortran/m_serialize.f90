@@ -1754,7 +1754,7 @@ SUBROUTINE fs_read_and_perturb_float_0d(serializer, savepoint, fieldname, field,
   REAL, INTENT(IN)                         :: rperturb
 
   CALL fs_read_field(serializer, savepoint, fieldname, field)
-  CALL fld_perturb(field, rperturb)
+  CALL ser_fld_perturb(field, rperturb)
 END SUBROUTINE fs_read_and_perturb_float_0d
 
 SUBROUTINE fs_read_and_perturb_float_1d(serializer, savepoint, fieldname, field, rperturb)
@@ -1766,7 +1766,7 @@ SUBROUTINE fs_read_and_perturb_float_1d(serializer, savepoint, fieldname, field,
   REAL, INTENT(IN)                         :: rperturb
 
   CALL fs_read_field(serializer, savepoint, fieldname, field)
-  CALL fld_perturb(field, rperturb)
+  CALL ser_fld_perturb(field, rperturb)
 END SUBROUTINE fs_read_and_perturb_float_1d
 
 SUBROUTINE fs_read_and_perturb_float_2d(serializer, savepoint, fieldname, field, rperturb)
@@ -1778,7 +1778,7 @@ SUBROUTINE fs_read_and_perturb_float_2d(serializer, savepoint, fieldname, field,
   REAL, INTENT(IN)                         :: rperturb
 
   CALL fs_read_field(serializer, savepoint, fieldname, field)
-  CALL fld_perturb(field, rperturb)
+  CALL ser_fld_perturb(field, rperturb)
 END SUBROUTINE fs_read_and_perturb_float_2d
 
 SUBROUTINE fs_read_and_perturb_float_3d(serializer, savepoint, fieldname, field, rperturb)
@@ -1790,7 +1790,7 @@ SUBROUTINE fs_read_and_perturb_float_3d(serializer, savepoint, fieldname, field,
   REAL, INTENT(IN)                         :: rperturb
 
   CALL fs_read_field(serializer, savepoint, fieldname, field)
-  CALL fld_perturb(field, rperturb)
+  CALL ser_fld_perturb(field, rperturb)
 END SUBROUTINE fs_read_and_perturb_float_3d
 
 SUBROUTINE fs_read_and_perturb_float_4d(serializer, savepoint, fieldname, field, rperturb)
@@ -1802,7 +1802,7 @@ SUBROUTINE fs_read_and_perturb_float_4d(serializer, savepoint, fieldname, field,
   REAL, INTENT(IN)                         :: rperturb
 
   CALL fs_read_field(serializer, savepoint, fieldname, field)
-  CALL fld_perturb(field, rperturb)
+  CALL ser_fld_perturb(field, rperturb)
 END SUBROUTINE fs_read_and_perturb_float_4d
 
 SUBROUTINE fs_read_and_perturb_double_0d(serializer, savepoint, fieldname, field, rperturb)
@@ -1814,7 +1814,7 @@ SUBROUTINE fs_read_and_perturb_double_0d(serializer, savepoint, fieldname, field
   REAL, INTENT(IN)                         :: rperturb
 
   CALL fs_read_field(serializer, savepoint, fieldname, field)
-  CALL fld_perturb(field, rperturb)
+  CALL ser_fld_perturb(field, rperturb)
 END SUBROUTINE fs_read_and_perturb_double_0d
 
 SUBROUTINE fs_read_and_perturb_double_1d(serializer, savepoint, fieldname, field, rperturb)
@@ -1826,7 +1826,7 @@ SUBROUTINE fs_read_and_perturb_double_1d(serializer, savepoint, fieldname, field
   REAL, INTENT(IN)                         :: rperturb
 
   CALL fs_read_field(serializer, savepoint, fieldname, field)
-  CALL fld_perturb(field, rperturb)
+  CALL ser_fld_perturb(field, rperturb)
 END SUBROUTINE fs_read_and_perturb_double_1d
 
 SUBROUTINE fs_read_and_perturb_double_2d(serializer, savepoint, fieldname, field, rperturb)
@@ -1838,7 +1838,7 @@ SUBROUTINE fs_read_and_perturb_double_2d(serializer, savepoint, fieldname, field
   REAL, INTENT(IN)                         :: rperturb
 
   CALL fs_read_field(serializer, savepoint, fieldname, field)
-  CALL fld_perturb(field, rperturb)
+  CALL ser_fld_perturb(field, rperturb)
 END SUBROUTINE fs_read_and_perturb_double_2d
 
 SUBROUTINE fs_read_and_perturb_double_3d(serializer, savepoint, fieldname, field, rperturb)
@@ -1850,7 +1850,7 @@ SUBROUTINE fs_read_and_perturb_double_3d(serializer, savepoint, fieldname, field
   REAL, INTENT(IN)                         :: rperturb
 
   CALL fs_read_field(serializer, savepoint, fieldname, field)
-  CALL fld_perturb(field, rperturb)
+  CALL ser_fld_perturb(field, rperturb)
 END SUBROUTINE fs_read_and_perturb_double_3d
 
 SUBROUTINE fs_read_and_perturb_double_4d(serializer, savepoint, fieldname, field, rperturb)
@@ -1862,7 +1862,7 @@ SUBROUTINE fs_read_and_perturb_double_4d(serializer, savepoint, fieldname, field
   REAL, INTENT(IN)                         :: rperturb
 
   CALL fs_read_field(serializer, savepoint, fieldname, field)
-  CALL fld_perturb(field, rperturb)
+  CALL ser_fld_perturb(field, rperturb)
 END SUBROUTINE fs_read_and_perturb_double_4d
 
 
