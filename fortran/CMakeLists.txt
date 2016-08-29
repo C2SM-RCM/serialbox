@@ -5,7 +5,7 @@ endif()
 
 set(
     SOURCES
-    "m_perturb.f90"
+    "m_ser_perturb.f90"
     "m_serialize.f90"
     "utils_ppser.f90"
 )
@@ -15,4 +15,3 @@ add_library(
 )
 
 install( TARGETS FortranSer DESTINATION lib/ )
-
