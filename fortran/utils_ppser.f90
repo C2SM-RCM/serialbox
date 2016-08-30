@@ -36,7 +36,7 @@ USE m_serialize
 
   INTEGER            :: ppser_intlength, ppser_reallength
   CHARACTER (LEN=6)  :: ppser_realtype
-  REAL               :: zrperturb
+  REAL               :: ppser_zrperturb
 
   ! 0 corresponds to "read"
   ! 1 corresponds to "write"
@@ -105,14 +105,14 @@ SUBROUTINE ppser_initialize(directory, prefix, mode, prefix_ref, mpi_rank, rprec
       !    field = field * (1 + 1.0e-5 * R) in double precision
       !    field = field * (1 + 1.0e-5 * R) in single precision
       !  ... where R is a random number from -1.0 to 1.0
-      zrperturb = rperturb
+      ppser_zrperturb = rperturb
     ELSE
       ! relative perturbation with a magnitude relative to precision
       ! Example: if rperturb = -10.0 then perturbation will be ...
       !    field = field * (1 + 10.0 * 1e-16 * R) in double precision
       !    field = field * (1 + 10.0 * 1e-7 * R) in single precision
       !  ... where R is a random number from -1.0 to 1.0
-      zrperturb = - rperturb * rprecision
+      ppser_zrperturb = - rperturb * rprecision
     ENDIF
   ELSE IF ( PRESENT(rprecision) ) THEN
     PRINT*,'Perturbation initialization not complete. rperturb is missing' 

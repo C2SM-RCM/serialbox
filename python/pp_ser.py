@@ -476,7 +476,7 @@ class pp_ser:
             # If the field does not contains any compute sign, the read call is
             # generated
             if not any(ext in v for ext in self.__computed_fields_sign):
-                l += tab + '    ' + 'call ' + self.methods['datareadperturb'] + '(ppser_serializer_ref, ppser_savepoint, \'' + k + '\', ' + v + ', zrperturb)\n'
+                l += tab + '    ' + 'call ' + self.methods['datareadperturb'] + '(ppser_serializer_ref, ppser_savepoint, \'' + k + '\', ' + v + ', ppser_zrperturb)\n'
                 if isacc: # Genarate acc upadte directives only for accdata clause
                     l += tab + '    ' + 'ACC_PREFIX UPDATE DEVICE ( ' + v + ' )'
                     # Genarate IF clause if needed
@@ -582,7 +582,7 @@ class pp_ser:
             ncalls = len(calls_pp) + len(calls_fs)
             if ncalls > 0:
                 calls_pp += ['ppser_savepoint', 'ppser_serializer', 'ppser_serializer_ref',
-                             'ppser_intlength', 'ppser_reallength', 'ppser_realtype', 'zrperturb']
+                             'ppser_intlength', 'ppser_reallength', 'ppser_realtype', 'ppser_zrperturb']
             if ncalls > 0 and not self.__implicitnone_done:
                 l = '\n'
                 if self.ifdef:
