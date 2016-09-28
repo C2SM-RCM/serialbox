@@ -121,7 +121,7 @@ class pp_ser:
         self.__module = ''       # current module
         self.__calls = set()     # calls to serialization module
         self.__outputBuffer = '' # preprocessed file
-        self.__useStmtInModule = False  # USE statement was inserted in module
+        self.__use_stmt_in_module = False  # USE statement was inserted in module
 
         # define compute sign used in field definition. If one is matched,
         # the read call is not added
@@ -570,14 +570,14 @@ class pp_ser:
             if self.__module:
                 self.__exit_error(msg = 'Unexpected ' + m.group(1) + ' statement')
             if(m.group(1).upper() == 'MODULE'):
-                self.__useStmtInModule = True
+                self.__use_stmt_in_module = True
             self.__produce_use_stmt()
             self.__module = m.group(2)
         return m
 
     # LINE: subroutine or function
     def __re_subroutine_function(self):
-        if(self.__useStmtInModule): # Statement produced at module level
+        if(self.__use_stmt_in_module): # Statement produced at module level
             return
         r = re.compile('^ *(subroutine|function).*', re.IGNORECASE)
         m = r.search(self.__line)
@@ -638,7 +638,7 @@ class pp_ser:
             if self.__module != m.group(2):
                 self.__exit_error(msg = 'Was expecting "end '+m.group(1)+' '+self.__module+'"')
             self.__module = ''
-            self.__useStmtInModule = False
+            self.__use_stmt_in_module = False
         return m
 
     def __check_intent_in(self, line):
