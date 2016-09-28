@@ -122,8 +122,6 @@ class pp_ser:
         self.__calls = set()     # calls to serialization module
         self.__outputBuffer = '' # preprocessed file
         self.__useStmtInModule = False  # USE statement was inserted in module
-        self.__implicitnone_found = False # has a implicit none statement been found?
-        self.__implicitnone_done = False # has code been inserted at IMPLICIT NONE?
 
         # define compute sign used in field definition. If one is matched,
         # the read call is not added
@@ -698,7 +696,6 @@ class pp_ser:
         if ncalls > 0:
             calls_pp += ['ppser_savepoint', 'ppser_serializer', 'ppser_serializer_ref',
                          'ppser_intlength', 'ppser_reallength', 'ppser_realtype', 'ppser_zrperturb']
-        if ncalls > 0 and not self.__implicitnone_done:
             self.__line += '\n'
             if self.ifdef:
                 self.__line += '#ifdef ' + self.ifdef + '\n'
@@ -755,9 +752,6 @@ class pp_ser:
         self.__linenum = 0       # current line number
         self.__module = ''       # current module
         self.__outputBuffer = '' # preprocessed file
-
-        self.__implicitnone_found = False # has a implicit none statement been found?
-        self.__implicitnone_done = False # has code been inserted at IMPLICIT NONE?
 
         # generate preprocessing macro for ACC_PREFIX
         if self.acc_prefix:
