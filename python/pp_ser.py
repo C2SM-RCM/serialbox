@@ -121,6 +121,7 @@ class pp_ser:
         self.__module = ''       # current module
         self.__calls = set()     # calls to serialization module
         self.__outputBuffer = '' # preprocessed file
+        self.__useStmtInModule = False  # USE statement was inserted in module
         self.__implicitnone_found = False # has a implicit none statement been found?
         self.__implicitnone_done = False # has code been inserted at IMPLICIT NONE?
 
@@ -564,16 +565,22 @@ class pp_ser:
     def __re_module(self):
         r = re.compile('^ *(module|program) +([a-z][a-z0-9_]*)', re.IGNORECASE)
         m = r.search(self.__line)
+
         if m:
             if m.group(2).upper() == 'PROCEDURE':
                 return False
             if self.__module:
                 self.__exit_error(msg = 'Unexpected ' + m.group(1) + ' statement')
+            # Insert USE statement at the module level
+            self.__useStmtInModule = True
+            self.__produce_use_stmt()
             self.__module = m.group(2)
         return m
 
     # LINE: implicit none
     def __re_implicit(self):
+        if(self.__useStmtInModule):
+            return
         r = re.compile('^ *implicit +none', re.IGNORECASE)
         m = r.search(self.__line)
         if m:
@@ -709,6 +716,33 @@ class pp_ser:
             self.__check_intent_in(splitted[1])
         return m
 
+    # Produce the USE statement and append it to l
+    def __produce_use_stmt(self):
+        calls_pp = [c for c in self.__calls if     c.startswith('ppser')]
+        calls_fs = [c for c in self.__calls if not c.startswith('ppser')]
+        ncalls = len(calls_pp) + len(calls_fs)
+        if ncalls > 0:
+            calls_pp += ['ppser_savepoint', 'ppser_serializer', 'ppser_serializer_ref',
+                         'ppser_intlength', 'ppser_reallength', 'ppser_realtype', 'ppser_zrperturb']
+        if ncalls > 0 and not self.__implicitnone_done:
+            self.__line += '\n'
+            if self.ifdef:
+                self.__line += '#ifdef ' + self.ifdef + '\n'
+            if len(calls_fs) > 0:
+                self.__line += 'USE ' + self.module + ', ONLY: &\n'
+                for s in calls_fs[:-1]:
+                    self.__line += '  ' + s + ', &\n'
+                self.__line += '  ' + calls_fs[-1] + '\n'
+            if len(calls_pp) > 0:
+                self.__line += 'USE utils_ppser, ONLY:  &\n'
+                for s in calls_pp[:-1]:
+                    self.__line += '  ' + s + ', &\n'
+                self.__line += '  ' + calls_pp[-1] + '\n'
+
+            if self.ifdef:
+                self.__line += '#endif\n'
+            self.__line += '\n'
+
     # evaluate one line
     def lexer(self, final=False):
 
@@ -736,8 +770,8 @@ class pp_ser:
                 self.__exit_error(msg = 'Unterminated #ifdef ' + self.ifdef + ' encountered')
             if self.__module:
                 self.__exit_error(msg = 'Unterminated module or program unit encountered')
-            if len(self.__calls) > 0 and not self.__implicitnone_found:
-                self.__exit_error(msg = 'No IMPLICIT NONE statement found in code')
+            if len(self.__calls) > 0 and (not self.__implicitnone_found and not self.__useStmtInModule):
+                self.__exit_error(msg = 'No MODULE or IMPLICIT NONE statement found in code. Cannot insert USE statement')
 
     # execute one parsing pass over file
     def parse(self, generate=False):
@@ -749,6 +783,7 @@ class pp_ser:
         self.__linenum = 0       # current line number
         self.__module = ''       # current module
         self.__outputBuffer = '' # preprocessed file
+
         self.__implicitnone_found = False # has a implicit none statement been found?
         self.__implicitnone_done = False # has code been inserted at IMPLICIT NONE?
 
