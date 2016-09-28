@@ -638,6 +638,7 @@ class pp_ser:
             if self.__module != m.group(2):
                 self.__exit_error(msg = 'Was expecting "end '+m.group(1)+' '+self.__module+'"')
             self.__module = ''
+            self.__useStmtInModule = False
         return m
 
     def __check_intent_in(self, line):
