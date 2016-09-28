@@ -571,46 +571,20 @@ class pp_ser:
                 return False
             if self.__module:
                 self.__exit_error(msg = 'Unexpected ' + m.group(1) + ' statement')
-            # Insert USE statement at the module level
-            self.__useStmtInModule = True
+            if(m.group(1).upper() == 'MODULE'):
+                self.__useStmtInModule = True
             self.__produce_use_stmt()
             self.__module = m.group(2)
         return m
 
-    # LINE: implicit none
-    def __re_implicit(self):
-        if(self.__useStmtInModule):
+    # LINE: subroutine or function
+    def __re_subroutine_function(self):
+        if(self.__useStmtInModule): # Statement produced at module level
             return
-        r = re.compile('^ *implicit +none', re.IGNORECASE)
+        r = re.compile('^ *(subroutine|function).*', re.IGNORECASE)
         m = r.search(self.__line)
         if m:
-            calls_pp = [c for c in self.__calls if     c.startswith('ppser')]
-            calls_fs = [c for c in self.__calls if not c.startswith('ppser')]
-            ncalls = len(calls_pp) + len(calls_fs)
-            if ncalls > 0:
-                calls_pp += ['ppser_savepoint', 'ppser_serializer', 'ppser_serializer_ref',
-                             'ppser_intlength', 'ppser_reallength', 'ppser_realtype', 'ppser_zrperturb']
-            if ncalls > 0 and not self.__implicitnone_done:
-                l = '\n'
-                if self.ifdef:
-                    l += '#ifdef ' + self.ifdef + '\n'
-                if len(calls_fs) > 0:
-                    l += 'USE ' + self.module + ', ONLY: &\n'
-                    for s in calls_fs[:-1]:
-                        l += '  ' + s + ', &\n'
-                    l += '  ' + calls_fs[-1] + '\n'
-                if len(calls_pp) > 0:
-                    l += 'USE utils_ppser, ONLY:  &\n'
-                    for s in calls_pp[:-1]:
-                        l += '  ' + s + ', &\n'
-                    l += '  ' + calls_pp[-1] + '\n'
-
-                if self.ifdef:
-                    l += '#endif\n'
-                l += '\n'
-                self.__line = l + self.__line
-                self.__implicitnone_done = True
-            self.__implicitnone_found = True
+            self.__produce_use_stmt()
         return m
 
     # LINE: !$SER directive
@@ -748,7 +722,7 @@ class pp_ser:
 
         # parse lines related to scope
         self.__re_module()
-        self.__re_implicit()
+        self.__re_subroutine_function()
         self.__re_endmodule()
         self.__re_def()
 
@@ -770,8 +744,6 @@ class pp_ser:
                 self.__exit_error(msg = 'Unterminated #ifdef ' + self.ifdef + ' encountered')
             if self.__module:
                 self.__exit_error(msg = 'Unterminated module or program unit encountered')
-            if len(self.__calls) > 0 and (not self.__implicitnone_found and not self.__useStmtInModule):
-                self.__exit_error(msg = 'No MODULE or IMPLICIT NONE statement found in code. Cannot insert USE statement')
 
     # execute one parsing pass over file
     def parse(self, generate=False):
