@@ -561,18 +561,18 @@ class pp_ser:
 
     # LINE: module/program
     def __re_module(self):
-        r = re.compile('^ *(module|program) +([a-z][a-z0-9_]*)', re.IGNORECASE)
+        r = re.compile('^ *(?P<statement>module|program) +(?P<identifier>[a-z][a-z0-9_]*)', re.IGNORECASE)
         m = r.search(self.__line)
 
         if m:
-            if m.group(2).upper() == 'PROCEDURE':
+            if m.group('identifier').upper() == 'PROCEDURE':
                 return False
             if self.__module:
                 self.__exit_error(msg = 'Unexpected ' + m.group(1) + ' statement')
             self.__produce_use_stmt()
-            if(m.group(1).upper() == 'MODULE'):
+            if(m.group('statement').upper() == 'MODULE'):
                 self.__use_stmt_in_module = True
-            self.__module = m.group(2)
+            self.__module = m.group('identifier')
         return m
 
     # LINE: subroutine or function
