@@ -569,9 +569,9 @@ class pp_ser:
                 return False
             if self.__module:
                 self.__exit_error(msg = 'Unexpected ' + m.group(1) + ' statement')
+            self.__produce_use_stmt()
             if(m.group(1).upper() == 'MODULE'):
                 self.__use_stmt_in_module = True
-            self.__produce_use_stmt()
             self.__module = m.group(2)
         return m
 
@@ -691,6 +691,8 @@ class pp_ser:
 
     # Produce the USE statement and append it to l
     def __produce_use_stmt(self):
+        if (self.__use_stmt_in_module == True):
+            return
         calls_pp = [c for c in self.__calls if     c.startswith('ppser')]
         calls_fs = [c for c in self.__calls if not c.startswith('ppser')]
         ncalls = len(calls_pp) + len(calls_fs)
