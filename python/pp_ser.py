@@ -41,12 +41,12 @@ __date__ = 'Sun Mar 23 22:06:44 2014'
 __email__ = 'oliver.fuhrer@meteoswiss.ch'
 
 
-
 def toASCII(text):
     if sys.version_info[0] == 3:
         return bytes(text, 'ascii')
     else:
         return str(text)
+
 
 class pp_ser:
 
@@ -428,7 +428,6 @@ class pp_ser:
             l += 'ENDIF\n'
         self.__line = l
 
-
     # DATA directive
     def __ser_data(self, args, isacc = False):
 
@@ -542,7 +541,6 @@ class pp_ser:
         if if_statement:
             l += 'ENDIF\n'
         self.__line = l
-
 
     # CLEANUP directive
     def __ser_cleanup(self, args):
@@ -660,7 +658,6 @@ class pp_ser:
             l += '#else\n' + self.__line + '#endif\n'
             self.__line = l
         return fields_in_this_line
-
 
     def __re_def(self):
         r = re.compile(r'.*intent *\(in\)[^:]*::\s*([^!]*)\s*.*', re.IGNORECASE)
@@ -791,7 +788,6 @@ class pp_ser:
                 # cleanup current line (used for line continuation and final lexer call)
                 self.__line = ''
             self.lexer(final=True)
-
 
         finally:
             input_file.close()
