@@ -383,7 +383,7 @@ class Serializer(object):
     def __init__(self, directory, prefix, openmode):
         # Extract open mode
         openmode = openmode.lower()
-        if len(openmode) != 1 or not openmode in 'rwa':
+        if len(openmode) != 1 or openmode not in 'rwa':
             raise ValueError("openmode can be one of 'r', 'w' or 'a'")
 
         # Extract strings
