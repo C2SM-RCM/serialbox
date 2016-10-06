@@ -41,14 +41,14 @@ __date__ = 'Sun Mar 23 22:06:44 2014'
 __email__ = 'oliver.fuhrer@meteoswiss.ch'
 
 
-def toASCII(text):
+def to_ascii(text):
     if sys.version_info[0] == 3:
         return bytes(text, 'ascii')
     else:
         return str(text)
 
 
-class pp_ser:
+class PpSer:
 
     def __init__(self, infile, outfile='', ifdef='SERIALIZE', real='ireals',
                  module='m_serialize', identical=True, verbose=False,
@@ -803,7 +803,7 @@ class pp_ser:
         # write output
         if self.outfile != '':
             output_file = tempfile.NamedTemporaryFile(delete=False)
-            output_file.write(toASCII(self.__outputBuffer))
+            output_file.write(to_ascii(self.__outputBuffer))
             output_file.close()
             useit = True
             if os.path.isfile(self.outfile) and not self.identical:
@@ -891,8 +891,8 @@ end module test
         f = tempfile.NamedTemporaryFile(delete=False)
         f.write(test)
         f.close()
-        ser = pp_ser(f.name)
-        pp_ser.real = 'wp'
+        ser = PpSer(f.name)
+        PpSer.real = 'wp'
         ser.preprocess()
     finally:
         os.remove(f.name)
@@ -929,6 +929,6 @@ if __name__ == "__main__":
             print('Skipping', infile)
         else:
             print('Processing file', infile)
-            ser = pp_ser(infile, real='wp', outfile=outfile, identical=(not options.ignore_identical),
-                         verbose=options.verbose, acc_prefix=options.acc_prefix, acc_if=options.acc_if)
+            ser = PpSer(infile, real='wp', outfile=outfile, identical=(not options.ignore_identical),
+                        verbose=options.verbose, acc_prefix=options.acc_prefix, acc_if=options.acc_if)
             ser.preprocess()
