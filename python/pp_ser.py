@@ -899,15 +899,15 @@ def parse_args():
     from optparse import OptionParser
     parser = OptionParser()
     parser.add_option('-i', '--ignore-identical', help='Ignore files which are not modified by pre-processor',
-               default=False, action='store_true', dest='ignore_identical')
+                      default=False, action='store_true', dest='ignore_identical')
     parser.add_option('-d', '--output-dir', help='The target directory for writing pre-processed files',
-               default='', type=str, dest='output_dir')
+                      default='', type=str, dest='output_dir')
     parser.add_option('-v', '--verbose', help='Enable verbose execution',
-               default=False, action='store_true', dest='verbose')
+                      default=False, action='store_true', dest='verbose')
     parser.add_option('-p', '--no-prefix', help='Don\'t generate preprocessing macro definition for ACC_PREFIX',
-               default=True, action='store_false', dest='acc_prefix')
+                      default=True, action='store_false', dest='acc_prefix')
     parser.add_option('-a', '--acc-if', help='Add IF clause to OpenACC update statement',
-               default='', type=str, dest='acc_if')
+                      default='', type=str, dest='acc_if')
     (options, args) = parser.parse_args()
     if len(args) < 1:
         parser.error('Need at least one source file to process')
