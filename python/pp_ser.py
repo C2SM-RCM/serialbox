@@ -213,7 +213,7 @@ class pp_ser:
         if_encountered = False
         if_statement = ''
 
-        pattern  = '^([a-zA-Z_0-9]+|\$[a-zA-Z_0-9\(\)]+(?:-[a-zA-Z_0-9\(\)]+)?|%all)'  # Tracer name, id(s) or %all
+        pattern = '^([a-zA-Z_0-9]+|\$[a-zA-Z_0-9\(\)]+(?:-[a-zA-Z_0-9\(\)]+)?|%all)'  # Tracer name, id(s) or %all
         pattern += '(?:#(tens|bd|surf|sedimvel))?'  # Type (stype)
         pattern += '(?:@([a-zA-Z_0-9]+))?'  # Time level (timelevel)
         r = re.compile(pattern)
@@ -332,7 +332,8 @@ class pp_ser:
         datatypes = dict(integer=["'int'", 'ppser_intlength'], real=['ppser_realtype', 'ppser_reallength'])
 
         if dirs[1] not in datatypes:
-            self.__exit_error(directive=args[0], msg='Data type "{0}" not understood. Valid types are: {1}'.format(dirs[1], ', '.join('"' + d + '"' for d in datatypes.keys())))
+            self.__exit_error(directive=args[0], msg='Data type "{0}" not understood. Valid types are: {1}'.
+                              format(dirs[1], ', '.join('"' + d + '"' for d in datatypes.keys())))
 
         dirs[1:2] = datatypes[dirs[1]]
 
@@ -357,8 +358,9 @@ class pp_ser:
         if len(keys) > 0:
             self.__exit_error(directive=args[0],
                               msg='Metainformation for fields are not yet implemented')
-        #for k,v in zip(keys, values):
-        #    l += tab + 'call ' + self.methods['fieldmetainfo'] + '(ppser_serializer, ' + dirs[0] + ', "' + k + '", ' + v + ')\n'
+        # for k,v in zip(keys, values):
+        #    l += tab + 'call ' + self.methods['fieldmetainfo'] + '
+        #       (ppser_serializer, ' + dirs[0] + ', "' + k + '", ' + v + ')\n'
 
         if if_statement:
             l += 'ENDIF\n'
@@ -460,13 +462,15 @@ class pp_ser:
                     l += ', IF (' + self.acc_if + ') \n'
                 else:
                     l += '\n'
-            l += tab + '    ' + 'call ' + self.methods['datawrite'] + '(ppser_serializer, ppser_savepoint, \'' + k + '\', ' + v + ')\n'
+            l += tab + '    ' + 'call ' + self.methods['datawrite'] + \
+                '(ppser_serializer, ppser_savepoint, \'' + k + '\', ' + v + ')\n'
         l += tab + '  ' + 'CASE(' + str(self.modes['read']) + ')\n'
         for k, v in zip(keys, values):
             # If the field does not contains any compute sign, the read call is
             # generated
             if not any(ext in v for ext in self.__computed_fields_sign):
-                l += tab + '    ' + 'call ' + self.methods['dataread'] + '(ppser_serializer_ref, ppser_savepoint, \'' + k + '\', ' + v + ')\n'
+                l += tab + '    ' + 'call ' + self.methods['dataread'] + '(ppser_serializer_ref, ppser_savepoint, \'' \
+                     + k + '\', ' + v + ')\n'
                 if isacc:  # Genarate acc upadte directives only for accdata clause
                     l += tab + '    ' + 'ACC_PREFIX UPDATE DEVICE ( ' + v + ' )'
                     # Genarate IF clause if needed
@@ -479,7 +483,8 @@ class pp_ser:
             # If the field does not contains any compute sign, the read call is
             # generated
             if not any(ext in v for ext in self.__computed_fields_sign):
-                l += tab + '    ' + 'call ' + self.methods['datareadperturb'] + '(ppser_serializer_ref, ppser_savepoint, \'' + k + '\', ' + v + ', ppser_zrperturb)\n'
+                l += tab + '    ' + 'call ' + self.methods['datareadperturb'] + \
+                     '(ppser_serializer_ref, ppser_savepoint, \'' + k + '\', ' + v + ', ppser_zrperturb)\n'
                 if isacc:  # Genarate acc upadte directives only for accdata clause
                     l += tab + '    ' + 'ACC_PREFIX UPDATE DEVICE ( ' + v + ' )'
                     # Genarate IF clause if needed
@@ -678,7 +683,7 @@ class pp_ser:
                 nextline = linecache.getline(os.path.join(self.infile), lookahead_index)
                 while nextline:
                     self.__check_intent_in(nextline)
-                    if(nextline.find('&')!=-1):
+                    if(nextline.find('&') != -1):
                         lookahead_index += 1
                         nextline = linecache.getline(os.path.join(self.infile), lookahead_index)
                     else:
@@ -693,7 +698,7 @@ class pp_ser:
 
     # Produce the USE statement and append it to l
     def __produce_use_stmt(self):
-        if (self.__use_stmt_in_module == True):
+        if self.__use_stmt_in_module is True:
             return
         calls_pp = [c for c in self.__calls if c.startswith('ppser')]
         calls_fs = [c for c in self.__calls if not c.startswith('ppser')]
@@ -926,5 +931,6 @@ if __name__ == "__main__":
             print('Skipping', infile)
         else:
             print('Processing file', infile)
-            ser = pp_ser(infile, real='wp', outfile=outfile, identical=(not options.ignore_identical), verbose=options.verbose, acc_prefix=options.acc_prefix, acc_if=options.acc_if)
+            ser = pp_ser(infile, real='wp', outfile=outfile, identical=(not options.ignore_identical),
+                         verbose=options.verbose, acc_prefix=options.acc_prefix, acc_if=options.acc_if)
             ser.preprocess()
