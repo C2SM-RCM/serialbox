@@ -22,7 +22,7 @@ framework.
 The grammar is defined by a set of !$SER directives. All directives are case-
 insensitive. The main keywords are INIT for initialization, VERBATIM for echoeing
 some Fortran statements, OPTION for setting specific options for the serialization
-modlue, REGISTER for registering a data field meta-information,
+module, REGISTER for registering a data field meta-information,
 ZERO for setting some field to zero, SAVEPOINT for registering a savepoint with some
 optional information, DATA for serializing a data field, and CLEANUP for finishing
 serialization.
@@ -450,9 +450,9 @@ class PpSer:
         l += tab + 'SELECT CASE ( ' + self.methods['getmode'] + '() )\n'
         l += tab + '  ' + 'CASE(' + str(self.modes['write']) + ')\n'
         for k, v in zip(keys, values):
-            if isacc:  # Genarate acc update directives only for accdata clause
+            if isacc:  # Generate acc update directives only for accdata clause
                 l += tab + '    ' + 'ACC_PREFIX UPDATE HOST ( ' + v + ' )'
-                # Genarate IF clause if needed
+                # Generate IF clause if needed
                 if len(self.acc_if) > 0:
                     l += ', IF (' + self.acc_if + ') \n'
                 else:
@@ -466,9 +466,9 @@ class PpSer:
             if not any(ext in v for ext in self.__computed_fields_sign):
                 l += tab + '    ' + 'call ' + self.methods['dataread'] + '(ppser_serializer_ref, ppser_savepoint, \'' \
                      + k + '\', ' + v + ')\n'
-                if isacc:  # Genarate acc upadte directives only for accdata clause
+                if isacc:  # Generate acc upadte directives only for accdata clause
                     l += tab + '    ' + 'ACC_PREFIX UPDATE DEVICE ( ' + v + ' )'
-                    # Genarate IF clause if needed
+                    # Generate IF clause if needed
                     if len(self.acc_if) > 0:
                         l += ', IF (' + self.acc_if + ') \n'
                     else:
@@ -480,9 +480,9 @@ class PpSer:
             if not any(ext in v for ext in self.__computed_fields_sign):
                 l += tab + '    ' + 'call ' + self.methods['datareadperturb'] + \
                      '(ppser_serializer_ref, ppser_savepoint, \'' + k + '\', ' + v + ', ppser_zrperturb)\n'
-                if isacc:  # Genarate acc upadte directives only for accdata clause
+                if isacc:  # Generate acc upadte directives only for accdata clause
                     l += tab + '    ' + 'ACC_PREFIX UPDATE DEVICE ( ' + v + ' )'
-                    # Genarate IF clause if needed
+                    # Generate IF clause if needed
                     if len(self.acc_if) > 0:
                         l += ', IF (' + self.acc_if + ') \n'
                     else:
