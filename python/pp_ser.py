@@ -136,7 +136,7 @@ class pp_ser:
     def __reg_shortcuts(self, shortcut):
         shortcut = shortcut.upper()
         l = []
-        if re.match('(^$|[IJK][IJK1-9]*)',shortcut):
+        if re.match('(^$|[IJK][IJK1-9]*)', shortcut):
             if shortcut == '':
                 l = '1 1 1 1 0 0 0 0 0 0 0 0'.split()
             elif shortcut == 'I':
@@ -279,10 +279,10 @@ class pp_ser:
         for i in range(len(keys)):
             if keys[i].lower() == 'verbosity':
                 if values[i].lower() == 'off':
-                    values[i]='0'
+                    values[i] = '0'
                 if values[i].lower() == 'on':
-                    values[i]='1'
-            if i==0:
+                    values[i] = '1'
+            if i == 0:
                 l += keys[i] + '=' + values[i]
             else:
                 l += ', ' + keys[i] + '=' + values[i]
@@ -300,7 +300,7 @@ class pp_ser:
         if if_statement:
             l += 'IF (' + if_statement + ') THEN\n'
             tab = '  '
-        for k,v in zip(keys, values):
+        for k, v in zip(keys, values):
             l += tab + 'CALL ' + self.methods['serinfo'] + '(ppser_serializer, "' + k + '", ' + v + ')\n'
         for d in dirs:
             l += tab + 'CALL ' + self.methods['serinfo'] + '(ppser_serializer, "' + d + '", ' + d + ')\n'
@@ -405,7 +405,7 @@ class pp_ser:
         self.__calls.add(self.methods['savepoint'])
         self.__calls.add(self.methods['spinfo'])
         l += tab + 'call ' + self.methods['savepoint'] + '(\'' + name + '\', ppser_savepoint)\n'
-        for k,v in zip(keys, values):
+        for k, v in zip(keys, values):
             l += tab + 'call ' + self.methods['spinfo'] + '(ppser_savepoint, \'' + k + '\', ' + v + ')\n'
         if if_statement:
             l += 'ENDIF\n'
@@ -452,7 +452,7 @@ class pp_ser:
 
         l += tab + 'SELECT CASE ( ' + self.methods['getmode'] + '() )\n'
         l += tab + '  ' + 'CASE(' + str(self.modes['write']) + ')\n'
-        for k,v in zip(keys, values):
+        for k, v in zip(keys, values):
             if isacc: # Genarate acc update directives only for accdata clause
                 l += tab + '    ' + 'ACC_PREFIX UPDATE HOST ( ' + v + ' )'
                 # Genarate IF clause if needed
@@ -462,7 +462,7 @@ class pp_ser:
                     l += '\n'
             l += tab + '    ' + 'call ' + self.methods['datawrite'] + '(ppser_serializer, ppser_savepoint, \'' + k + '\', ' + v + ')\n'
         l += tab + '  ' + 'CASE(' + str(self.modes['read']) + ')\n'
-        for k,v in zip(keys, values):
+        for k, v in zip(keys, values):
             # If the field does not contains any compute sign, the read call is
             # generated
             if not any(ext in v for ext in self.__computed_fields_sign):
@@ -475,7 +475,7 @@ class pp_ser:
                     else:
                         l += '\n'
         l += tab + '  ' + 'CASE(' + str(self.modes['read-perturb']) + ')\n'
-        for k,v in zip(keys, values):
+        for k, v in zip(keys, values):
             # If the field does not contains any compute sign, the read call is
             # generated
             if not any(ext in v for ext in self.__computed_fields_sign):
@@ -596,7 +596,7 @@ class pp_ser:
         if m:
             if m.group(1):
                 args = r2.split(m.group(1))[1::2]
-                if   args[0].upper() in self.language['init']:
+                if args[0].upper() in self.language['init']:
                     self.__ser_init(args)
                 elif args[0].upper() in self.language['option']:
                     self.__ser_option(args)
@@ -652,7 +652,7 @@ class pp_ser:
         self.intentin_removed.extend([x for x in fields_in_this_line if x not in self.intentin_removed])
 
         if fields_in_this_line:
-            l =  '#ifdef ' + self.ifdef + '\n'
+            l = '#ifdef ' + self.ifdef + '\n'
             r = re.compile(r', *intent *\(in\)', re.IGNORECASE)
             l += r.sub('', self.__line)
             l += '#else\n' + self.__line + '#endif\n'
@@ -695,7 +695,7 @@ class pp_ser:
     def __produce_use_stmt(self):
         if (self.__use_stmt_in_module == True):
             return
-        calls_pp = [c for c in self.__calls if     c.startswith('ppser')]
+        calls_pp = [c for c in self.__calls if c.startswith('ppser')]
         calls_fs = [c for c in self.__calls if not c.startswith('ppser')]
         ncalls = len(calls_pp) + len(calls_fs)
         if ncalls > 0:
@@ -816,6 +816,7 @@ class pp_ser:
         else:
             print(self.__outputBuffer)
 
+
 def simple_test():
     try:
         test = """
@@ -893,6 +894,7 @@ end module test
     finally:
         os.remove(f.name)
 
+
 def parse_args():
     from optparse import OptionParser
     parser = OptionParser()
@@ -912,7 +914,7 @@ def parse_args():
     return (options, args)
 
 if __name__ == "__main__":
-    (options,args) = parse_args()
+    (options, args) = parse_args()
     for infile in args:
         if options.output_dir:
             outfile = os.path.join(options.output_dir, os.path.basename(infile))
