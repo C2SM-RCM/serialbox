@@ -27,12 +27,12 @@ methods from the Fortran serialization module. The second pass expands the direc
 """
 
 # information
-__author__    = 'Oliver Fuhrer'
+__author__ = 'Oliver Fuhrer'
 __copyright__ = 'Copyright 2014, MeteoSwiss'
-__license__   = 'GPL'
-__version__   = '0.1'
-__date__      = 'Sun Mar 23 22:06:44 2014'
-__email__     = 'oliver.fuhrer@meteoswiss.ch'
+__license__ = 'GPL'
+__version__ = '0.1'
+__date__ = 'Sun Mar 23 22:06:44 2014'
+__email__ = 'oliver.fuhrer@meteoswiss.ch'
 
 # modules
 import sys, os, tempfile, re, filecmp, shutil
