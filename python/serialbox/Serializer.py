@@ -1,7 +1,9 @@
-#This file is released under terms of BSD license`
-#See LICENSE.txt for more information
+# This file is released under terms of BSD license`
+# See LICENSE.txt for more information
+
 
 """Serializer module used to read serialized data"""
+
 
 class Savepoint(dict):
     """Represents a serializer savepoint"""
@@ -66,12 +68,14 @@ class Savepoint(dict):
     def __repr__(self):
         return "{{ {names} }}".format(names=", ".join(["'{}'".format(a) for a in self.fields]))
 
+
 # Nested dictionary set
 # http://stackoverflow.com/q/13687924/592024
 def _nested_set(dic, keys, value):
     for key in keys[:-1]:
         dic = dic.setdefault(key, {})
     dic[keys[-1]] = value
+
 
 class Serializer(dict):
     """The serializer that allows accessing serialized data""" 
@@ -87,8 +91,8 @@ class Serializer(dict):
         if openmode != "r":
             raise ValueError("Only reads are supported at the moment")
 
-        from .serialization import serializer
-        self.serializer = serializer(directory, prefix, openmode)
+        from .serialization import Serializer
+        self.serializer = Serializer(directory, prefix, openmode)
         fnames = self.serializer.fieldnames
         finfos = self.serializer.fieldinfos
 

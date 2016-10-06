@@ -34,7 +34,7 @@ PUBLIC :: &
   fs_create_serializer, fs_destroy_serializer, fs_serializer_openmode, fs_add_serializer_metainfo, &
   fs_create_savepoint, fs_destroy_savepoint, fs_add_savepoint_metainfo, &
   fs_field_exists, fs_register_field, fs_add_field_metainfo, fs_write_field, fs_read_field,        &
-  fs_enable_serialization, fs_disable_serialization, fs_print_debuginfo
+  fs_enable_serialization, fs_disable_serialization, fs_print_debuginfo, fs_read_and_perturb_field
 
 PRIVATE
 
@@ -197,6 +197,28 @@ PRIVATE
       fs_read_double_2d, &
       fs_read_double_3d, &
       fs_read_double_4d
+  END INTERFACE
+
+  !==============================================================================
+  !+ Module interface to read and perturb the given field at the given savepoint
+  !------------------------------------------------------------------------------
+  INTERFACE fs_read_and_perturb_field
+    MODULE PROCEDURE &
+      fs_read_and_perturb_int_0d,    &
+      fs_read_and_perturb_int_1d,    &
+      fs_read_and_perturb_int_2d,    &
+      fs_read_and_perturb_int_3d,    &
+      fs_read_and_perturb_int_4d,    &
+      fs_read_and_perturb_float_0d,  &
+      fs_read_and_perturb_float_1d,  &
+      fs_read_and_perturb_float_2d,  &
+      fs_read_and_perturb_float_3d,  &
+      fs_read_and_perturb_float_4d,  &
+      fs_read_and_perturb_double_0d, &
+      fs_read_and_perturb_double_1d, &
+      fs_read_and_perturb_double_2d, &
+      fs_read_and_perturb_double_3d, &
+      fs_read_and_perturb_double_4d
   END INTERFACE
 
 CONTAINS
@@ -1429,7 +1451,6 @@ SUBROUTINE fs_read_float_0d(serializer, savepoint, fieldname, field)
                       C_LOC(padd), istride, jstride, kstride, lstride)
 END SUBROUTINE fs_read_float_0d
 
-
 SUBROUTINE fs_read_float_1d(serializer, savepoint, fieldname, field)
   TYPE(t_serializer), INTENT(IN)           :: serializer
   TYPE(t_savepoint) , INTENT(IN)           :: savepoint
@@ -1562,7 +1583,6 @@ SUBROUTINE fs_read_double_0d(serializer, savepoint, fieldname, field)
                       C_LOC(padd), istride, jstride, kstride, lstride)
 END SUBROUTINE fs_read_double_0d
 
-
 SUBROUTINE fs_read_double_1d(serializer, savepoint, fieldname, field)
   TYPE(t_serializer), INTENT(IN)           :: serializer
   TYPE(t_savepoint) , INTENT(IN)           :: savepoint
@@ -1670,5 +1690,180 @@ SUBROUTINE fs_read_double_4d(serializer, savepoint, fieldname, field)
                       C_LOC(padd(1,1,1,1)), istride, jstride, kstride, lstride)
 END SUBROUTINE fs_read_double_4d
 
-END MODULE m_serialize
+SUBROUTINE fs_read_and_perturb_int_0d(serializer, savepoint, fieldname, field, rperturb)
+  ! Dummy call as perturbing int doesn't make sense (at least right now)
+  TYPE(t_serializer), INTENT(IN)           :: serializer
+  TYPE(t_savepoint) , INTENT(IN)           :: savepoint
+  CHARACTER(LEN=*)                         :: fieldname
+  INTEGER(KIND=C_INT), INTENT(OUT), TARGET :: field
+  REAL, INTENT(IN)                         :: rperturb
 
+  CALL fs_read_field(serializer, savepoint, fieldname, field)
+END SUBROUTINE fs_read_and_perturb_int_0d
+
+SUBROUTINE fs_read_and_perturb_int_1d(serializer, savepoint, fieldname, field, rperturb)
+  ! Dummy call as perturbing int doesn't make sense (at least right now)
+  TYPE(t_serializer), INTENT(IN)           :: serializer
+  TYPE(t_savepoint) , INTENT(IN)           :: savepoint
+  CHARACTER(LEN=*)                         :: fieldname
+  INTEGER(KIND=C_INT), INTENT(OUT), TARGET :: field(:)
+  REAL, INTENT(IN)                         :: rperturb
+
+  CALL fs_read_field(serializer, savepoint, fieldname, field)
+END SUBROUTINE fs_read_and_perturb_int_1d
+
+SUBROUTINE fs_read_and_perturb_int_2d(serializer, savepoint, fieldname, field, rperturb)
+  ! Dummy call as perturbing int doesn't make sense (at least right now)
+  TYPE(t_serializer), INTENT(IN)           :: serializer
+  TYPE(t_savepoint) , INTENT(IN)           :: savepoint
+  CHARACTER(LEN=*)                         :: fieldname
+  INTEGER(KIND=C_INT), INTENT(OUT), TARGET :: field(:,:)
+  REAL, INTENT(IN)                         :: rperturb
+
+  CALL fs_read_field(serializer, savepoint, fieldname, field)
+END SUBROUTINE fs_read_and_perturb_int_2d
+
+SUBROUTINE fs_read_and_perturb_int_3d(serializer, savepoint, fieldname, field, rperturb)
+  ! Dummy call as perturbing int doesn't make sense (at least right now)
+  TYPE(t_serializer), INTENT(IN)           :: serializer
+  TYPE(t_savepoint) , INTENT(IN)           :: savepoint
+  CHARACTER(LEN=*)                         :: fieldname
+  INTEGER(KIND=C_INT), INTENT(OUT), TARGET :: field(:,:,:)
+  REAL, INTENT(IN)                         :: rperturb
+
+  CALL fs_read_field(serializer, savepoint, fieldname, field)
+END SUBROUTINE fs_read_and_perturb_int_3d
+
+SUBROUTINE fs_read_and_perturb_int_4d(serializer, savepoint, fieldname, field, rperturb)
+  ! Dummy call as perturbing int doesn't make sense (at least right now)
+  TYPE(t_serializer), INTENT(IN)           :: serializer
+  TYPE(t_savepoint) , INTENT(IN)           :: savepoint
+  CHARACTER(LEN=*)                         :: fieldname
+  INTEGER(KIND=C_INT), INTENT(OUT), TARGET :: field(:,:,:,:)
+  REAL, INTENT(IN)                         :: rperturb
+
+  CALL fs_read_field(serializer, savepoint, fieldname, field)
+END SUBROUTINE fs_read_and_perturb_int_4d
+
+SUBROUTINE fs_read_and_perturb_float_0d(serializer, savepoint, fieldname, field, rperturb)
+  USE m_ser_perturb
+  TYPE(t_serializer), INTENT(IN)           :: serializer
+  TYPE(t_savepoint) , INTENT(IN)           :: savepoint
+  CHARACTER(LEN=*)                         :: fieldname
+  REAL(KIND=C_FLOAT), INTENT(OUT), TARGET  :: field
+  REAL, INTENT(IN)                         :: rperturb
+
+  CALL fs_read_field(serializer, savepoint, fieldname, field)
+  CALL ser_fld_perturb(field, rperturb)
+END SUBROUTINE fs_read_and_perturb_float_0d
+
+SUBROUTINE fs_read_and_perturb_float_1d(serializer, savepoint, fieldname, field, rperturb)
+  USE m_ser_perturb
+  TYPE(t_serializer), INTENT(IN)           :: serializer
+  TYPE(t_savepoint) , INTENT(IN)           :: savepoint
+  CHARACTER(LEN=*)                         :: fieldname
+  REAL(KIND=C_FLOAT), INTENT(OUT), TARGET  :: field(:)
+  REAL, INTENT(IN)                         :: rperturb
+
+  CALL fs_read_field(serializer, savepoint, fieldname, field)
+  CALL ser_fld_perturb(field, rperturb)
+END SUBROUTINE fs_read_and_perturb_float_1d
+
+SUBROUTINE fs_read_and_perturb_float_2d(serializer, savepoint, fieldname, field, rperturb)
+  USE m_ser_perturb
+  TYPE(t_serializer), INTENT(IN)           :: serializer
+  TYPE(t_savepoint) , INTENT(IN)           :: savepoint
+  CHARACTER(LEN=*)                         :: fieldname
+  REAL(KIND=C_FLOAT), INTENT(OUT), TARGET  :: field(:,:)
+  REAL, INTENT(IN)                         :: rperturb
+
+  CALL fs_read_field(serializer, savepoint, fieldname, field)
+  CALL ser_fld_perturb(field, rperturb)
+END SUBROUTINE fs_read_and_perturb_float_2d
+
+SUBROUTINE fs_read_and_perturb_float_3d(serializer, savepoint, fieldname, field, rperturb)
+  USE m_ser_perturb
+  TYPE(t_serializer), INTENT(IN)           :: serializer
+  TYPE(t_savepoint) , INTENT(IN)           :: savepoint
+  CHARACTER(LEN=*)                         :: fieldname
+  REAL(KIND=C_FLOAT), INTENT(OUT), TARGET  :: field(:,:,:)
+  REAL, INTENT(IN)                         :: rperturb
+
+  CALL fs_read_field(serializer, savepoint, fieldname, field)
+  CALL ser_fld_perturb(field, rperturb)
+END SUBROUTINE fs_read_and_perturb_float_3d
+
+SUBROUTINE fs_read_and_perturb_float_4d(serializer, savepoint, fieldname, field, rperturb)
+  USE m_ser_perturb
+  TYPE(t_serializer), INTENT(IN)           :: serializer
+  TYPE(t_savepoint) , INTENT(IN)           :: savepoint
+  CHARACTER(LEN=*)                         :: fieldname
+  REAL(KIND=C_FLOAT), INTENT(OUT), TARGET  :: field(:,:,:,:)
+  REAL, INTENT(IN)                         :: rperturb
+
+  CALL fs_read_field(serializer, savepoint, fieldname, field)
+  CALL ser_fld_perturb(field, rperturb)
+END SUBROUTINE fs_read_and_perturb_float_4d
+
+SUBROUTINE fs_read_and_perturb_double_0d(serializer, savepoint, fieldname, field, rperturb)
+  USE m_ser_perturb
+  TYPE(t_serializer), INTENT(IN)           :: serializer
+  TYPE(t_savepoint) , INTENT(IN)           :: savepoint
+  CHARACTER(LEN=*)                         :: fieldname
+  REAL(KIND=C_DOUBLE), INTENT(OUT), TARGET :: field
+  REAL, INTENT(IN)                         :: rperturb
+
+  CALL fs_read_field(serializer, savepoint, fieldname, field)
+  CALL ser_fld_perturb(field, rperturb)
+END SUBROUTINE fs_read_and_perturb_double_0d
+
+SUBROUTINE fs_read_and_perturb_double_1d(serializer, savepoint, fieldname, field, rperturb)
+  USE m_ser_perturb
+  TYPE(t_serializer), INTENT(IN)           :: serializer
+  TYPE(t_savepoint) , INTENT(IN)           :: savepoint
+  CHARACTER(LEN=*)                         :: fieldname
+  REAL(KIND=C_DOUBLE), INTENT(OUT), TARGET :: field(:)
+  REAL, INTENT(IN)                         :: rperturb
+
+  CALL fs_read_field(serializer, savepoint, fieldname, field)
+  CALL ser_fld_perturb(field, rperturb)
+END SUBROUTINE fs_read_and_perturb_double_1d
+
+SUBROUTINE fs_read_and_perturb_double_2d(serializer, savepoint, fieldname, field, rperturb)
+  USE m_ser_perturb
+  TYPE(t_serializer), INTENT(IN)           :: serializer
+  TYPE(t_savepoint) , INTENT(IN)           :: savepoint
+  CHARACTER(LEN=*)                         :: fieldname
+  REAL(KIND=C_DOUBLE), INTENT(OUT), TARGET :: field(:,:)
+  REAL, INTENT(IN)                         :: rperturb
+
+  CALL fs_read_field(serializer, savepoint, fieldname, field)
+  CALL ser_fld_perturb(field, rperturb)
+END SUBROUTINE fs_read_and_perturb_double_2d
+
+SUBROUTINE fs_read_and_perturb_double_3d(serializer, savepoint, fieldname, field, rperturb)
+  USE m_ser_perturb
+  TYPE(t_serializer), INTENT(IN)           :: serializer
+  TYPE(t_savepoint) , INTENT(IN)           :: savepoint
+  CHARACTER(LEN=*)                         :: fieldname
+  REAL(KIND=C_DOUBLE), INTENT(OUT), TARGET :: field(:,:,:)
+  REAL, INTENT(IN)                         :: rperturb
+
+  CALL fs_read_field(serializer, savepoint, fieldname, field)
+  CALL ser_fld_perturb(field, rperturb)
+END SUBROUTINE fs_read_and_perturb_double_3d
+
+SUBROUTINE fs_read_and_perturb_double_4d(serializer, savepoint, fieldname, field, rperturb)
+  USE m_ser_perturb
+  TYPE(t_serializer), INTENT(IN)           :: serializer
+  TYPE(t_savepoint) , INTENT(IN)           :: savepoint
+  CHARACTER(LEN=*)                         :: fieldname
+  REAL(KIND=C_DOUBLE), INTENT(OUT), TARGET :: field(:,:,:,:)
+  REAL, INTENT(IN)                         :: rperturb
+
+  CALL fs_read_field(serializer, savepoint, fieldname, field)
+  CALL ser_fld_perturb(field, rperturb)
+END SUBROUTINE fs_read_and_perturb_double_4d
+
+
+END MODULE m_serialize

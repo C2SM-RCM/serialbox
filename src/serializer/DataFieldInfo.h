@@ -11,7 +11,8 @@
 #include "TypeName.h"
 #include "IJKBoundary.h"
 #include "IJKSize.h"
-#include "libjson.h"
+
+class JSONNode;
 
 namespace ser {
     class DataFieldInfo
@@ -478,3 +479,4 @@ namespace ser {
     };
 
 } // namespace ser
+

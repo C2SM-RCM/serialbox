@@ -9,15 +9,14 @@ exitError()
 
 cmakeConfigure()
 {
-    local fcomp=$1
-    local idir=$2
+    local idir=$1
 
     # construct cmake arguments
     local CMAKEARGS=(..
-           "-DCMAKE_Fortran_COMPILER=${fcomp}"
            "-DCMAKE_INSTALL_PREFIX=${idir}"
-           "-DCMAKE_CXX_COMPILER=g++"
-           "-DCMAKE_C_COMPILER=gcc"
+           "-DBoost_NO_SYSTEM_PATHS=TRUE" # http://stackoverflow.com/a/13204207/592024
+           "-DBoost_NO_BOOST_CMAKE=TRUE"
+           "-DBOOST_ROOT=${BOOST_PATH}"
     )
 
     local logfile=`pwd`/cmake.log
@@ -40,7 +39,6 @@ eval set -- "$TEMP"
 
 while true; do
     case "$1" in
-        --fcompiler|-f ) fortran_compiler="$2"; shift 2;;
         --idir|-i) install_dir="$2"; shift 2;;
         --local) install_local="yes"; shift;;
         -z) clean_build="yes"; shift;;
@@ -48,10 +46,6 @@ while true; do
         * ) break ;;
     esac
 done
-
-if [[ -z ${fortran_compiler} ]] ; then
-    exitError 4410 ${LINENO} "compiler option has to be specified"
-fi
 
 base_path=$PWD
 build_dir=$base_path/build
@@ -69,7 +63,12 @@ if [[ ${install_local} == "yes" ]]; then
     install_dir=${base_path}/install
 fi
 
-cmakeConfigure "${fortran_compiler}" "${install_dir}"
+cmakeConfigure "${install_dir}"
+if [ $? -ne 0 ]; then
+    exitError 4430 ${LINENO} "Unable to configure cmake"
+fi
 
 make install 
-
+if [ $? -ne 0 ]; then
+    exitError 4420 ${LINENO} "Unable to configure cmake"
+fi

@@ -124,6 +124,8 @@ void printDifference(const Serializer& serializer1, const Serializer& serializer
 	int nValues = (bounds.iUpper - bounds.iLower + 1) * (bounds.jUpper - bounds.jLower + 1) *
 	              (bounds.kUpper - bounds.kLower + 1) * (bounds.lUpper - bounds.lLower + 1);
 	int nErrors = 0;
+	unsigned int nNan = 0;
+
 	double maxRelError = 0;
 	double maxAbsError = 0;
 
@@ -139,6 +141,8 @@ void printDifference(const Serializer& serializer1, const Serializer& serializer
 
 						const double val = static_cast<double>(data1[index]);
 						const double ref = static_cast<double>(data2[index]);
+
+						if ((val != val) || (ref != ref)) ++nNan;
 						maxAbsError = std::max(maxAbsError, std::fabs(val - ref));
 						maxRelError = std::max(maxRelError, std::fabs((val - ref) / ref));
 					}
@@ -146,6 +150,7 @@ void printDifference(const Serializer& serializer1, const Serializer& serializer
 
 	std::cout << " | Number of values: " << std::setw(6) << nValues << "\n";
 	std::cout << " | Number of errors: " << std::setw(6) << nErrors << "\n";
+	if (nNan > 0) std::cout << " | Number of NaN errors: " << std::setw(6) << nNan << "\n";
 	std::cout << " | Percentuage of errors: " << std::setprecision(2) << std::fixed << (100.*nErrors) / nValues << " %\n";
 	std::cout << " | Maximum absolute error: " << std::setw(17) << std::setfill(' ') << std::scientific << std::setprecision(10) << maxAbsError  << "\n";
 	std::cout << " | Maximum relative error: " << std::setw(17) << std::setfill(' ') << std::scientific << std::setprecision(10) << maxRelError  << "\n";

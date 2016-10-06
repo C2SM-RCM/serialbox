@@ -5,7 +5,8 @@
 
 #include <string>
 #include "MetainfoSet.h"
-#include "libjson.h"
+
+class JSONNode;
 
 namespace ser {
 

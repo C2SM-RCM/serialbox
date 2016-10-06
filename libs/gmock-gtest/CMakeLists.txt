@@ -11,10 +11,9 @@ include_directories ( "." )
 include_directories ( "./gtest" ) 
 
 # generatring the library called gmock-gtest 
-
 add_library( gmock-gtest ${GMOCK_GTEST_SOURCES} )
+target_link_libraries(gmock-gtest ${CMAKE_THREAD_LIBS_INIT})
 
 install( TARGETS gmock-gtest DESTINATION lib/ )
 
 install (FILES ${GTEST_INSTALL_HEADERS} DESTINATION "include/STELLA/gtest")
-

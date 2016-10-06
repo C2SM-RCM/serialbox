@@ -1,18 +1,22 @@
-# SerialBox Python Tools
+# Serialbox Python Tools
 
-This folder contains the SerialBox python tools. 
+This folder contains the Serialbox python tools.
 
-- `pp_ser.py` - the SerialBox preproccessor to add the serialization directives to a Fortran program. For documentation see the docs folder. 
-- `serialbox` - the SerialBox python module that allows de-serializing and visualizing data stored by SerialBox
+- `pp_ser.py` - the Serialbox preproccessor to add the serialization directives to a Fortran program. For documentation see the docs folder.
+- `serialbox` - the Serialbox python module that allows de-serializing and visualizing data stored by Serialbox
 - `test.py` - the unittests for the Python Tools
+
+### Style Guide for Python Code in Serialbox
+All the Python code in Serialbox should follow the PEP 8 coding convention.
+[https://www.python.org/dev/peps/pep-0008/](https://www.python.org/dev/peps/pep-0008/)
 
 ## The `serialbox` Python Module
 
-The serialbox python module makes use of the C++ SerialBox wrapper to read serialized data written by SerialBox. For convenience the required dynamic library is distributed with an installation of SerialBox. 
+The serialbox python module makes use of the C++ Serialbox wrapper to read serialized data written by Serialbox. For convenience the required dynamic library is distributed with an installation of Serialbox.
 
 ### Installation
 
-Build SerialBox as per the installation and building instructions. CMake installs the serialbox module to 
+Build Serialbox as per the installation and building instructions. CMake installs the serialbox module to
 `$CMAKE_INSTALL_PREFIX/python/serialbox` with `make install` in the build directory.
 
 To use the serialbox python module either
@@ -72,7 +76,7 @@ Out[4]: { 'FastWavesSCUnittest.UV-out' = [...], 'AdvectionPDBottUnittest.Init-in
 
 #### Visualizing
 
-To help visualizing the data serialbox contains a built-in Visualizer based on matplotlib. The visualizer expects two arguments: 
+To help visualizing the data serialbox contains a built-in Visualizer based on matplotlib. The visualizer expects two arguments:
 
 - The 3D numpy array loaded by the serializer
 - The name of the plot

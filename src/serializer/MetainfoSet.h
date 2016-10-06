@@ -7,13 +7,13 @@
 #include <sstream>
 #include <map>
 #include <vector>
-#include "boost/static_assert.hpp"
-#include "boost/any.hpp"
-#include "boost/type_traits/is_same.hpp"
+#include <boost/static_assert.hpp>
+#include <boost/any.hpp>
+#include <boost/type_traits/is_same.hpp>
 
 #include "SerializationException.h"
-#include "libjson.h"
 
+class JSONNode;
 
 namespace ser {
 

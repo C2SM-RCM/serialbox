@@ -1,12 +1,13 @@
-#This file is released under terms of BSD license`
-#See LICENSE.txt for more information
+# This file is released under terms of BSD license`
+# See LICENSE.txt for more information
 
 """Internal serialization module that wraps the dynamic library of serialbox. 
 This module is used by the Serializer module.
 """
 
 from __future__ import print_function
-import os, sys
+import os
+import sys
 from os.path import join as pjoin
 import ctypes
 import numpy as np
@@ -32,39 +33,42 @@ for d in dirs:
 
     # OS X
 
-    libfile = pjoin(d, 'libSerialBox_Wrapper.'+library_postfix)
+    libfile = pjoin(d, 'libSerialbox_Wrapper.'+library_postfix)
     try:
         wrapper_try = ctypes.cdll.LoadLibrary(libfile)
         if wrapper_try is not None:
             wrapper = wrapper_try
             break
     except Exception as e:
-        #raise
+        # raise
         pass
 
 if wrapper is None:
     raise ImportError("The serialization library could not be found {dirs}".format(dirs=dirs))
 
+
 def type2dtype(typestr, typesize):
     conv = {
-        'int1' : np.int8,
-        'int2' : np.int16,
-        'int4' : np.int32,
-        'int8' : np.int64,
-        'float4' : np.float32,
-        'float324' : np.float32,
-        'double8' : np.float64,
-        'float648' : np.float64
+        'int1':     np.int8,
+        'int2':     np.int16,
+        'int4':     np.int32,
+        'int8':     np.int64,
+        'float4':   np.float32,
+        'float324': np.float32,
+        'double8':  np.float64,
+        'float648': np.float64
         }
     try:
-        return conv["{0}{1}".format(typestr,typesize)]
+        return conv["{0}{1}".format(typestr, typesize)]
     except KeyError:
         raise Exception('Type \'{0}\' with {1} bytes per element not understood'.format(typestr, typesize))
 
 # Extract wrapper functions
-fs_create_serializer = wrapper.fs_create_serializer                               ; fs_create_serializer.restype = ctypes.c_void_p
+fs_create_serializer = wrapper.fs_create_serializer
+fs_create_serializer.restype = ctypes.c_void_p
 fs_destroy_serializer = wrapper.fs_destroy_serializer
-fs_serializer_metainfo_size = wrapper.fs_serializer_metainfo_size                 ; fs_serializer_metainfo_size.restype = ctypes.c_int
+fs_serializer_metainfo_size = wrapper.fs_serializer_metainfo_size
+fs_serializer_metainfo_size.restype = ctypes.c_int
 fs_serializer_metainfo_key_lengths = wrapper.fs_serializer_metainfo_key_lengths
 fs_serializer_metainfo_get_keys = wrapper.fs_serializer_metainfo_get_keys
 fs_serializer_metainfo_get_types = wrapper.fs_serializer_metainfo_get_types
@@ -78,32 +82,43 @@ fs_add_serializer_metainfo_i = wrapper.fs_add_serializer_metainfo_i
 fs_add_serializer_metainfo_f = wrapper.fs_add_serializer_metainfo_f
 fs_add_serializer_metainfo_d = wrapper.fs_add_serializer_metainfo_d
 fs_add_serializer_metainfo_s = wrapper.fs_add_serializer_metainfo_s
-fs_savepoints = wrapper.fs_savepoints                                             ; fs_savepoints.restype = ctypes.c_int
-fs_get_savepoint = wrapper.fs_get_savepoint                                       ; fs_get_savepoint.restype = ctypes.c_void_p
-fs_fields = wrapper.fs_fields                                                     ; fs_fields.restype = ctypes.c_int
+fs_savepoints = wrapper.fs_savepoints
+fs_savepoints.restype = ctypes.c_int
+fs_get_savepoint = wrapper.fs_get_savepoint
+fs_get_savepoint.restype = ctypes.c_void_p
+fs_fields = wrapper.fs_fields
+fs_fields.restype = ctypes.c_int
 fs_fieldname_lengths = wrapper.fs_fieldname_lengths
 fs_get_fieldnames = wrapper.fs_get_fieldnames
 fs_get_fieldinfo = wrapper.fs_get_fieldinfo
-fs_get_field_type_length = wrapper.fs_get_field_type_length                       ; fs_get_field_type_length.restype = ctypes.c_int
+fs_get_field_type_length = wrapper.fs_get_field_type_length
+fs_get_field_type_length.restype = ctypes.c_int
 fs_get_field_type = wrapper.fs_get_field_type
-fs_fields_at_savepoint = wrapper.fs_fields_at_savepoint                           ; fs_fields_at_savepoint.restype = ctypes.c_int
+fs_fields_at_savepoint = wrapper.fs_fields_at_savepoint
+fs_fields_at_savepoint.restype = ctypes.c_int
 fs_fields_at_savepoint_name_lengths = wrapper.fs_fields_at_savepoint_name_lengths
 fs_fields_at_savepoint_names = wrapper.fs_fields_at_savepoint_names
 fs_register_field = wrapper.fs_register_field
-fs_field_exists = wrapper.fs_field_exists                                         ; fs_field_exists.restype = ctypes.c_int
-fs_get_element_size = wrapper.fs_get_element_size                                 ; fs_get_element_size.restype = ctypes.c_int
+fs_field_exists = wrapper.fs_field_exists
+fs_field_exists.restype = ctypes.c_int
+fs_get_element_size = wrapper.fs_get_element_size
+fs_get_element_size.restype = ctypes.c_int
 fs_get_field_size = wrapper.fs_get_field_size
 fs_add_field_metainfo_b = wrapper.fs_add_field_metainfo_b
 fs_add_field_metainfo_i = wrapper.fs_add_field_metainfo_i
 fs_add_field_metainfo_f = wrapper.fs_add_field_metainfo_f
 fs_add_field_metainfo_d = wrapper.fs_add_field_metainfo_d
 fs_add_field_metainfo_s = wrapper.fs_add_field_metainfo_s
-fs_create_savepoint = wrapper.fs_create_savepoint                                 ; fs_create_savepoint.restype = ctypes.c_void_p
-fs_duplicate_savepoint = wrapper.fs_duplicate_savepoint                           ; fs_duplicate_savepoint.restype = ctypes.c_void_p
+fs_create_savepoint = wrapper.fs_create_savepoint
+fs_create_savepoint.restype = ctypes.c_void_p
+fs_duplicate_savepoint = wrapper.fs_duplicate_savepoint
+fs_duplicate_savepoint.restype = ctypes.c_void_p
 fs_destroy_savepoint = wrapper.fs_destroy_savepoint
 fs_reinitialize_savepoint = wrapper.fs_reinitialize_savepoint
-fs_savepoint_metainfo_size = wrapper.fs_savepoint_metainfo_size                   ; fs_savepoint_metainfo_size.restype = ctypes.c_int
-fs_savepoint_name_length = wrapper.fs_savepoint_name_length                       ; fs_savepoint_name_length.restype = ctypes.c_int
+fs_savepoint_metainfo_size = wrapper.fs_savepoint_metainfo_size
+fs_savepoint_metainfo_size.restype = ctypes.c_int
+fs_savepoint_name_length = wrapper.fs_savepoint_name_length
+fs_savepoint_name_length.restype = ctypes.c_int
 fs_savepoint_get_name = wrapper.fs_savepoint_get_name
 fs_savepoint_key_lengths = wrapper.fs_savepoint_key_lengths
 fs_savepoint_get_keys = wrapper.fs_savepoint_get_keys
@@ -121,7 +136,8 @@ fs_add_savepoint_metainfo_s = wrapper.fs_add_savepoint_metainfo_s
 fs_read_field = wrapper.fs_read_field
 fs_write_field = wrapper.fs_write_field
 fs_compute_strides = wrapper.fs_compute_strides
-fs_field_exists_at_savepoint = wrapper.fs_field_exists_at_savepoint               ; fs_field_exists_at_savepoint.restype = ctypes.c_int
+fs_field_exists_at_savepoint = wrapper.fs_field_exists_at_savepoint
+fs_field_exists_at_savepoint.restype = ctypes.c_int
 
 
 def extract_string(string):
@@ -134,11 +150,12 @@ floattypes = (np.float32, )
 doubletypes = (float, np.float64, )
 stringtypes = (bytes, str, )
 
-class fieldinfo(object):
+
+class FieldInfo(object):
     def __init__(self, name, datatype, bytes_per_element, rank,
-            isize, jsize, ksize, lsize,
-            iminushalo, iplushalo, jminushalo, jplushalo,
-            kminushalo, kplushalo, lminushalo, lplushalo):
+                 isize, jsize, ksize, lsize,
+                 iminushalo, iplushalo, jminushalo, jplushalo,
+                 kminushalo, kplushalo, lminushalo, lplushalo):
         self._name = name
         self._datatype = datatype
         self._bytes_per_element = bytes_per_element
@@ -157,7 +174,8 @@ class fieldinfo(object):
         self._lplushalo = lplushalo
 
     def __repr__(self):
-        return '<field ' + '{0}({1}x{2}x{3}x{4})'.format(self._name, self._isize, self._jsize, self._ksize, self._lsize) + '>'
+        return '<field ' + '{0}({1}x{2}x{3}x{4})'.\
+            format(self._name, self._isize, self._jsize, self._ksize, self._lsize) + '>'
 
     def __str__(self):
         ret = 'field ' + self.name + '\n'
@@ -247,7 +265,7 @@ class fieldinfo(object):
         return (self._isize, self._jsize, self._ksize, self._lsize)
 
 
-class savepoint(object):
+class Savepoint(object):
     def __init__(self, **kwargs):
         if 'sp' in kwargs and ('name' in kwargs or 'metainfo' in kwargs):
             raise AttributeError("Giving name and pointer is not allowed")
@@ -337,12 +355,11 @@ class savepoint(object):
                 f = fs_get_savepoint_metainfo_d(self.savepoint, key, keylength, ctypes.pointer(v))
                 metainfo[keystr] = v.value
             elif (types[i] >= 0):
-                v = ctypes.create_string_buffer(types[i])
+                v = ctypes.create_string_buffer(types[i]+1)
                 f = fs_get_savepoint_metainfo_s(self.savepoint, key, keylength, v)
                 metainfo[keystr] = v.value.decode()
 
         return metainfo
-
 
     def add_metainfo(self, key, value):
         key, keylength = extract_string(key)
@@ -362,11 +379,11 @@ class savepoint(object):
             raise AttributeError("Error: type of value not supported")
 
 
-class serializer(object):
+class Serializer(object):
     def __init__(self, directory, prefix, openmode):
         # Extract open mode
         openmode = openmode.lower()
-        if len(openmode) != 1 or not openmode in 'rwa':
+        if len(openmode) != 1 or openmode not in 'rwa':
             raise ValueError("openmode can be one of 'r', 'w' or 'a'")
 
         # Extract strings
@@ -381,7 +398,7 @@ class serializer(object):
     @property
     def savepoints(self):
         n_sps = int(fs_savepoints(self.serializer))
-        return [savepoint(sp=ctypes.c_void_p(fs_get_savepoint(self.serializer, i))) for i in range(n_sps)]
+        return [Savepoint(sp=ctypes.c_void_p(fs_get_savepoint(self.serializer, i))) for i in range(n_sps)]
 
     def fields_at_savepoint(self, savepoint):
         n_fields = int(fs_fields_at_savepoint(self.serializer, savepoint.savepoint))
@@ -394,7 +411,6 @@ class serializer(object):
 
         return [n.decode() for n in names]
 
-
     def load_field(self, name, savepoint):
         fieldinfo = self._fieldinfo(name)
         field = np.ndarray(shape=fieldinfo.shape, dtype=type2dtype(fieldinfo.datatype, fieldinfo.bytes_per_element))
@@ -404,7 +420,7 @@ class serializer(object):
 
         name, namelength = extract_string(name)
         fs_read_field(self.serializer, savepoint.savepoint, name, namelength,
-                ctypes.c_void_p(field.ctypes.data), strides[0], strides[1], strides[2], strides[3])
+                      ctypes.c_void_p(field.ctypes.data), strides[0], strides[1], strides[2], strides[3])
 
         return field
 
@@ -418,7 +434,7 @@ class serializer(object):
         strides = [field.strides[i] if i < len(field.strides) else 0 for i in range(4)]
 
         fs_write_field(self.serializer, savepoint.savepoint, name, namelength,
-                field.ctypes.data, strides[0], strides[1], strides[2], strides[3])
+                       field.ctypes.data, strides[0], strides[1], strides[2], strides[3])
 
     def register_field(self, name, field, **kwargs):
         name, namelength = extract_string(name)
@@ -437,16 +453,20 @@ class serializer(object):
 
         # Call C routine
         fs_register_field(self.serializer, name, namelength,
-                dtype, dtypelength, field.dtype.itemsize,
-                size[0], size[1], size[2], size[3],
-                iminushalo, iplushalo, jminushalo, jplushalo,
-                kminushalo, kplushalo, lminushalo, lplushalo
-                )
+                          dtype, dtypelength, field.dtype.itemsize,
+                          size[0], size[1], size[2], size[3],
+                          iminushalo, iplushalo, jminushalo, jplushalo,
+                          kminushalo, kplushalo, lminushalo, lplushalo
+                          )
 
     @property
     def fieldnames(self):
-        # Get name lengths
         n_fields = fs_fields(self.serializer)
+
+        if n_fields == 0:
+            return []
+
+        # Get name lengths
         name_lengths = (ctypes.c_int*n_fields)()
         fs_fieldname_lengths(self.serializer, name_lengths)
         name_length = max(name_lengths)+1
@@ -499,7 +519,7 @@ class serializer(object):
                 f = fs_get_serializer_metainfo_d(self.serializer, key, keylength, ctypes.pointer(v))
                 metainfo[keystr] = v.value
             elif (types[i] >= 0):
-                v = ctypes.create_string_buffer(types[i])
+                v = ctypes.create_string_buffer(types[i]+1)
                 f = fs_get_serializer_metainfo_s(self.serializer, key, keylength, v)
                 metainfo[keystr] = v.value.decode()
 
@@ -521,7 +541,6 @@ class serializer(object):
             fs_add_serializer_metainfo_s(self.serializer, key, keylength, value, valuelength)
         else:
             raise AttributeError("Error: type of value not supported")
-
 
     def add_field_metainfo(self, fieldname, key, value):
         fieldname, fieldnamelength = extract_string(fieldname)
@@ -560,11 +579,12 @@ class serializer(object):
         lplushalo = ctypes.c_int()
 
         fs_get_fieldinfo(self.serializer, name, namelength,
-            ctypes.pointer(bytes_per_element),
-            ctypes.pointer(isize), ctypes.pointer(jsize), ctypes.pointer(ksize), ctypes.pointer(lsize),
-            ctypes.pointer(iminushalo), ctypes.pointer(iplushalo), ctypes.pointer(jminushalo), ctypes.pointer(jplushalo),
-            ctypes.pointer(kminushalo), ctypes.pointer(kplushalo), ctypes.pointer(lminushalo), ctypes.pointer(lplushalo)
-            )
+                         ctypes.pointer(bytes_per_element),
+                         ctypes.pointer(isize), ctypes.pointer(jsize), ctypes.pointer(ksize), ctypes.pointer(lsize),
+                         ctypes.pointer(iminushalo), ctypes.pointer(iplushalo), ctypes.pointer(jminushalo),
+                         ctypes.pointer(jplushalo), ctypes.pointer(kminushalo), ctypes.pointer(kplushalo),
+                         ctypes.pointer(lminushalo), ctypes.pointer(lplushalo)
+                         )
 
         bytes_per_element = bytes_per_element.value
         isize = isize.value
@@ -582,15 +602,15 @@ class serializer(object):
 
         # Get type
         datatype_length = fs_get_field_type_length(self.serializer, name, namelength)
-        datatype = ctypes.create_string_buffer(datatype_length)
+        datatype = ctypes.create_string_buffer(datatype_length+1)
         fs_get_field_type(self.serializer, name, namelength, datatype)
 
         # Get rank
         rank = (1 if isize > 1 else 0) + (1 if jsize > 1 else 0) + (1 if ksize > 1 else 0) + (1 if lsize > 1 else 0)
 
-        return fieldinfo(fieldname, datatype.value.decode(), bytes_per_element, rank,
+        return FieldInfo(fieldname, datatype.value.decode(), bytes_per_element, rank,
                          isize, jsize, ksize, lsize,
                          iminushalo, iplushalo, jminushalo, jplushalo,
                          kminushalo, kplushalo, lminushalo, lplushalo
-                    )
+                         )
 

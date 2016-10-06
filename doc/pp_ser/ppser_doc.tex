@@ -61,7 +61,7 @@ $ ./pp_ser.py -d . --no-prefix
 Initialize the serialization framework.
 
 \begin{lstlisting}
-!$ser init directory=dir prefix=pre [mode=] [prefix_ref=] [if if_statement]
+!$ser init directory=dir prefix=pre [mode=] [prefix_ref=] [mpi_rank=] [rprecision=] [rperturb=] [realtype=] [if if_statement]
 \end{lstlisting}
 
 \begin{itemize}
@@ -69,22 +69,37 @@ Initialize the serialization framework.
 \item \texttt{prefix}: the prefix of the main database file names
 \item \texttt{mode}: 0 or 1
 \item \texttt{prefix\_ref}: the prefix of the reference database file names. If reference database is set, the serializer reads from the reference database and writes to the main database.
+\item \texttt{mpi\_rank}: the MPI rank (optional). If the MPI rank is set, database files will be suffixed with it. 
+\item \texttt{rprecision}: specify the precision for the perturbation.
+\item \texttt{rperturb}: specify the desired magnitude of perturbation.
+\item \texttt{realtype}: specify the size of the real type with an integer value.
 \item \texttt{if\_statement}: under which condition is the directive executed
 \end{itemize}
 
 Examples:
 \begin{lstlisting}
-!$ser init directory='.' prefix='Field'
+!$ser init directory='.' prefix='Field' mpi_rank=my_cart_id
 !$ser init directory='.' prefix='database' prefix_ref='ref_database'
 !$ser init directory='.' prefix='Field' if ser_test_mode==0
 \end{lstlisting}
 
+\begin{lstlisting}
+REAL(KIND=8) :: rprecision
+rprecision = 10.0**(-PRECISION(1.0))
+
+!$ser init directory='.' prefix='SerialboxTest-output' &
+!$ser prefix_ref='SerialboxTest' rprecision=rprecision &
+!$ser rperturb=1.0e-5_8
+\end{lstlisting}
+
 \subsection{\texttt{MODE}}
-Set the serialization mode (\texttt{ppser\_mode}). 0 = write, 1 = read. \texttt{ppser\_mode} is by default 0.
+Set the serialization mode (\texttt{ppser\_mode}). 0 = write, 1 = read, 2 = read with perturbation. \texttt{ppser\_mode} is by default 0.
 
 \begin{lstlisting}
-!$ser mode [[read | write] | [0 | 1] | variable] [if if_statement]
+!$ser mode [[read | write | read-perturb] | [0 | 1] | variable] [if if_statement]
 \end{lstlisting}
+
+When the mode \lstinline!read-perturb! is used, the initialization must be made with \lstinline!rprecision! and \lstinline!rperturb! values.
 
 Examples:
 \begin{lstlisting}
@@ -97,26 +112,13 @@ Examples:
 Serialize the data field.
 
 \begin{lstlisting}
-!$ser data field=variable [field2=variable2 ...] [removeintentin] [if if_statement]
-\end{lstlisting}
-
-If \texttt{removeintentin} is stated, \ppser{} will find the declarations of all the variables in that directive and remove \texttt{INTENT(IN)}:
-\begin{lstlisting}
-!$ser data pp=pp(:) removeintentin
-\end{lstlisting}
-is translated to
-\begin{lstlisting}
-#ifdef SERIALIZE
-  REAL(wp) :: pp(kbdim)
-#else
-  REAL(wp), INTENT (IN) :: pp(kbdim)
-#endif
+!$ser data field=variable [field2=variable2 ...] [if if_statement]
 \end{lstlisting}
 
 Examples:
 \begin{lstlisting}
 !$ser data pt=pt(:,kk) pq=pq(:,kk)
-!$ser data pp=pp(:) removeintentin
+!$ser data pp=pp(:) 
 !$ser data pp_field=pp pq=pq if test_counter<30
 \end{lstlisting}
 
@@ -128,7 +130,7 @@ or writing data from the accelerator.
 Examples:
 \begin{lstlisting}
 !$ser accdata pt=pt(:,kk) pq=pq(:,kk)
-!$ser data pp=pp(:) removeintentin
+!$ser data pp=pp(:)
 \end{lstlisting}
 
 \subsection{\texttt{VERBATIM}}
@@ -195,7 +197,7 @@ ACC_PREFIX DATA PCOPY(pt(:,kk), pq(:,kk)), IF (i_am_accel_node)
     !$ser savepoint cuadjtq.DoStep-in
     !$ser mode write
     !$ser data pt=pt(:,kk) pq=pq(:,kk)
-    !$ser data pp=pp(:) removeintentin
+    !$ser data pp=pp(:)
 
 ACC_PREFIX PARALLEL, IF (i_am_accel_node)
 ...
@@ -294,23 +296,5 @@ END module mo_cuadjust
 
 If \texttt{ser\_test\_mode} is 0, we are generating the reference database. If it is 1, we are generating the test database.
 
-\subsection{Multiple MPI nodes}
-When we are running on multiple MPI nodes, we do not want the serializer to write to the same database. To solve this, we add the MPI rank to the prefix of the database.
-\begin{lstlisting}
-MODULE mo_cuadjust
-  !$ser verbatim USE mo_mpi,        ONLY: get_my_global_mpi_id
-  IMPLICIT NONE
-SUBROUTINE cuadjtq()
-!get mpi rank
-    !$ser verbatim mpi_id = get_my_global_mpi_id()
-    !$ser verbatim Write( str_prefix, '(I1)' ) mpi_id
-    !$ser verbatim str_prefix = 'rank'//trim(str_prefix)//'_field'
-
-!initialize the serialization framework
-    !$ser init directory='.' prefix='ref_'//str_prefix
-
-END SUBROUTINE cuadjtq
-END module mo_cuadjust
-\end{lstlisting}
 
 \end{document}
