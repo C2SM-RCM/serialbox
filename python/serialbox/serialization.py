@@ -49,13 +49,13 @@ if wrapper is None:
 
 def type2dtype(typestr, typesize):
     conv = {
-        'int1': np.int8,
-        'int2': np.int16,
-        'int4': np.int32,
-        'int8': np.int64,
-        'float4': np.float32,
+        'int1':     np.int8,
+        'int2':     np.int16,
+        'int4':     np.int32,
+        'int8':     np.int64,
+        'float4':   np.float32,
         'float324': np.float32,
-        'double8': np.float64,
+        'double8':  np.float64,
         'float648': np.float64
         }
     try:
