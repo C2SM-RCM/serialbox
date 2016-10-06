@@ -251,7 +251,7 @@ class PpSer:
         l += tab + '! setup serialization environment\n'
 
         args_lower = [item.lower() for item in args]
-        if ('if' in args_lower):
+        if 'if' in args_lower:
             if_pos = args_lower.index('if'.lower())
         else:
             if_pos = len(args)
@@ -269,10 +269,8 @@ class PpSer:
             self.__exit_error(directive=args[0],
                               msg='Must specify a name and a list of key=value pairs')
         l = ''
-        tab = ''
         if if_statement:
             l += 'IF (' + if_statement + ') THEN\n'
-            tab = '  '
         l += 'call ' + self.methods['option'] + '('
         for i in range(len(keys)):
             if keys[i].lower() == 'verbosity':
@@ -438,7 +436,6 @@ class PpSer:
         self.__calls.add(self.methods['dataread'])
         self.__calls.add(self.methods['datareadperturb'])
         self.__calls.add(self.methods['getmode'])
-        l = ''
         l = '! file: ' + self.infile + ' lineno: #' + str(self.__linenum) + '\n'
         tab = ''
         if if_statement:
@@ -576,14 +573,14 @@ class PpSer:
             if self.__module:
                 self.__exit_error(msg='Unexpected ' + m.group(1) + ' statement')
             self.__produce_use_stmt()
-            if(m.group('statement').upper() == 'MODULE'):
+            if m.group('statement').upper() == 'MODULE':
                 self.__use_stmt_in_module = True
             self.__module = m.group('identifier')
         return m
 
     # LINE: subroutine or function
     def __re_subroutine_function(self):
-        if(self.__use_stmt_in_module):  # Statement produced at module level
+        if self.__use_stmt_in_module:  # Statement produced at module level
             return
         r = re.compile('^ *(subroutine|function).*', re.IGNORECASE)
         m = r.search(self.__line)
@@ -681,7 +678,7 @@ class PpSer:
                 nextline = linecache.getline(os.path.join(self.infile), lookahead_index)
                 while nextline:
                     self.__check_intent_in(nextline)
-                    if(nextline.find('&') != -1):
+                    if nextline.find('&') != -1:
                         lookahead_index += 1
                         nextline = linecache.getline(os.path.join(self.infile), lookahead_index)
                     else:
@@ -914,7 +911,7 @@ def parse_args():
     (options, args) = parser.parse_args()
     if len(args) < 1:
         parser.error('Need at least one source file to process')
-    return (options, args)
+    return options, args
 
 if __name__ == "__main__":
     (options, args) = parse_args()
