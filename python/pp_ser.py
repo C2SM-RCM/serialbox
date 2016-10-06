@@ -56,14 +56,14 @@ class pp_ser:
 
         # public variables
         self.verbose = verbose
-        self.infile = infile         # input file
-        self.outfile = outfile       # output file
-        self.ifdef = ifdef           # write #ifdef/#endif blocks
-        self.real = real             # name of real type (Fortran)
-        self.module = module         # name of Fortran module which contains serialization methods
-        self.identical = identical   # write identical files (no preprocessing done)?
-        self.acc_prefix = acc_prefix # generate preprocessing marco for ACC_PREFIX
-        self.acc_if = acc_if         # generate IF clause after OpenACC update
+        self.infile = infile          # input file
+        self.outfile = outfile        # output file
+        self.ifdef = ifdef            # write #ifdef/#endif blocks
+        self.real = real              # name of real type (Fortran)
+        self.module = module          # name of Fortran module which contains serialization methods
+        self.identical = identical    # write identical files (no preprocessing done)?
+        self.acc_prefix = acc_prefix  # generate preprocessing marco for ACC_PREFIX
+        self.acc_if = acc_if          # generate IF clause after OpenACC update
 
         # setup (also public)
         self.methods = {
@@ -120,12 +120,12 @@ class pp_ser:
         self.intentin_removed = []
 
         # private variables
-        self.__ser = False       # currently processing !$SER directives
-        self.__line = ''         # current line
-        self.__linenum = 0       # current line number
-        self.__module = ''       # current module
-        self.__calls = set()     # calls to serialization module
-        self.__outputBuffer = '' # preprocessed file
+        self.__ser = False        # currently processing !$SER directives
+        self.__line = ''          # current line
+        self.__linenum = 0        # current line number
+        self.__module = ''        # current module
+        self.__calls = set()      # calls to serialization module
+        self.__outputBuffer = ''  # preprocessed file
         self.__use_stmt_in_module = False  # USE statement was inserted in module
 
         # define compute sign used in field definition. If one is matched,
@@ -213,9 +213,9 @@ class pp_ser:
         if_encountered = False
         if_statement = ''
 
-        pattern  = '^([a-zA-Z_0-9]+|\$[a-zA-Z_0-9\(\)]+(?:-[a-zA-Z_0-9\(\)]+)?|%all)' # Tracer name, id(s) or %all
-        pattern += '(?:#(tens|bd|surf|sedimvel))?' # Type (stype)
-        pattern += '(?:@([a-zA-Z_0-9]+))?' # Time level (timelevel)
+        pattern  = '^([a-zA-Z_0-9]+|\$[a-zA-Z_0-9\(\)]+(?:-[a-zA-Z_0-9\(\)]+)?|%all)'  # Tracer name, id(s) or %all
+        pattern += '(?:#(tens|bd|surf|sedimvel))?'  # Type (stype)
+        pattern += '(?:@([a-zA-Z_0-9]+))?'  # Time level (timelevel)
         r = re.compile(pattern)
 
         for arg in args[1:]:
@@ -453,7 +453,7 @@ class pp_ser:
         l += tab + 'SELECT CASE ( ' + self.methods['getmode'] + '() )\n'
         l += tab + '  ' + 'CASE(' + str(self.modes['write']) + ')\n'
         for k, v in zip(keys, values):
-            if isacc: # Genarate acc update directives only for accdata clause
+            if isacc:  # Genarate acc update directives only for accdata clause
                 l += tab + '    ' + 'ACC_PREFIX UPDATE HOST ( ' + v + ' )'
                 # Genarate IF clause if needed
                 if len(self.acc_if) > 0:
@@ -467,7 +467,7 @@ class pp_ser:
             # generated
             if not any(ext in v for ext in self.__computed_fields_sign):
                 l += tab + '    ' + 'call ' + self.methods['dataread'] + '(ppser_serializer_ref, ppser_savepoint, \'' + k + '\', ' + v + ')\n'
-                if isacc: # Genarate acc upadte directives only for accdata clause
+                if isacc:  # Genarate acc upadte directives only for accdata clause
                     l += tab + '    ' + 'ACC_PREFIX UPDATE DEVICE ( ' + v + ' )'
                     # Genarate IF clause if needed
                     if len(self.acc_if) > 0:
@@ -480,7 +480,7 @@ class pp_ser:
             # generated
             if not any(ext in v for ext in self.__computed_fields_sign):
                 l += tab + '    ' + 'call ' + self.methods['datareadperturb'] + '(ppser_serializer_ref, ppser_savepoint, \'' + k + '\', ' + v + ', ppser_zrperturb)\n'
-                if isacc: # Genarate acc upadte directives only for accdata clause
+                if isacc:  # Genarate acc upadte directives only for accdata clause
                     l += tab + '    ' + 'ACC_PREFIX UPDATE DEVICE ( ' + v + ' )'
                     # Genarate IF clause if needed
                     if len(self.acc_if) > 0:
@@ -580,7 +580,7 @@ class pp_ser:
 
     # LINE: subroutine or function
     def __re_subroutine_function(self):
-        if(self.__use_stmt_in_module): # Statement produced at module level
+        if(self.__use_stmt_in_module):  # Statement produced at module level
             return
         r = re.compile('^ *(subroutine|function).*', re.IGNORECASE)
         m = r.search(self.__line)
@@ -645,7 +645,7 @@ class pp_ser:
         return m
 
     def __check_intent_in(self, line):
-        lhs = re.sub(r'!.*', '', line) # Remove comments at end of the line
+        lhs = re.sub(r'!.*', '', line)  # Remove comments at end of the line
         var_with_dim = [x.strip().replace(' ', '') for x in re.split(r',(?![^(]*\))', lhs)]
         var = [re.sub(r'\(.*?\)', '', x) for x in var_with_dim]
         fields_in_this_line = [x for x in self.intentin_to_remove if x in var]
@@ -668,7 +668,7 @@ class pp_ser:
         m = r.search(self.__line)
         if m_cont:
             splitted = self.__line.split('::')
-            splitted[1] = re.sub(r'!.*', '', splitted[1]) # Remove comments at end of the line
+            splitted[1] = re.sub(r'!.*', '', splitted[1])  # Remove comments at end of the line
             if not self.__check_intent_in(splitted[1]):
                 # look ahead to find the variable
                 lookahead_index = self.__linenum
@@ -687,7 +687,7 @@ class pp_ser:
         # Match a standard declaration with variable and intent on the same line
         elif m:
             splitted = self.__line.split('::')
-            splitted[1] = re.sub(r'!.*', '', splitted[1]) # Remove comments at end of the line
+            splitted[1] = re.sub(r'!.*', '', splitted[1])  # Remove comments at end of the line
             self.__check_intent_in(splitted[1])
         return m
 
@@ -752,11 +752,11 @@ class pp_ser:
         # if generate == False we only analyse the file
 
         # reset flags (which define state of parser)
-        self.__ser = False       # currently processing !$SER directives
-        self.__line = ''         # current line
-        self.__linenum = 0       # current line number
-        self.__module = ''       # current module
-        self.__outputBuffer = '' # preprocessed file
+        self.__ser = False        # currently processing !$SER directives
+        self.__line = ''          # current line
+        self.__linenum = 0        # current line number
+        self.__module = ''        # current module
+        self.__outputBuffer = ''  # preprocessed file
 
         # generate preprocessing macro for ACC_PREFIX
         if self.acc_prefix:
