@@ -67,53 +67,51 @@ class pp_ser:
 
         # setup (also public)
         self.methods = {
-            'mode'            : 'ppser_set_mode',
-            'getmode'         : 'ppser_get_mode',
-            'init'            : 'ppser_initialize',
-            'cleanup'         : 'ppser_finalize',
-            'data'            : 'fs_write_field',
-            'datawrite'       : 'fs_write_field',
-            'dataread'        : 'fs_read_field',
-            'datareadperturb' : 'fs_read_and_perturb_field',
-            'option'          : 'fs_Option',
-            'serinfo'         : 'fs_add_serializer_metainfo',
-            'register'        : 'fs_register_field',
-            'registertracers' : 'fs_RegisterAllTracers',
-            'fieldmetainfo'   : 'fs_AddFieldMetaInfo',
-            'savepoint'       : 'fs_create_savepoint',
-            'spinfo'          : 'fs_add_savepoint_metainfo',
-            'fieldinfo'       : 'fs_add_field_metainfo',
-            'on'              : 'fs_enable_serialization',
-            'off'             : 'fs_disable_serialization'
+            'mode':             'ppser_set_mode',
+            'getmode':          'ppser_get_mode',
+            'init':             'ppser_initialize',
+            'cleanup':          'ppser_finalize',
+            'data':             'fs_write_field',
+            'datawrite':        'fs_write_field',
+            'dataread':         'fs_read_field',
+            'datareadperturb':  'fs_read_and_perturb_field',
+            'option':           'fs_Option',
+            'serinfo':          'fs_add_serializer_metainfo',
+            'register':         'fs_register_field',
+            'registertracers':  'fs_RegisterAllTracers',
+            'fieldmetainfo':    'fs_AddFieldMetaInfo',
+            'savepoint':        'fs_create_savepoint',
+            'spinfo':           'fs_add_savepoint_metainfo',
+            'fieldinfo':        'fs_add_field_metainfo',
+            'on':               'fs_enable_serialization',
+            'off':              'fs_disable_serialization'
         }
 
         # language definition (also public)
         self.language = {
-            'cleanup'           : ['CLEANUP', 'CLE'],
-            'data'              : ['DATA', 'DAT'],
-            'accdata'           : ['ACCDATA', 'ACC'],
-            'mode'              : ['MODE', 'MOD'],
-            'init'              : ['INIT', 'INI'],
-            'option'            : ['OPTION', 'OPT'],
-            'metainfo'          : ['METAINFO'],
-            'verbatim'          : ['VERBATIM', 'VER'],
-            'register'          : ['REGISTER', 'REG'],
-            'registertracers'   : ['REGISTERTRACERS'],
-            'zero'              : ['ZERO', 'ZER'],
-            'savepoint'         : ['SAVEPOINT', 'SAV'],
-            'tracer'            : ['TRACER', 'TRA'],
-            'registertracers'   : ['REGISTERTRACERS'],
-            'cleanup'           : ['CLEANUP', 'CLE'],
-            'on'                : ['ON'],
-            'off'               : ['OFF']
+            'cleanup':         ['CLEANUP', 'CLE'],
+            'data':            ['DATA', 'DAT'],
+            'accdata':         ['ACCDATA', 'ACC'],
+            'mode':            ['MODE', 'MOD'],
+            'init':            ['INIT', 'INI'],
+            'option':          ['OPTION', 'OPT'],
+            'metainfo':        ['METAINFO'],
+            'verbatim':        ['VERBATIM', 'VER'],
+            'register':        ['REGISTER', 'REG'],
+            'registertracers': ['REGISTERTRACERS'],
+            'zero':            ['ZERO', 'ZER'],
+            'savepoint':       ['SAVEPOINT', 'SAV'],
+            'tracer':          ['TRACER', 'TRA'],
+            'on':              ['ON'],
+            'off':             ['OFF']
         }
 
         self.modes = {
-            'write'        : 0,
-            'read'         : 1,
-            'read-perturb' : 2,
-            'CPU'          : 0,
-            'GPU'          : 1
+            'write':        0,
+            'read':         1,
+            'read-perturb': 2,
+            'CPU':          0,
+            'GPU':          1
         }
 
         self.intentin_to_remove = []
