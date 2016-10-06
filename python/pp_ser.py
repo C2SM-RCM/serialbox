@@ -1,10 +1,16 @@
 #!/usr/bin/env python
-#This file is released under terms of BSD license`
-#See LICENSE.txt for more information
+# This file is released under terms of BSD license`
+# See LICENSE.txt for more information
 
 from __future__ import print_function
-import linecache
 
+import filecmp
+import linecache
+import os
+import re
+import shutil
+import sys
+import tempfile
 
 """
 pp_ser.py
@@ -16,7 +22,7 @@ framework.
 The grammar is defined by a set of !$SER directives. All directives are case-
 insensitive. The main keywords are INIT for initialization, VERBATIM for echoeing
 some Fortran statements, OPTION for setting specific options for the serialization
-modlue, REGISTER for registering a data field meta-information,
+module, REGISTER for registering a data field meta-information,
 ZERO for setting some field to zero, SAVEPOINT for registering a savepoint with some
 optional information, DATA for serializing a data field, and CLEANUP for finishing
 serialization.
@@ -27,23 +33,22 @@ methods from the Fortran serialization module. The second pass expands the direc
 """
 
 # information
-__author__    = 'Oliver Fuhrer'
+__author__ = 'Oliver Fuhrer'
 __copyright__ = 'Copyright 2014, MeteoSwiss'
-__license__   = 'GPL'
-__version__   = '0.1'
-__date__      = 'Sun Mar 23 22:06:44 2014'
-__email__     = 'oliver.fuhrer@meteoswiss.ch'
+__license__ = 'GPL'
+__version__ = '0.1'
+__date__ = 'Sun Mar 23 22:06:44 2014'
+__email__ = 'oliver.fuhrer@meteoswiss.ch'
 
-# modules
-import sys, os, tempfile, re, filecmp, shutil
 
-def toASCII(text):
+def to_ascii(text):
     if sys.version_info[0] == 3:
         return bytes(text, 'ascii')
     else:
         return str(text)
 
-class pp_ser:
+
+class PpSer:
 
     def __init__(self, infile, outfile='', ifdef='SERIALIZE', real='ireals',
                  module='m_serialize', identical=True, verbose=False,
@@ -51,76 +56,74 @@ class pp_ser:
 
         # public variables
         self.verbose = verbose
-        self.infile = infile         # input file
-        self.outfile = outfile       # output file
-        self.ifdef = ifdef           # write #ifdef/#endif blocks
-        self.real = real             # name of real type (Fortran)
-        self.module = module         # name of Fortran module which contains serialization methods
-        self.identical = identical   # write identical files (no preprocessing done)?
-        self.acc_prefix = acc_prefix # generate preprocessing marco for ACC_PREFIX
-        self.acc_if = acc_if         # generate IF clause after OpenACC update
+        self.infile = infile          # input file
+        self.outfile = outfile        # output file
+        self.ifdef = ifdef            # write #ifdef/#endif blocks
+        self.real = real              # name of real type (Fortran)
+        self.module = module          # name of Fortran module which contains serialization methods
+        self.identical = identical    # write identical files (no preprocessing done)?
+        self.acc_prefix = acc_prefix  # generate preprocessing marco for ACC_PREFIX
+        self.acc_if = acc_if          # generate IF clause after OpenACC update
 
         # setup (also public)
         self.methods = {
-            'mode'            : 'ppser_set_mode',
-            'getmode'         : 'ppser_get_mode',
-            'init'            : 'ppser_initialize',
-            'cleanup'         : 'ppser_finalize',
-            'data'            : 'fs_write_field',
-            'datawrite'       : 'fs_write_field',
-            'dataread'        : 'fs_read_field',
-            'datareadperturb' : 'fs_read_and_perturb_field',
-            'option'          : 'fs_Option',
-            'serinfo'         : 'fs_add_serializer_metainfo',
-            'register'        : 'fs_register_field',
-            'registertracers' : 'fs_RegisterAllTracers',
-            'fieldmetainfo'   : 'fs_AddFieldMetaInfo',
-            'savepoint'       : 'fs_create_savepoint',
-            'spinfo'          : 'fs_add_savepoint_metainfo',
-            'fieldinfo'       : 'fs_add_field_metainfo',
-            'on'              : 'fs_enable_serialization',
-            'off'             : 'fs_disable_serialization'
+            'mode':             'ppser_set_mode',
+            'getmode':          'ppser_get_mode',
+            'init':             'ppser_initialize',
+            'cleanup':          'ppser_finalize',
+            'data':             'fs_write_field',
+            'datawrite':        'fs_write_field',
+            'dataread':         'fs_read_field',
+            'datareadperturb':  'fs_read_and_perturb_field',
+            'option':           'fs_Option',
+            'serinfo':          'fs_add_serializer_metainfo',
+            'register':         'fs_register_field',
+            'registertracers':  'fs_RegisterAllTracers',
+            'fieldmetainfo':    'fs_AddFieldMetaInfo',
+            'savepoint':        'fs_create_savepoint',
+            'spinfo':           'fs_add_savepoint_metainfo',
+            'fieldinfo':        'fs_add_field_metainfo',
+            'on':               'fs_enable_serialization',
+            'off':              'fs_disable_serialization'
         }
 
         # language definition (also public)
         self.language = {
-            'cleanup'           : ['CLEANUP', 'CLE'],
-            'data'              : ['DATA', 'DAT'],
-            'accdata'           : ['ACCDATA', 'ACC'],
-            'mode'              : ['MODE', 'MOD'],
-            'init'              : ['INIT', 'INI'],
-            'option'            : ['OPTION', 'OPT'],
-            'metainfo'          : ['METAINFO'],
-            'verbatim'          : ['VERBATIM', 'VER'],
-            'register'          : ['REGISTER', 'REG'],
-            'registertracers'   : ['REGISTERTRACERS'],
-            'zero'              : ['ZERO', 'ZER'],
-            'savepoint'         : ['SAVEPOINT', 'SAV'],
-            'tracer'            : ['TRACER', 'TRA'],
-            'registertracers'   : ['REGISTERTRACERS'],
-            'cleanup'           : ['CLEANUP', 'CLE'],
-            'on'                : ['ON'],
-            'off'               : ['OFF']
+            'cleanup':         ['CLEANUP', 'CLE'],
+            'data':            ['DATA', 'DAT'],
+            'accdata':         ['ACCDATA', 'ACC'],
+            'mode':            ['MODE', 'MOD'],
+            'init':            ['INIT', 'INI'],
+            'option':          ['OPTION', 'OPT'],
+            'metainfo':        ['METAINFO'],
+            'verbatim':        ['VERBATIM', 'VER'],
+            'register':        ['REGISTER', 'REG'],
+            'registertracers': ['REGISTERTRACERS'],
+            'zero':            ['ZERO', 'ZER'],
+            'savepoint':       ['SAVEPOINT', 'SAV'],
+            'tracer':          ['TRACER', 'TRA'],
+            'on':              ['ON'],
+            'off':             ['OFF']
         }
 
         self.modes = {
-            'write'        : 0,
-            'read'         : 1,
-            'read-perturb' : 2,
-            'CPU'          : 0,
-            'GPU'          : 1
+            'write':        0,
+            'read':         1,
+            'read-perturb': 2,
+            'CPU':          0,
+            'GPU':          1
         }
 
         self.intentin_to_remove = []
         self.intentin_removed = []
 
         # private variables
-        self.__ser = False       # currently processing !$SER directives
-        self.__line = ''         # current line
-        self.__linenum = 0       # current line number
-        self.__module = ''       # current module
-        self.__calls = set()     # calls to serialization module
-        self.__outputBuffer = '' # preprocessed file
+        self.__ser = False        # currently processing !$SER directives
+        self.__line = ''          # current line
+        self.__linenum = 0        # current line number
+        self.__module = ''        # current module
+        self.__calls = set()      # calls to serialization module
+        self.__outputBuffer = ''  # preprocessed file
         self.__use_stmt_in_module = False  # USE statement was inserted in module
 
         # define compute sign used in field definition. If one is matched,
@@ -131,7 +134,7 @@ class pp_ser:
     def __reg_shortcuts(self, shortcut):
         shortcut = shortcut.upper()
         l = []
-        if re.match('(^$|[IJK][IJK1-9]*)',shortcut):
+        if re.match('(^$|[IJK][IJK1-9]*)', shortcut):
             if shortcut == '':
                 l = '1 1 1 1 0 0 0 0 0 0 0 0'.split()
             elif shortcut == 'I':
@@ -163,7 +166,7 @@ class pp_ser:
         return l
 
     # error handling
-    def __exit_error(self, directive = '', msg = ''):
+    def __exit_error(self, directive='', msg=''):
         print('File: "' + self.infile + '", line ' + str(self.__linenum))
         if directive:
             print('SyntaxError: Invalid !$SER ' + directive + ' directive')
@@ -187,8 +190,8 @@ class pp_ser:
                 continue
             if if_encountered:
                 if if_statement:
-                    self.__exit_error(directive = args[0],
-                                      msg = 'IF statement must be last argument')
+                    self.__exit_error(directive=args[0],
+                                      msg='IF statement must be last argument')
                 if_statement = arg
             else:
                 val = arg.split('=')
@@ -198,8 +201,8 @@ class pp_ser:
                     keys.append(val[0])
                     values.append(val[1])
                 else:
-                    self.__exit_error(directive = args[0],
-                                      msg = 'Problem extracting arguments and key=value pairs')
+                    self.__exit_error(directive=args[0],
+                                      msg='Problem extracting arguments and key=value pairs')
         return dirs, keys, values, if_statement
 
     # parser for tracer directive
@@ -208,9 +211,9 @@ class pp_ser:
         if_encountered = False
         if_statement = ''
 
-        pattern  = '^([a-zA-Z_0-9]+|\$[a-zA-Z_0-9\(\)]+(?:-[a-zA-Z_0-9\(\)]+)?|%all)' # Tracer name, id(s) or %all
-        pattern += '(?:#(tens|bd|surf|sedimvel))?' # Type (stype)
-        pattern += '(?:@([a-zA-Z_0-9]+))?' # Time level (timelevel)
+        pattern = '^([a-zA-Z_0-9]+|\$[a-zA-Z_0-9\(\)]+(?:-[a-zA-Z_0-9\(\)]+)?|%all)'  # Tracer name, id(s) or %all
+        pattern += '(?:#(tens|bd|surf|sedimvel))?'  # Type (stype)
+        pattern += '(?:@([a-zA-Z_0-9]+))?'  # Time level (timelevel)
         r = re.compile(pattern)
 
         for arg in args[1:]:
@@ -219,14 +222,14 @@ class pp_ser:
                 continue
             if if_encountered:
                 if if_statement:
-                    self.__exit_error(directive = args[0],
-                                      msg = 'IF statement must be last argument')
+                    self.__exit_error(directive=args[0],
+                                      msg='IF statement must be last argument')
                 if_statement = arg
             else:
                 m = r.search(arg)
                 if m is None:
-                    self.__exit_error(directive = args[0],
-                                      msg = 'Tracer specification ' + arg + ' is invalid')
+                    self.__exit_error(directive=args[0],
+                                      msg='Tracer specification ' + arg + ' is invalid')
                 tracersspec.append(m.groups())
         return tracersspec, if_statement
 
@@ -248,7 +251,7 @@ class pp_ser:
         l += tab + '! setup serialization environment\n'
 
         args_lower = [item.lower() for item in args]
-        if ('if' in args_lower):
+        if 'if' in args_lower:
             if_pos = args_lower.index('if'.lower())
         else:
             if_pos = len(args)
@@ -263,21 +266,19 @@ class pp_ser:
     def __ser_option(self, args):
         (dirs, keys, values, if_statement) = self.__ser_arg_parse(args)
         if len(dirs) != 0:
-            self.__exit_error(directive = args[0],
-                              msg = 'Must specify a name and a list of key=value pairs')
+            self.__exit_error(directive=args[0],
+                              msg='Must specify a name and a list of key=value pairs')
         l = ''
-        tab = ''
         if if_statement:
             l += 'IF (' + if_statement + ') THEN\n'
-            tab = '  '
         l += 'call ' + self.methods['option'] + '('
         for i in range(len(keys)):
             if keys[i].lower() == 'verbosity':
                 if values[i].lower() == 'off':
-                    values[i]='0'
+                    values[i] = '0'
                 if values[i].lower() == 'on':
-                    values[i]='1'
-            if i==0:
+                    values[i] = '1'
+            if i == 0:
                 l += keys[i] + '=' + values[i]
             else:
                 l += ', ' + keys[i] + '=' + values[i]
@@ -295,7 +296,7 @@ class pp_ser:
         if if_statement:
             l += 'IF (' + if_statement + ') THEN\n'
             tab = '  '
-        for k,v in zip(keys, values):
+        for k, v in zip(keys, values):
             l += tab + 'CALL ' + self.methods['serinfo'] + '(ppser_serializer, "' + k + '", ' + v + ')\n'
         for d in dirs:
             l += tab + 'CALL ' + self.methods['serinfo'] + '(ppser_serializer, "' + d + '", ' + d + ')\n'
@@ -314,8 +315,8 @@ class pp_ser:
         # parse arguments
         (dirs, keys, values, if_statement) = self.__ser_arg_parse(args)
         if len(dirs) < 2:
-            self.__exit_error(directive = args[0],
-                              msg = 'Must specify a name, a type and the field sizes')
+            self.__exit_error(directive=args[0],
+                              msg='Must specify a name, a type and the field sizes')
 
         if len(dirs) == 2:
             dirs.append('')
@@ -327,7 +328,8 @@ class pp_ser:
         datatypes = dict(integer=["'int'", 'ppser_intlength'], real=['ppser_realtype', 'ppser_reallength'])
 
         if dirs[1] not in datatypes:
-            self.__exit_error(directive = args[0], msg = 'Data type "{0}" not understood. Valid types are: {1}'.format(dirs[1], ', '.join('"' + d + '"' for d in datatypes.keys())))
+            self.__exit_error(directive=args[0], msg='Data type "{0}" not understood. Valid types are: {1}'.
+                              format(dirs[1], ', '.join('"' + d + '"' for d in datatypes.keys())))
 
         dirs[1:2] = datatypes[dirs[1]]
 
@@ -350,10 +352,11 @@ class pp_ser:
 
         # metainfo
         if len(keys) > 0:
-            self.__exit_error(directive = args[0],
-                              msg = 'Metainformation for fields are not yet implemented')
-        #for k,v in zip(keys, values):
-        #    l += tab + 'call ' + self.methods['fieldmetainfo'] + '(ppser_serializer, ' + dirs[0] + ', "' + k + '", ' + v + ')\n'
+            self.__exit_error(directive=args[0],
+                              msg='Metainformation for fields are not yet implemented')
+        # for k,v in zip(keys, values):
+        #    l += tab + 'call ' + self.methods['fieldmetainfo'] + '
+        #       (ppser_serializer, ' + dirs[0] + ', "' + k + '", ' + v + ')\n'
 
         if if_statement:
             l += 'ENDIF\n'
@@ -370,8 +373,8 @@ class pp_ser:
     def __ser_zero(self, args):
         (dirs, keys, values, if_statement) = self.__ser_arg_parse(args)
         if len(keys) > 0:
-            self.__exit_error(directive = args[0],
-                              msg = 'Must specify a list of fields')
+            self.__exit_error(directive=args[0],
+                              msg='Must specify a list of fields')
         l = ''
         tab = ''
         if if_statement:
@@ -388,8 +391,8 @@ class pp_ser:
         (dirs, keys, values, if_statement) = self.__ser_arg_parse(args)
         # extract save point name
         if len(dirs) != 1:
-            self.__exit_error(directive = args[0],
-                              msg = 'Must specify a name and a list of key=value pairs')
+            self.__exit_error(directive=args[0],
+                              msg='Must specify a name and a list of key=value pairs')
         name = dirs[0]
         # generate serialization code
         l = ''
@@ -400,7 +403,7 @@ class pp_ser:
         self.__calls.add(self.methods['savepoint'])
         self.__calls.add(self.methods['spinfo'])
         l += tab + 'call ' + self.methods['savepoint'] + '(\'' + name + '\', ppser_savepoint)\n'
-        for k,v in zip(keys, values):
+        for k, v in zip(keys, values):
             l += tab + 'call ' + self.methods['spinfo'] + '(ppser_savepoint, \'' + k + '\', ' + v + ')\n'
         if if_statement:
             l += 'ENDIF\n'
@@ -423,9 +426,8 @@ class pp_ser:
             l += 'ENDIF\n'
         self.__line = l
 
-
     # DATA directive
-    def __ser_data(self, args, isacc = False):
+    def __ser_data(self, args, isacc=False):
 
         (dirs, keys, values, if_statement) = self.__ser_arg_parse(args)
 
@@ -434,7 +436,6 @@ class pp_ser:
         self.__calls.add(self.methods['dataread'])
         self.__calls.add(self.methods['datareadperturb'])
         self.__calls.add(self.methods['getmode'])
-        l = ''
         l = '! file: ' + self.infile + ' lineno: #' + str(self.__linenum) + '\n'
         tab = ''
         if if_statement:
@@ -448,37 +449,40 @@ class pp_ser:
 
         l += tab + 'SELECT CASE ( ' + self.methods['getmode'] + '() )\n'
         l += tab + '  ' + 'CASE(' + str(self.modes['write']) + ')\n'
-        for k,v in zip(keys, values):
-            if isacc: # Genarate acc update directives only for accdata clause
+        for k, v in zip(keys, values):
+            if isacc:  # Generate acc update directives only for accdata clause
                 l += tab + '    ' + 'ACC_PREFIX UPDATE HOST ( ' + v + ' )'
-                # Genarate IF clause if needed
+                # Generate IF clause if needed
                 if len(self.acc_if) > 0:
                     l += ', IF (' + self.acc_if + ') \n'
                 else:
                     l += '\n'
-            l += tab + '    ' + 'call ' + self.methods['datawrite'] + '(ppser_serializer, ppser_savepoint, \'' + k + '\', ' + v + ')\n'
+            l += tab + '    ' + 'call ' + self.methods['datawrite'] + \
+                '(ppser_serializer, ppser_savepoint, \'' + k + '\', ' + v + ')\n'
         l += tab + '  ' + 'CASE(' + str(self.modes['read']) + ')\n'
-        for k,v in zip(keys, values):
+        for k, v in zip(keys, values):
             # If the field does not contains any compute sign, the read call is
             # generated
             if not any(ext in v for ext in self.__computed_fields_sign):
-                l += tab + '    ' + 'call ' + self.methods['dataread'] + '(ppser_serializer_ref, ppser_savepoint, \'' + k + '\', ' + v + ')\n'
-                if isacc: # Genarate acc upadte directives only for accdata clause
+                l += tab + '    ' + 'call ' + self.methods['dataread'] + '(ppser_serializer_ref, ppser_savepoint, \'' \
+                     + k + '\', ' + v + ')\n'
+                if isacc:  # Generate acc upadte directives only for accdata clause
                     l += tab + '    ' + 'ACC_PREFIX UPDATE DEVICE ( ' + v + ' )'
-                    # Genarate IF clause if needed
+                    # Generate IF clause if needed
                     if len(self.acc_if) > 0:
                         l += ', IF (' + self.acc_if + ') \n'
                     else:
                         l += '\n'
         l += tab + '  ' + 'CASE(' + str(self.modes['read-perturb']) + ')\n'
-        for k,v in zip(keys, values):
+        for k, v in zip(keys, values):
             # If the field does not contains any compute sign, the read call is
             # generated
             if not any(ext in v for ext in self.__computed_fields_sign):
-                l += tab + '    ' + 'call ' + self.methods['datareadperturb'] + '(ppser_serializer_ref, ppser_savepoint, \'' + k + '\', ' + v + ', ppser_zrperturb)\n'
-                if isacc: # Genarate acc upadte directives only for accdata clause
+                l += tab + '    ' + 'call ' + self.methods['datareadperturb'] + \
+                     '(ppser_serializer_ref, ppser_savepoint, \'' + k + '\', ' + v + ', ppser_zrperturb)\n'
+                if isacc:  # Generate acc upadte directives only for accdata clause
                     l += tab + '    ' + 'ACC_PREFIX UPDATE DEVICE ( ' + v + ' )'
-                    # Genarate IF clause if needed
+                    # Generate IF clause if needed
                     if len(self.acc_if) > 0:
                         l += ', IF (' + self.acc_if + ') \n'
                     else:
@@ -538,7 +542,6 @@ class pp_ser:
             l += 'ENDIF\n'
         self.__line = l
 
-
     # CLEANUP directive
     def __ser_cleanup(self, args):
         l = ''
@@ -568,16 +571,16 @@ class pp_ser:
             if m.group('identifier').upper() == 'PROCEDURE':
                 return False
             if self.__module:
-                self.__exit_error(msg = 'Unexpected ' + m.group(1) + ' statement')
+                self.__exit_error(msg='Unexpected ' + m.group(1) + ' statement')
             self.__produce_use_stmt()
-            if(m.group('statement').upper() == 'MODULE'):
+            if m.group('statement').upper() == 'MODULE':
                 self.__use_stmt_in_module = True
             self.__module = m.group('identifier')
         return m
 
     # LINE: subroutine or function
     def __re_subroutine_function(self):
-        if(self.__use_stmt_in_module): # Statement produced at module level
+        if self.__use_stmt_in_module:  # Statement produced at module level
             return
         r = re.compile('^ *(subroutine|function).*', re.IGNORECASE)
         m = r.search(self.__line)
@@ -593,7 +596,7 @@ class pp_ser:
         if m:
             if m.group(1):
                 args = r2.split(m.group(1))[1::2]
-                if   args[0].upper() in self.language['init']:
+                if args[0].upper() in self.language['init']:
                     self.__ser_init(args)
                 elif args[0].upper() in self.language['option']:
                     self.__ser_option(args)
@@ -624,8 +627,8 @@ class pp_ser:
                 elif args[0].upper() in self.language['mode']:
                     self.__ser_mode(args)
                 else:
-                    self.__exit_error(directive = args[0],
-                                      msg = 'Unknown directive encountered')
+                    self.__exit_error(directive=args[0],
+                                      msg='Unknown directive encountered')
         return m
 
     # LINE: end module/end program
@@ -634,28 +637,27 @@ class pp_ser:
         m = r.search(self.__line)
         if m:
             if not self.__module:
-                self.__exit_error(msg = 'Unexpected "end '+m.group(1)+'" statement')
+                self.__exit_error(msg='Unexpected "end '+m.group(1)+'" statement')
             if self.__module != m.group(2):
-                self.__exit_error(msg = 'Was expecting "end '+m.group(1)+' '+self.__module+'"')
+                self.__exit_error(msg='Was expecting "end '+m.group(1)+' '+self.__module+'"')
             self.__module = ''
             self.__use_stmt_in_module = False
         return m
 
     def __check_intent_in(self, line):
-        lhs = re.sub(r'!.*', '', line) # Remove comments at end of the line
+        lhs = re.sub(r'!.*', '', line)  # Remove comments at end of the line
         var_with_dim = [x.strip().replace(' ', '') for x in re.split(r',(?![^(]*\))', lhs)]
         var = [re.sub(r'\(.*?\)', '', x) for x in var_with_dim]
         fields_in_this_line = [x for x in self.intentin_to_remove if x in var]
         self.intentin_removed.extend([x for x in fields_in_this_line if x not in self.intentin_removed])
 
         if fields_in_this_line:
-            l =  '#ifdef ' + self.ifdef + '\n'
+            l = '#ifdef ' + self.ifdef + '\n'
             r = re.compile(r', *intent *\(in\)', re.IGNORECASE)
             l += r.sub('', self.__line)
             l += '#else\n' + self.__line + '#endif\n'
             self.__line = l
         return fields_in_this_line
-
 
     def __re_def(self):
         r = re.compile(r'.*intent *\(in\)[^:]*::\s*([^!]*)\s*.*', re.IGNORECASE)
@@ -666,7 +668,7 @@ class pp_ser:
         m = r.search(self.__line)
         if m_cont:
             splitted = self.__line.split('::')
-            splitted[1] = re.sub(r'!.*', '', splitted[1]) # Remove comments at end of the line
+            splitted[1] = re.sub(r'!.*', '', splitted[1])  # Remove comments at end of the line
             if not self.__check_intent_in(splitted[1]):
                 # look ahead to find the variable
                 lookahead_index = self.__linenum
@@ -676,7 +678,7 @@ class pp_ser:
                 nextline = linecache.getline(os.path.join(self.infile), lookahead_index)
                 while nextline:
                     self.__check_intent_in(nextline)
-                    if(nextline.find('&')!=-1):
+                    if nextline.find('&') != -1:
                         lookahead_index += 1
                         nextline = linecache.getline(os.path.join(self.infile), lookahead_index)
                     else:
@@ -685,15 +687,15 @@ class pp_ser:
         # Match a standard declaration with variable and intent on the same line
         elif m:
             splitted = self.__line.split('::')
-            splitted[1] = re.sub(r'!.*', '', splitted[1]) # Remove comments at end of the line
+            splitted[1] = re.sub(r'!.*', '', splitted[1])  # Remove comments at end of the line
             self.__check_intent_in(splitted[1])
         return m
 
     # Produce the USE statement and append it to l
     def __produce_use_stmt(self):
-        if (self.__use_stmt_in_module == True):
+        if self.__use_stmt_in_module is True:
             return
-        calls_pp = [c for c in self.__calls if     c.startswith('ppser')]
+        calls_pp = [c for c in self.__calls if c.startswith('ppser')]
         calls_fs = [c for c in self.__calls if not c.startswith('ppser')]
         ncalls = len(calls_pp) + len(calls_fs)
         if ncalls > 0:
@@ -741,20 +743,20 @@ class pp_ser:
         if final:
             # final call, check consistency
             if self.__ser:
-                self.__exit_error(msg = 'Unterminated #ifdef ' + self.ifdef + ' encountered')
+                self.__exit_error(msg='Unterminated #ifdef ' + self.ifdef + ' encountered')
             if self.__module:
-                self.__exit_error(msg = 'Unterminated module or program unit encountered')
+                self.__exit_error(msg='Unterminated module or program unit encountered')
 
     # execute one parsing pass over file
     def parse(self, generate=False):
         # if generate == False we only analyse the file
 
         # reset flags (which define state of parser)
-        self.__ser = False       # currently processing !$SER directives
-        self.__line = ''         # current line
-        self.__linenum = 0       # current line number
-        self.__module = ''       # current module
-        self.__outputBuffer = '' # preprocessed file
+        self.__ser = False        # currently processing !$SER directives
+        self.__line = ''          # current line
+        self.__linenum = 0        # current line number
+        self.__module = ''        # current module
+        self.__outputBuffer = ''  # preprocessed file
 
         # generate preprocessing macro for ACC_PREFIX
         if self.acc_prefix:
@@ -770,7 +772,7 @@ class pp_ser:
                     if re.match('^ *!\$ser& ', line, re.IGNORECASE):
                         line = re.sub('^ *!\$ser& *', ' ', line, re.IGNORECASE)
                     else:
-                        self.__exit_error(msg = 'Incorrect line continuation encountered')
+                        self.__exit_error(msg='Incorrect line continuation encountered')
                 self.__line += line
                 self.__linenum += 1
                 # handle line continuation (continued line going out)
@@ -787,7 +789,6 @@ class pp_ser:
                 self.__line = ''
             self.lexer(final=True)
 
-
         finally:
             input_file.close()
 
@@ -798,8 +799,8 @@ class pp_ser:
         self.parse(generate=True)   # second pass, preprocess
         # write output
         if self.outfile != '':
-            output_file = tempfile.NamedTemporaryFile(delete = False)
-            output_file.write(toASCII(self.__outputBuffer))
+            output_file = tempfile.NamedTemporaryFile(delete=False)
+            output_file.write(to_ascii(self.__outputBuffer))
             output_file.close()
             useit = True
             if os.path.isfile(self.outfile) and not self.identical:
@@ -814,6 +815,7 @@ class pp_ser:
                 os.remove(output_file.name)
         else:
             print(self.__outputBuffer)
+
 
 def simple_test():
     try:
@@ -883,35 +885,36 @@ implicit none
 
 end module test
 """
-        f = tempfile.NamedTemporaryFile(delete = False)
+        f = tempfile.NamedTemporaryFile(delete=False)
         f.write(test)
         f.close()
-        ser = pp_ser(f.name)
-        pp_ser.real = 'wp'
+        ser = PpSer(f.name)
+        PpSer.real = 'wp'
         ser.preprocess()
     finally:
         os.remove(f.name)
+
 
 def parse_args():
     from optparse import OptionParser
     parser = OptionParser()
     parser.add_option('-i', '--ignore-identical', help='Ignore files which are not modified by pre-processor',
-               default=False, action='store_true', dest='ignore_identical')
+                      default=False, action='store_true', dest='ignore_identical')
     parser.add_option('-d', '--output-dir', help='The target directory for writing pre-processed files',
-               default='', type=str, dest='output_dir')
+                      default='', type=str, dest='output_dir')
     parser.add_option('-v', '--verbose', help='Enable verbose execution',
-               default=False, action='store_true', dest='verbose')
+                      default=False, action='store_true', dest='verbose')
     parser.add_option('-p', '--no-prefix', help='Don\'t generate preprocessing macro definition for ACC_PREFIX',
-               default=True, action='store_false', dest='acc_prefix')
+                      default=True, action='store_false', dest='acc_prefix')
     parser.add_option('-a', '--acc-if', help='Add IF clause to OpenACC update statement',
-               default='', type=str, dest='acc_if')
+                      default='', type=str, dest='acc_if')
     (options, args) = parser.parse_args()
     if len(args) < 1:
         parser.error('Need at least one source file to process')
-    return (options, args)
+    return options, args
 
 if __name__ == "__main__":
-    (options,args) = parse_args()
+    (options, args) = parse_args()
     for infile in args:
         if options.output_dir:
             outfile = os.path.join(options.output_dir, os.path.basename(infile))
@@ -923,5 +926,6 @@ if __name__ == "__main__":
             print('Skipping', infile)
         else:
             print('Processing file', infile)
-            ser = pp_ser(infile, real='wp', outfile=outfile, identical=(not options.ignore_identical), verbose=options.verbose, acc_prefix=options.acc_prefix, acc_if=options.acc_if)
+            ser = PpSer(infile, real='wp', outfile=outfile, identical=(not options.ignore_identical),
+                        verbose=options.verbose, acc_prefix=options.acc_prefix, acc_if=options.acc_if)
             ser.preprocess()
