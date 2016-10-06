@@ -168,7 +168,7 @@ class pp_ser:
         return l
 
     # error handling
-    def __exit_error(self, directive = '', msg = ''):
+    def __exit_error(self, directive='', msg=''):
         print('File: "' + self.infile + '", line ' + str(self.__linenum))
         if directive:
             print('SyntaxError: Invalid !$SER ' + directive + ' directive')
@@ -192,8 +192,8 @@ class pp_ser:
                 continue
             if if_encountered:
                 if if_statement:
-                    self.__exit_error(directive = args[0],
-                                      msg = 'IF statement must be last argument')
+                    self.__exit_error(directive=args[0],
+                                      msg='IF statement must be last argument')
                 if_statement = arg
             else:
                 val = arg.split('=')
@@ -203,8 +203,8 @@ class pp_ser:
                     keys.append(val[0])
                     values.append(val[1])
                 else:
-                    self.__exit_error(directive = args[0],
-                                      msg = 'Problem extracting arguments and key=value pairs')
+                    self.__exit_error(directive=args[0],
+                                      msg='Problem extracting arguments and key=value pairs')
         return dirs, keys, values, if_statement
 
     # parser for tracer directive
@@ -224,14 +224,14 @@ class pp_ser:
                 continue
             if if_encountered:
                 if if_statement:
-                    self.__exit_error(directive = args[0],
-                                      msg = 'IF statement must be last argument')
+                    self.__exit_error(directive=args[0],
+                                      msg='IF statement must be last argument')
                 if_statement = arg
             else:
                 m = r.search(arg)
                 if m is None:
-                    self.__exit_error(directive = args[0],
-                                      msg = 'Tracer specification ' + arg + ' is invalid')
+                    self.__exit_error(directive=args[0],
+                                      msg='Tracer specification ' + arg + ' is invalid')
                 tracersspec.append(m.groups())
         return tracersspec, if_statement
 
@@ -268,8 +268,8 @@ class pp_ser:
     def __ser_option(self, args):
         (dirs, keys, values, if_statement) = self.__ser_arg_parse(args)
         if len(dirs) != 0:
-            self.__exit_error(directive = args[0],
-                              msg = 'Must specify a name and a list of key=value pairs')
+            self.__exit_error(directive=args[0],
+                              msg='Must specify a name and a list of key=value pairs')
         l = ''
         tab = ''
         if if_statement:
@@ -319,8 +319,8 @@ class pp_ser:
         # parse arguments
         (dirs, keys, values, if_statement) = self.__ser_arg_parse(args)
         if len(dirs) < 2:
-            self.__exit_error(directive = args[0],
-                              msg = 'Must specify a name, a type and the field sizes')
+            self.__exit_error(directive=args[0],
+                              msg='Must specify a name, a type and the field sizes')
 
         if len(dirs) == 2:
             dirs.append('')
@@ -332,7 +332,7 @@ class pp_ser:
         datatypes = dict(integer=["'int'", 'ppser_intlength'], real=['ppser_realtype', 'ppser_reallength'])
 
         if dirs[1] not in datatypes:
-            self.__exit_error(directive = args[0], msg = 'Data type "{0}" not understood. Valid types are: {1}'.format(dirs[1], ', '.join('"' + d + '"' for d in datatypes.keys())))
+            self.__exit_error(directive=args[0], msg='Data type "{0}" not understood. Valid types are: {1}'.format(dirs[1], ', '.join('"' + d + '"' for d in datatypes.keys())))
 
         dirs[1:2] = datatypes[dirs[1]]
 
@@ -355,8 +355,8 @@ class pp_ser:
 
         # metainfo
         if len(keys) > 0:
-            self.__exit_error(directive = args[0],
-                              msg = 'Metainformation for fields are not yet implemented')
+            self.__exit_error(directive=args[0],
+                              msg='Metainformation for fields are not yet implemented')
         #for k,v in zip(keys, values):
         #    l += tab + 'call ' + self.methods['fieldmetainfo'] + '(ppser_serializer, ' + dirs[0] + ', "' + k + '", ' + v + ')\n'
 
@@ -375,8 +375,8 @@ class pp_ser:
     def __ser_zero(self, args):
         (dirs, keys, values, if_statement) = self.__ser_arg_parse(args)
         if len(keys) > 0:
-            self.__exit_error(directive = args[0],
-                              msg = 'Must specify a list of fields')
+            self.__exit_error(directive=args[0],
+                              msg='Must specify a list of fields')
         l = ''
         tab = ''
         if if_statement:
@@ -393,8 +393,8 @@ class pp_ser:
         (dirs, keys, values, if_statement) = self.__ser_arg_parse(args)
         # extract save point name
         if len(dirs) != 1:
-            self.__exit_error(directive = args[0],
-                              msg = 'Must specify a name and a list of key=value pairs')
+            self.__exit_error(directive=args[0],
+                              msg='Must specify a name and a list of key=value pairs')
         name = dirs[0]
         # generate serialization code
         l = ''
@@ -429,7 +429,7 @@ class pp_ser:
         self.__line = l
 
     # DATA directive
-    def __ser_data(self, args, isacc = False):
+    def __ser_data(self, args, isacc=False):
 
         (dirs, keys, values, if_statement) = self.__ser_arg_parse(args)
 
@@ -571,7 +571,7 @@ class pp_ser:
             if m.group('identifier').upper() == 'PROCEDURE':
                 return False
             if self.__module:
-                self.__exit_error(msg = 'Unexpected ' + m.group(1) + ' statement')
+                self.__exit_error(msg='Unexpected ' + m.group(1) + ' statement')
             self.__produce_use_stmt()
             if(m.group('statement').upper() == 'MODULE'):
                 self.__use_stmt_in_module = True
@@ -627,8 +627,8 @@ class pp_ser:
                 elif args[0].upper() in self.language['mode']:
                     self.__ser_mode(args)
                 else:
-                    self.__exit_error(directive = args[0],
-                                      msg = 'Unknown directive encountered')
+                    self.__exit_error(directive=args[0],
+                                      msg='Unknown directive encountered')
         return m
 
     # LINE: end module/end program
@@ -637,9 +637,9 @@ class pp_ser:
         m = r.search(self.__line)
         if m:
             if not self.__module:
-                self.__exit_error(msg = 'Unexpected "end '+m.group(1)+'" statement')
+                self.__exit_error(msg='Unexpected "end '+m.group(1)+'" statement')
             if self.__module != m.group(2):
-                self.__exit_error(msg = 'Was expecting "end '+m.group(1)+' '+self.__module+'"')
+                self.__exit_error(msg='Was expecting "end '+m.group(1)+' '+self.__module+'"')
             self.__module = ''
             self.__use_stmt_in_module = False
         return m
@@ -743,9 +743,9 @@ class pp_ser:
         if final:
             # final call, check consistency
             if self.__ser:
-                self.__exit_error(msg = 'Unterminated #ifdef ' + self.ifdef + ' encountered')
+                self.__exit_error(msg='Unterminated #ifdef ' + self.ifdef + ' encountered')
             if self.__module:
-                self.__exit_error(msg = 'Unterminated module or program unit encountered')
+                self.__exit_error(msg='Unterminated module or program unit encountered')
 
     # execute one parsing pass over file
     def parse(self, generate=False):
@@ -772,7 +772,7 @@ class pp_ser:
                     if re.match('^ *!\$ser& ', line, re.IGNORECASE):
                         line = re.sub('^ *!\$ser& *', ' ', line, re.IGNORECASE)
                     else:
-                        self.__exit_error(msg = 'Incorrect line continuation encountered')
+                        self.__exit_error(msg='Incorrect line continuation encountered')
                 self.__line += line
                 self.__linenum += 1
                 # handle line continuation (continued line going out)
@@ -799,7 +799,7 @@ class pp_ser:
         self.parse(generate=True)   # second pass, preprocess
         # write output
         if self.outfile != '':
-            output_file = tempfile.NamedTemporaryFile(delete = False)
+            output_file = tempfile.NamedTemporaryFile(delete=False)
             output_file.write(toASCII(self.__outputBuffer))
             output_file.close()
             useit = True
@@ -885,7 +885,7 @@ implicit none
 
 end module test
 """
-        f = tempfile.NamedTemporaryFile(delete = False)
+        f = tempfile.NamedTemporaryFile(delete=False)
         f.write(test)
         f.close()
         ser = pp_ser(f.name)
