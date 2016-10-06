@@ -3,8 +3,14 @@
 # See LICENSE.txt for more information
 
 from __future__ import print_function
-import linecache
 
+import filecmp
+import linecache
+import os
+import re
+import shutil
+import sys
+import tempfile
 
 """
 pp_ser.py
@@ -34,8 +40,7 @@ __version__ = '0.1'
 __date__ = 'Sun Mar 23 22:06:44 2014'
 __email__ = 'oliver.fuhrer@meteoswiss.ch'
 
-# modules
-import sys, os, tempfile, re, filecmp, shutil
+
 
 def toASCII(text):
     if sys.version_info[0] == 3:
