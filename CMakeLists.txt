@@ -27,6 +27,8 @@ install(DIRECTORY ${CMAKE_BINARY_DIR}/fortran/ DESTINATION include/fortran FILES
 if (CMAKE_VERSION VERSION_LESS "3.1")
     if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Cray")
         set (CMAKE_CXX_FLAGS "-h std=c++11 ${CMAKE_CXX_FLAGS}")
+    elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "PGI")
+        set (CMAKE_CXX_FLAGS "--c++11 ${CMAKE_CXX_FLAGS}")
     else()
          set (CMAKE_CXX_FLAGS "--std=c++11 ${CMAKE_CXX_FLAGS}")
     endif()
