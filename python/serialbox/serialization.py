@@ -292,6 +292,9 @@ class Savepoint(object):
     def __str__(self):
         return self.name + '[ ' + ' '.join(['{0}:{1}'.format(*i) for i in self.metainfo.items()]) + ' ]'
 
+    def __eq__(self, other):
+        return self.name == other.name and self.metainfo == other.metainfo
+
     @property
     def name(self):
         namelength = fs_savepoint_name_length(self.savepoint)
